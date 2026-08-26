@@ -4,17 +4,25 @@ import { api } from "@/lib/api";
 import type {
   AcademicProfile,
   AcademicsUpdate,
+  AgentReply,
   AssessmentSummary,
   AttemptResult,
+  CareerClusterExplain,
+  CareerExploration,
   CareerIntelligence,
+  CareerLandscapeDetail,
   CareerPreferences,
   CareerPreferencesUpdate,
   ConsentInput,
+  EvidenceItem,
   FullProfile,
   IdentityUpdate,
   InterestArea,
   InterestsUpdate,
+  ReadinessDetail,
+  RefreshResult,
   SaveResponseResult,
+  SkillState,
   StartedAttempt,
   StudentIdentity,
   StudentInterest,
@@ -42,6 +50,10 @@ export const careerai = {
   // Home
   getCareerIntelligence: (studentId: string) =>
     api.get<CareerIntelligence>(`/students/${studentId}/career-intelligence`),
+  refreshIntelligence: (studentId: string) =>
+    api.post<RefreshResult>(`/students/${studentId}/career-intelligence/refresh`, {
+      body: { reason: "MANUAL_REFRESH" },
+    }),
 
   // Diagnostic
   listAssessments: () => api.get<AssessmentSummary[]>(`/assessments`),
@@ -55,4 +67,45 @@ export const careerai = {
     }),
   completeAttempt: (attemptId: string) =>
     api.post<AttemptResult>(`/assessment-attempts/${attemptId}/complete`, { body: {} }),
+
+  // Skills & evidence
+  getSkills: (studentId: string) => api.get<SkillState[]>(`/students/${studentId}/skills`),
+  getSkillEvidence: (studentId: string, skillCode: string) =>
+    api.get<EvidenceItem[]>(`/students/${studentId}/skills/${skillCode}/evidence`),
+
+  // Career landscape
+  getCareerLandscape: (studentId: string) =>
+    api.get<CareerLandscapeDetail[]>(`/students/${studentId}/career-landscape`),
+  getCareerClusterDetail: (studentId: string, clusterCode: string) =>
+    api.get<CareerClusterExplain>(`/students/${studentId}/career-landscape/${clusterCode}`),
+
+  // Readiness
+  getReadiness: (studentId: string) => api.get<ReadinessDetail>(`/students/${studentId}/readiness`),
+
+  // Career exploration
+  getCareerExplorations: (studentId: string) =>
+    api.get<CareerExploration[]>(`/students/${studentId}/career-explorations`),
+  setCareerExploration: (studentId: string, clusterCode: string) =>
+    api.post<CareerExploration>(`/students/${studentId}/career-explorations/${clusterCode}`, {
+      body: {},
+    }),
+  makePrimaryCareer: (studentId: string, clusterCode: string) =>
+    api.post<CareerExploration>(
+      `/students/${studentId}/career-explorations/${clusterCode}/make-primary`,
+      { body: {} },
+    ),
+
+  // Next best action
+  getNextBestAction: (studentId: string) =>
+    api.get<CareerIntelligence["next_best_action"]>(`/students/${studentId}/next-best-action`),
+  startAction: (studentId: string, actionId: string) =>
+    api.post<unknown>(`/students/${studentId}/actions/${actionId}/start`, { body: {} }),
+  completeAction: (studentId: string, actionId: string) =>
+    api.post<unknown>(`/students/${studentId}/actions/${actionId}/complete`, { body: {} }),
+
+  // Agent
+  sendAgentMessage: (studentId: string, message: string, conversationId?: string) =>
+    api.post<AgentReply>(`/students/${studentId}/career-agent/messages`, {
+      body: { message, conversation_id: conversationId ?? null },
+    }),
 } as const;

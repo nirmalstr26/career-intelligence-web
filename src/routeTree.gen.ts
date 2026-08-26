@@ -13,12 +13,16 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as AppAgentRouteImport } from './routes/app/agent'
 import { Route as AppCareerRouteImport } from './routes/app/career'
 import { Route as AppDiagnosticRouteImport } from './routes/app/diagnostic'
 import { Route as AppEvidenceRouteImport } from './routes/app/evidence'
+import { Route as AppExploreRouteImport } from './routes/app/explore'
 import { Route as AppHomeRouteImport } from './routes/app/home'
 import { Route as AppMissionsRouteImport } from './routes/app/missions'
 import { Route as AppProfileRouteImport } from './routes/app/profile'
+import { Route as AppReadinessRouteImport } from './routes/app/readiness'
+import { Route as AppSkillsRouteImport } from './routes/app/skills'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +44,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAgentRoute = AppAgentRouteImport.update({
+  id: '/agent',
+  path: '/agent',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppCareerRoute = AppCareerRouteImport.update({
   id: '/career',
   path: '/career',
@@ -53,6 +62,11 @@ const AppDiagnosticRoute = AppDiagnosticRouteImport.update({
 const AppEvidenceRoute = AppEvidenceRouteImport.update({
   id: '/evidence',
   path: '/evidence',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppExploreRoute = AppExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
   getParentRoute: () => AppRoute,
 } as any)
 const AppHomeRoute = AppHomeRouteImport.update({
@@ -70,28 +84,46 @@ const AppProfileRoute = AppProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AppRoute,
 } as any)
+const AppReadinessRoute = AppReadinessRouteImport.update({
+  id: '/readiness',
+  path: '/readiness',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSkillsRoute = AppSkillsRouteImport.update({
+  id: '/skills',
+  path: '/skills',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/onboarding': typeof OnboardingRoute
+  '/app/agent': typeof AppAgentRoute
   '/app/career': typeof AppCareerRoute
   '/app/diagnostic': typeof AppDiagnosticRoute
   '/app/evidence': typeof AppEvidenceRoute
+  '/app/explore': typeof AppExploreRoute
   '/app/home': typeof AppHomeRoute
   '/app/missions': typeof AppMissionsRoute
   '/app/profile': typeof AppProfileRoute
+  '/app/readiness': typeof AppReadinessRoute
+  '/app/skills': typeof AppSkillsRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRoute
+  '/app/agent': typeof AppAgentRoute
   '/app/career': typeof AppCareerRoute
   '/app/diagnostic': typeof AppDiagnosticRoute
   '/app/evidence': typeof AppEvidenceRoute
+  '/app/explore': typeof AppExploreRoute
   '/app/home': typeof AppHomeRoute
   '/app/missions': typeof AppMissionsRoute
   '/app/profile': typeof AppProfileRoute
+  '/app/readiness': typeof AppReadinessRoute
+  '/app/skills': typeof AppSkillsRoute
   '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
@@ -99,12 +131,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/onboarding': typeof OnboardingRoute
+  '/app/agent': typeof AppAgentRoute
   '/app/career': typeof AppCareerRoute
   '/app/diagnostic': typeof AppDiagnosticRoute
   '/app/evidence': typeof AppEvidenceRoute
+  '/app/explore': typeof AppExploreRoute
   '/app/home': typeof AppHomeRoute
   '/app/missions': typeof AppMissionsRoute
   '/app/profile': typeof AppProfileRoute
+  '/app/readiness': typeof AppReadinessRoute
+  '/app/skills': typeof AppSkillsRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
@@ -113,35 +149,47 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/onboarding'
+    | '/app/agent'
     | '/app/career'
     | '/app/diagnostic'
     | '/app/evidence'
+    | '/app/explore'
     | '/app/home'
     | '/app/missions'
     | '/app/profile'
+    | '/app/readiness'
+    | '/app/skills'
     | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/onboarding'
+    | '/app/agent'
     | '/app/career'
     | '/app/diagnostic'
     | '/app/evidence'
+    | '/app/explore'
     | '/app/home'
     | '/app/missions'
     | '/app/profile'
+    | '/app/readiness'
+    | '/app/skills'
     | '/app'
   id:
     | '__root__'
     | '/'
     | '/app'
     | '/onboarding'
+    | '/app/agent'
     | '/app/career'
     | '/app/diagnostic'
     | '/app/evidence'
+    | '/app/explore'
     | '/app/home'
     | '/app/missions'
     | '/app/profile'
+    | '/app/readiness'
+    | '/app/skills'
     | '/app/'
   fileRoutesById: FileRoutesById
 }
@@ -181,6 +229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/agent': {
+      id: '/app/agent'
+      path: '/agent'
+      fullPath: '/app/agent'
+      preLoaderRoute: typeof AppAgentRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/career': {
       id: '/app/career'
       path: '/career'
@@ -200,6 +255,13 @@ declare module '@tanstack/react-router' {
       path: '/evidence'
       fullPath: '/app/evidence'
       preLoaderRoute: typeof AppEvidenceRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/explore': {
+      id: '/app/explore'
+      path: '/explore'
+      fullPath: '/app/explore'
+      preLoaderRoute: typeof AppExploreRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/home': {
@@ -223,26 +285,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProfileRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/readiness': {
+      id: '/app/readiness'
+      path: '/readiness'
+      fullPath: '/app/readiness'
+      preLoaderRoute: typeof AppReadinessRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/skills': {
+      id: '/app/skills'
+      path: '/skills'
+      fullPath: '/app/skills'
+      preLoaderRoute: typeof AppSkillsRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppAgentRoute: typeof AppAgentRoute
   AppCareerRoute: typeof AppCareerRoute
   AppDiagnosticRoute: typeof AppDiagnosticRoute
   AppEvidenceRoute: typeof AppEvidenceRoute
+  AppExploreRoute: typeof AppExploreRoute
   AppHomeRoute: typeof AppHomeRoute
   AppMissionsRoute: typeof AppMissionsRoute
   AppProfileRoute: typeof AppProfileRoute
+  AppReadinessRoute: typeof AppReadinessRoute
+  AppSkillsRoute: typeof AppSkillsRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAgentRoute: AppAgentRoute,
   AppCareerRoute: AppCareerRoute,
   AppDiagnosticRoute: AppDiagnosticRoute,
   AppEvidenceRoute: AppEvidenceRoute,
+  AppExploreRoute: AppExploreRoute,
   AppHomeRoute: AppHomeRoute,
   AppMissionsRoute: AppMissionsRoute,
   AppProfileRoute: AppProfileRoute,
+  AppReadinessRoute: AppReadinessRoute,
+  AppSkillsRoute: AppSkillsRoute,
   AppIndexRoute: AppIndexRoute,
 }
 

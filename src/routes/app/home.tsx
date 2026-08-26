@@ -20,7 +20,7 @@ import {
 } from "@/components/app/ui";
 import { InlineSpinner } from "@/components/common/Loader";
 import { Button } from "@/components/ui/button";
-import { useCareerIntelligence } from "@/lib/careerai/hooks";
+import { useCareerIntelligence, useRefreshIntelligence } from "@/lib/careerai/hooks";
 import type { CareerIntelligence } from "@/lib/careerai/types";
 
 export const Route = createFileRoute("/app/home")({

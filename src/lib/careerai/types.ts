@@ -330,3 +330,104 @@ export interface AttemptResult {
   completed_at: string | null;
   evidence_id: string | null;
 }
+
+// --- Skills ------------------------------------------------------------------
+
+export interface SkillState {
+  skill_code: string;
+  skill_name: string;
+  score: number | null;
+  confidence: number | null;
+  verification_level: string;
+  evidence_count: number;
+  last_updated_at: string | null;
+}
+
+export interface EvidenceItem {
+  evidence_id: string;
+  evidence_type: string;
+  score: number | null;
+  confidence: number | null;
+  observed_at: string | null;
+}
+
+// --- Career Landscape -------------------------------------------------------
+
+export interface CareerLandscapeDetail {
+  career_cluster_code: string;
+  alignment_score: number;
+  capability_alignment: number;
+  interest_alignment: number;
+  evidence_coverage: number;
+  confidence: number;
+  category: string;
+  strengths: string[];
+  exploration: string[];
+  calculation_version: string;
+}
+
+export interface CareerClusterExplain {
+  career_cluster_code: string;
+  important_skills: { skill_code: string; current_level: string; known: boolean }[];
+  unknown_skills: string[];
+  interest_signal: number | null;
+  strengths: string[];
+  explore: string[];
+}
+
+// --- Readiness --------------------------------------------------------------
+
+export interface ReadinessDetail {
+  placement_readiness: {
+    score: number;
+    confidence: number;
+    evidence_coverage: number;
+    ready_skills: string[];
+    priority_gaps: { skill_code: string; state: string; priority: string }[];
+    needs_validation: string[];
+    calculation_version: string;
+  } | null;
+  career_readiness: {
+    career_cluster_code: string;
+    score: number;
+    confidence: number;
+    evidence_coverage: number;
+    ready_skills: string[];
+    priority_gaps: { skill_code: string; state: string; priority: string }[];
+    needs_validation: string[];
+    calculation_version: string;
+  }[];
+}
+
+// --- Career Exploration -----------------------------------------------------
+
+export interface CareerExploration {
+  career_cluster_code: string;
+  status: string;
+  set_at: string;
+}
+
+// --- Agent ------------------------------------------------------------------
+
+export interface AgentMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface AgentReply {
+  message: string;
+  response_type: string;
+  referenced_careers: string[];
+  referenced_skills: string[];
+  suggested_action: string | null;
+  tool_calls: string[];
+}
+
+// --- Intelligence Refresh ---------------------------------------------------
+
+export interface RefreshResult {
+  status: string;
+  stages_executed: string[];
+  duration_ms: number;
+  intelligence: CareerIntelligence;
+}
