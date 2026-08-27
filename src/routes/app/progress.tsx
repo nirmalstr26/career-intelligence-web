@@ -68,8 +68,8 @@ function ProgressContent({ ci }: { ci: CareerIntelligence }) {
   const completedCount = curr?.completed_modules ?? 4;
   const totalModules = curr?.total_modules ?? 15;
 
-  const strengths = ci.verified_evidence.slice(0, 3);
-  const gaps = ci.skill_gaps.slice(0, 3);
+  const strengths = (ci.verified_evidence || (ci as any).strengths || []).slice(0, 3);
+  const gaps = (ci.skill_gaps || (ci as any).priority_gaps || []).slice(0, 3);
 
   const evidenceList = [
     {

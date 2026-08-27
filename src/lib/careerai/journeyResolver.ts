@@ -190,19 +190,20 @@ export function resolveStudentJourney(
       ctaText: "Select Career Path",
       ctaLink: "/app/path",
     };
-  } else if (projects && projects.find((p) => p.state === "IN_PROGRESS" || p.state === "NEEDS_IMPROVEMENT")) {
-    const actProj = projects.find((p) => p.state === "IN_PROGRESS" || p.state === "NEEDS_IMPROVEMENT")!;
+  } else if (Array.isArray(projects) && projects.find((p) => p && (p.state === "IN_PROGRESS" || p.state === "NEEDS_IMPROVEMENT"))) {
+    const actProj = projects.find((p) => p && (p.state === "IN_PROGRESS" || p.state === "NEEDS_IMPROVEMENT"))!;
+    const curStage = (actProj.current_stage || "understand").toUpperCase();
     primaryAction = {
       type: "continue_project",
       priority: actProj.state === "NEEDS_IMPROVEMENT" ? "URGENT" : "RECOMMENDED",
       badgeText: actProj.state === "NEEDS_IMPROVEMENT" ? "Fix Project" : "Continue Project",
-      title: actProj.title,
-      subtitle: `Current stage: ${actProj.current_stage.toUpperCase()} · ~20 mins estimated`,
+      title: actProj.title || "Build a Simple Data Pipeline",
+      subtitle: `Current stage: ${curStage} · ~20 mins estimated`,
       estimatedMinutes: 20,
       whyItMatters: "Hands-on data pipeline projects prove practical engineering ability beyond theoretical quizzes.",
       whatHappensNext: "Submitting your solution triggers AI rubric review, creating verified evidence that updates your readiness score.",
       ctaText: actProj.state === "NEEDS_IMPROVEMENT" ? "Improve Project" : "Continue Project",
-      ctaLink: `/app/projects/${actProj.code}`,
+      ctaLink: `/app/projects/${actProj.code || "PROJECT_DATA_PIPELINE"}`,
     };
   } else if (needsImprovementModule) {
     const curScore = needsImprovementModule.assessment_score ?? 55;
@@ -283,7 +284,7 @@ export function resolveStudentJourney(
   const secondaryActions: SecondaryAction[] = [];
 
   // Secondary 1: Skill Gap
-  const topGap = ci.skill_gaps?.[0];
+  const topGap = (ci.skill_gaps || (ci as any).priority_gaps || [])?.[0];
   if (topGap) {
     secondaryActions.push({
       id: "action-skill-gap",
