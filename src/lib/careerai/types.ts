@@ -754,3 +754,105 @@ export interface InterviewDefinitionDetail {
   past_attempts: InterviewSessionSummary[];
   active_session?: InterviewSessionDetail | null;
 }
+
+// ---------------------------------------------------------------------------
+// Domain 21 — Professional Profile, Resume & LinkedIn Intelligence
+// ---------------------------------------------------------------------------
+
+export interface VerifiedSkillItem {
+  skill_code: string;
+  skill_name: string;
+  score: number;
+  confidence: number;
+  evidence_count: number;
+  provenance_sources: string[];
+}
+
+export interface LearningSkillItem {
+  skill_code: string;
+  skill_name: string;
+  current_phase: string;
+  status: string;
+}
+
+export interface SkillCategoryBreakdown {
+  verified_skills: VerifiedSkillItem[];
+  learning_skills: LearningSkillItem[];
+  self_declared_skills: string[];
+}
+
+export interface ResumeSuggestion {
+  id: string;
+  section_type: "SUMMARY" | "PROJECTS" | "SKILLS" | "LINKEDIN_HEADLINE" | "LINKEDIN_ABOUT" | "GITHUB_README";
+  state: "PENDING" | "ACCEPTED" | "EDITED" | "REJECTED";
+  suggested_content: Record<string, any>;
+  edited_content?: Record<string, any> | null;
+  source_evidence_type?: string | null;
+  source_reference?: string | null;
+  source_score?: number | null;
+  provenance_label?: string | null;
+  created_at: string;
+  resolved_at?: string | null;
+}
+
+export interface ResumeSectionItem {
+  id: string;
+  section_type: "SUMMARY" | "EDUCATION" | "SKILLS" | "PROJECTS" | "EXPERIENCE" | "CERTIFICATIONS" | "ACHIEVEMENTS";
+  title: string;
+  content: Record<string, any>;
+  display_order: number;
+}
+
+export interface ResumeVersionSummary {
+  id: string;
+  version_number: number;
+  label: string;
+  created_by_reason?: string | null;
+  created_at: string;
+}
+
+export interface GitHubPortfolioItem {
+  project_code: string;
+  title: string;
+  short_description: string;
+  technologies: string[];
+  skills_demonstrated: string[];
+  score: number;
+  verification_status: string;
+  readme_suggestions: string[];
+  repo_url?: string | null;
+}
+
+export interface ProfileReadinessDimension {
+  dimension_id: string;
+  dimension_name: string;
+  score: number;
+  max_score: number;
+  status: "COMPLETED" | "IN_PROGRESS" | "NOT_STARTED";
+  details: string;
+}
+
+export interface ProfileReadiness {
+  overall_score: number;
+  readiness_level: "NEEDS_FOUNDATION" | "DEVELOPING" | "INTERNSHIP_READY" | "PLACEMENT_READY";
+  dimensions: ProfileReadinessDimension[];
+  missing_items: string[];
+  next_improvement_steps: string[];
+}
+
+export interface ProfessionalProfileDetail {
+  id: string;
+  student_id: string;
+  headline?: string | null;
+  summary?: string | null;
+  linkedin_headline?: string | null;
+  linkedin_about?: string | null;
+  current_version_number: number;
+  profile_readiness: ProfileReadiness;
+  skills_breakdown: SkillCategoryBreakdown;
+  github_portfolio: GitHubPortfolioItem[];
+  sections: ResumeSectionItem[];
+  pending_suggestions: ResumeSuggestion[];
+  all_suggestions: ResumeSuggestion[];
+  version_history: ResumeVersionSummary[];
+}

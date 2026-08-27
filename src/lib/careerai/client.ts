@@ -195,4 +195,33 @@ export const careerai = {
       `/students/${studentId}/interviews/sessions/${sessionId}/answer`,
       { body }
     ),
+  // Professional Profile & Resume Intelligence (Domain 21)
+  getProfessionalProfile: (studentId: string) =>
+    api.get<ProfessionalProfileDetail>(`/students/${studentId}/professional-profile`),
+  generateProfileSuggestions: (studentId: string) =>
+    api.post<ProfessionalProfileDetail>(`/students/${studentId}/professional-profile/generate-suggestions`),
+  resolveProfileSuggestion: (
+    studentId: string,
+    suggestionId: string,
+    action: "ACCEPT" | "EDIT" | "REJECT",
+    edited_content?: Record<string, any> | null
+  ) =>
+    api.post<ProfessionalProfileDetail>(
+      `/students/${studentId}/professional-profile/suggestions/${suggestionId}/resolve`,
+      { body: { action, edited_content } }
+    ),
+  updateProfileSection: (studentId: string, sectionType: string, content: Record<string, any>) =>
+    api.put<ProfessionalProfileDetail>(
+      `/students/${studentId}/professional-profile/sections/${sectionType}`,
+      { body: { content } }
+    ),
+  updateLinkedInProfile: (studentId: string, linkedin_headline: string, linkedin_about: string) =>
+    api.put<ProfessionalProfileDetail>(
+      `/students/${studentId}/professional-profile/linkedin`,
+      { body: { linkedin_headline, linkedin_about } }
+    ),
+  restoreProfileVersion: (studentId: string, versionId: string) =>
+    api.post<{ profile: ProfessionalProfileDetail; restored_version_number: number; message: string }>(
+      `/students/${studentId}/professional-profile/versions/${versionId}/restore`
+    ),
 };

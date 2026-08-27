@@ -327,3 +327,105 @@ export function useSubmitInterviewAnswer() {
     },
   });
 }
+
+// ---------------------------------------------------------------------------
+// Domain 21 — Professional Profile & Resume Intelligence Hooks
+// ---------------------------------------------------------------------------
+
+export function useProfessionalProfile() {
+  const { studentId } = useAuth();
+  return useQuery({
+    queryKey: ["professional-profile", studentId],
+    queryFn: () => careerAiClient.getProfessionalProfile(studentId!),
+    enabled: Boolean(studentId),
+    staleTime: 5_000,
+  });
+}
+
+export function useGenerateProfileSuggestions() {
+  const { studentId } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => careerAiClient.generateProfileSuggestions(studentId!),
+    onSuccess: (data) => {
+      queryClient.setQueryData(["professional-profile", studentId], data);
+    },
+  });
+}
+
+export function useResolveProfileSuggestion() {
+  const { studentId } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      suggestionId,
+      action,
+      edited_content,
+    }: {
+      suggestionId: string;
+      action: "ACCEPT" | "EDIT" | "REJECT";
+      edited_content?: Record<string, any> | null;
+    }) =>
+      careerAiClient.resolveProfileSuggestion(
+        studentId!,
+        suggestionId,
+        action,
+        edited_content
+      ),
+    onSuccess: (data) => {
+      queryClient.setQueryData(["professional-profile", studentId], data);
+      queryClient.invalidateQueries({ queryKey: ["career-intelligence", studentId] });
+    },
+  });
+}
+
+export function useUpdateProfileSection() {
+  const { studentId } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      sectionType,
+      content,
+    }: {
+      sectionType: string;
+      content: Record<string, any>;
+    }) => careerAiClient.updateProfileSection(studentId!, sectionType, content),
+    onSuccess: (data) => {
+      queryClient.setQueryData(["professional-profile", studentId], data);
+    },
+  });
+}
+
+export function useUpdateLinkedInProfile() {
+  const { studentId } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      headline,
+      about,
+    }: {
+      headline: string;
+      about: string;
+    }) => careerAiClient.updateLinkedInProfile(studentId!, headline, about),
+    onSuccess: (data) => {
+      queryClient.setQueryData(["professional-profile", studentId], data);
+    },
+  });
+}
+
+export function useRestoreProfileVersion() {
+  const { studentId } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (versionId: string) =>
+      careerAiClient.restoreProfileVersion(studentId!, versionId),
+    onSuccess: (res) => {
+      queryClient.setQueryData(["professional-profile", studentId], res.profile);
+    },
+  });
+}

@@ -227,16 +227,15 @@ export function resolveStudentJourney(
       };
     } else if (Array.isArray(projects) && projects.some((p) => p && p.state === "COMPLETED")) {
       primaryAction = {
-        type: "mock_interview",
+        type: "complete_profile",
         priority: "RECOMMENDED",
-        badgeText: "Interview Prep",
-        title: "Complete Technical Mock Interview",
-        subtitle: "7 adaptive questions testing SQL, Python, pipeline design, and your completed project defense.",
-        estimatedMinutes: 15,
-        whyItMatters: "Validates your ability to explain architectural decisions, debug pipelines, and defend technical choices in a real interview setting.",
-        whatHappensNext: "Generates deterministic 6-dimension rubric feedback and records verified interview evidence on your profile.",
-        ctaText: "Start Mock Interview",
-        ctaLink: "/app/practice",
+        badgeText: "Profile & Resume",
+        title: "Complete Your Professional Profile",
+        subtitle: "You now have verified project and interview evidence. Convert it into an internship-ready profile.",
+        whyItMatters: "Translating verified technical achievements into structured resume bullets and LinkedIn assets boosts your placement readiness.",
+        whatHappensNext: "Generates copy-ready LinkedIn content, portfolio highlights, and versioned resume snapshots.",
+        ctaText: "Update My Resume",
+        ctaLink: "/app/profile",
       };
     } else if (needsImprovementModule) {
       const curScore = needsImprovementModule.assessment_score ?? 55;
