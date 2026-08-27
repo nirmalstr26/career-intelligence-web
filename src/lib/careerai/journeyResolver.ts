@@ -225,6 +225,19 @@ export function resolveStudentJourney(
         ctaText: actProj.state === "NEEDS_IMPROVEMENT" ? "Improve Project" : "Continue Project",
         ctaLink: `/app/projects/${actProj.code || "PROJECT_DATA_PIPELINE"}`,
       };
+    } else if (Array.isArray(projects) && projects.some((p) => p && p.state === "COMPLETED")) {
+      primaryAction = {
+        type: "mock_interview",
+        priority: "RECOMMENDED",
+        badgeText: "Interview Prep",
+        title: "Complete Technical Mock Interview",
+        subtitle: "7 adaptive questions testing SQL, Python, pipeline design, and your completed project defense.",
+        estimatedMinutes: 15,
+        whyItMatters: "Validates your ability to explain architectural decisions, debug pipelines, and defend technical choices in a real interview setting.",
+        whatHappensNext: "Generates deterministic 6-dimension rubric feedback and records verified interview evidence on your profile.",
+        ctaText: "Start Mock Interview",
+        ctaLink: "/app/practice",
+      };
     } else if (needsImprovementModule) {
       const curScore = needsImprovementModule.assessment_score ?? 55;
       const reqScore = needsImprovementModule.min_pass_score ?? 65;

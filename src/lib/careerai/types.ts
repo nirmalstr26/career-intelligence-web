@@ -645,3 +645,112 @@ export interface ProjectDetail {
   attempt_count: number;
   latest_submission?: ProjectSubmission | null;
 }
+
+// ---------------------------------------------------------------------------
+// Domain 20 — AI Mock Interviews
+// ---------------------------------------------------------------------------
+
+export interface InterviewRubricCriterion {
+  criterion_id: string;
+  criterion_name: string;
+  max_score: number;
+  description: string;
+}
+
+export interface InterviewRubricScoreItem {
+  criterion_id: string;
+  criterion_name: string;
+  max_score: number;
+  score: number;
+  feedback: string;
+}
+
+export interface InterviewImprovementAction {
+  id: string;
+  title: string;
+  reason: string;
+  action_type: "COACH" | "PRACTICE" | "MODULE" | "PROJECT";
+  cta_text: string;
+  cta_link: string;
+}
+
+export interface InterviewTurn {
+  id: string;
+  turn_number: number;
+  competency: string;
+  question_text: string;
+  student_answer?: string | null;
+  is_followup: boolean;
+  is_dont_know: boolean;
+  score?: number | null;
+  what_was_good?: string | null;
+  what_was_missing?: string | null;
+  better_answer_structure?: string | null;
+  evaluation_notes?: string | null;
+  created_at: string;
+  answered_at?: string | null;
+}
+
+export interface InterviewDefinitionSummary {
+  id: string;
+  code: string;
+  title: string;
+  description: string;
+  career_cluster_code: string;
+  duration_minutes: number;
+  target_question_count: number;
+  competencies: string[];
+  attempt_count: number;
+  latest_score?: number | null;
+  latest_readiness_level?: string | null;
+  active_session_id?: string | null;
+}
+
+export interface InterviewSessionSummary {
+  id: string;
+  attempt_number: number;
+  status: "IN_PROGRESS" | "COMPLETED" | "ABANDONED";
+  current_turn_index: number;
+  total_turns: number;
+  total_score?: number | null;
+  readiness_level?: string | null;
+  started_at: string;
+  completed_at?: string | null;
+}
+
+export interface InterviewSessionDetail {
+  id: string;
+  interview_definition_id: string;
+  interview_code: string;
+  interview_title: string;
+  career_cluster_code: string;
+  attempt_number: number;
+  status: "IN_PROGRESS" | "COMPLETED" | "ABANDONED";
+  current_turn_index: number;
+  total_turns: number;
+  total_score?: number | null;
+  readiness_level?: string | null;
+  rubric_scores: InterviewRubricScoreItem[];
+  strongest_areas: string[];
+  needs_improvement: string[];
+  improvement_actions: InterviewImprovementAction[];
+  overall_feedback?: string | null;
+  started_at: string;
+  completed_at?: string | null;
+  turns: InterviewTurn[];
+  current_turn?: InterviewTurn | null;
+}
+
+export interface InterviewDefinitionDetail {
+  id: string;
+  code: string;
+  title: string;
+  description: string;
+  career_cluster_code: string;
+  duration_minutes: number;
+  target_question_count: number;
+  competencies: string[];
+  rubric: InterviewRubricCriterion[];
+  past_attempts: InterviewSessionSummary[];
+  active_session?: InterviewSessionDetail | null;
+}

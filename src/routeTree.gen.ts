@@ -29,6 +29,7 @@ import { Route as AppProgressRouteImport } from './routes/app/progress'
 import { Route as AppReadinessRouteImport } from './routes/app/readiness'
 import { Route as AppSkillsRouteImport } from './routes/app/skills'
 import { Route as AppTodayRouteImport } from './routes/app/today'
+import { Route as AppInterviewInterviewIdRouteImport } from './routes/app/interview.$interviewId'
 import { Route as AppLearnModuleCodeRouteImport } from './routes/app/learn.$moduleCode'
 import { Route as AppProjectsProjectCodeRouteImport } from './routes/app/projects.$projectCode'
 
@@ -132,6 +133,11 @@ const AppTodayRoute = AppTodayRouteImport.update({
   path: '/today',
   getParentRoute: () => AppRoute,
 } as any)
+const AppInterviewInterviewIdRoute = AppInterviewInterviewIdRouteImport.update({
+  id: '/interview/$interviewId',
+  path: '/interview/$interviewId',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppLearnModuleCodeRoute = AppLearnModuleCodeRouteImport.update({
   id: '/learn/$moduleCode',
   path: '/learn/$moduleCode',
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/app/skills': typeof AppSkillsRoute
   '/app/today': typeof AppTodayRoute
   '/app/': typeof AppIndexRoute
+  '/app/interview/$interviewId': typeof AppInterviewInterviewIdRoute
   '/app/learn/$moduleCode': typeof AppLearnModuleCodeRoute
   '/app/projects/$projectCode': typeof AppProjectsProjectCodeRoute
 }
@@ -187,6 +194,7 @@ export interface FileRoutesByTo {
   '/app/skills': typeof AppSkillsRoute
   '/app/today': typeof AppTodayRoute
   '/app': typeof AppIndexRoute
+  '/app/interview/$interviewId': typeof AppInterviewInterviewIdRoute
   '/app/learn/$moduleCode': typeof AppLearnModuleCodeRoute
   '/app/projects/$projectCode': typeof AppProjectsProjectCodeRoute
 }
@@ -212,6 +220,7 @@ export interface FileRoutesById {
   '/app/skills': typeof AppSkillsRoute
   '/app/today': typeof AppTodayRoute
   '/app/': typeof AppIndexRoute
+  '/app/interview/$interviewId': typeof AppInterviewInterviewIdRoute
   '/app/learn/$moduleCode': typeof AppLearnModuleCodeRoute
   '/app/projects/$projectCode': typeof AppProjectsProjectCodeRoute
 }
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
     | '/app/skills'
     | '/app/today'
     | '/app/'
+    | '/app/interview/$interviewId'
     | '/app/learn/$moduleCode'
     | '/app/projects/$projectCode'
   fileRoutesByTo: FileRoutesByTo
@@ -261,6 +271,7 @@ export interface FileRouteTypes {
     | '/app/skills'
     | '/app/today'
     | '/app'
+    | '/app/interview/$interviewId'
     | '/app/learn/$moduleCode'
     | '/app/projects/$projectCode'
   id:
@@ -285,6 +296,7 @@ export interface FileRouteTypes {
     | '/app/skills'
     | '/app/today'
     | '/app/'
+    | '/app/interview/$interviewId'
     | '/app/learn/$moduleCode'
     | '/app/projects/$projectCode'
   fileRoutesById: FileRoutesById
@@ -437,6 +449,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTodayRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/interview/$interviewId': {
+      id: '/app/interview/$interviewId'
+      path: '/interview/$interviewId'
+      fullPath: '/app/interview/$interviewId'
+      preLoaderRoute: typeof AppInterviewInterviewIdRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/learn/$moduleCode': {
       id: '/app/learn/$moduleCode'
       path: '/learn/$moduleCode'
@@ -472,6 +491,7 @@ interface AppRouteChildren {
   AppSkillsRoute: typeof AppSkillsRoute
   AppTodayRoute: typeof AppTodayRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppInterviewInterviewIdRoute: typeof AppInterviewInterviewIdRoute
   AppLearnModuleCodeRoute: typeof AppLearnModuleCodeRoute
   AppProjectsProjectCodeRoute: typeof AppProjectsProjectCodeRoute
 }
@@ -494,6 +514,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppSkillsRoute: AppSkillsRoute,
   AppTodayRoute: AppTodayRoute,
   AppIndexRoute: AppIndexRoute,
+  AppInterviewInterviewIdRoute: AppInterviewInterviewIdRoute,
   AppLearnModuleCodeRoute: AppLearnModuleCodeRoute,
   AppProjectsProjectCodeRoute: AppProjectsProjectCodeRoute,
 }

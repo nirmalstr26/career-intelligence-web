@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import React from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Code,
   CheckCircle2,
@@ -10,8 +11,18 @@ import {
   Award,
   AlertTriangle,
   FolderGit2,
+  Video,
+  ShieldCheck,
+  RotateCcw,
+  Zap,
 } from "lucide-react";
-import { useCareerIntelligence, useCurriculum, useProjects } from "@/lib/careerai/hooks";
+import {
+  useCareerIntelligence,
+  useCurriculum,
+  useProjects,
+  useInterviews,
+  useStartInterview,
+} from "@/lib/careerai/hooks";
 import { CareerIntelligence } from "@/lib/careerai/types";
 
 import { SectionCard, humanizeCode } from "@/components/app/ui";
@@ -26,9 +37,15 @@ export const Route = createFileRoute("/app/practice")({
 });
 
 function PracticePage() {
+  const navigate = useNavigate();
   const query = useCareerIntelligence();
+  const primaryCareerCode = query.data?.career_direction?.primary_career || "DATA_ENGINEER";
+  const curriculumQuery = useCurriculum(primaryCareerCode);
+  const projectsQuery = useProjects(primaryCareerCode);
+  const interviewsQuery = useInterviews(primaryCareerCode);
+  const startInterviewMutation = useStartInterview();
 
-  if (query.isLoading) {
+  if (query.isLoading || curriculumQuery.isLoading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <InlineSpinner className="size-6 text-primary" />
@@ -52,49 +69,80 @@ function PracticePage() {
     );
   }
 
-  return <PracticeContent ci={query.data} />;
-}
+  const ci: CareerIntelligence = query.data;
+  const curr = curriculumQuery.data;
+  const projects = projectsQuery.data || [];
+  const interviews = interviewsQuery.data || [];
+  const primaryInterview = interviews[0];
 
-function PracticeContent({ ci }: { ci: CareerIntelligence }) {
-  const primaryCareerCode = ci.career_direction.primary_career ?? "DATA_ENGINEER";
-  const currQuery = useCurriculum(primaryCareerCode);
-  const projectsQuery = useProjects(primaryCareerCode);
+  const handleStartInterview = async (code: string, activeSessionId?: string | null) => {
+    if (activeSessionId) {
+      navigate({
+        to: "/app/interview/$interviewId",
+        params: { interviewId: activeSessionId },
+      });
+      return;
+    }
+    try {
+      const res = await startInterviewMutation.mutateAsync(code);
+      navigate({
+        to: "/app/interview/$interviewId",
+        params: { interviewId: res.session.id },
+      });
+    } catch (err) {
+      console.error("Failed to start interview:", err);
+    }
+  };
 
-  const curr = currQuery.data;
-  const projects = projectsQuery.data ?? [];
-
-  // Active missions
-  const missions = ci.active_missions ?? [
+  const missions = [
     {
-      id: "m-1",
-      title: "SQL Aggregate & Join Mastery",
-      description: "Solve 5 multi-table aggregation challenges using GROUP BY and HAVING clauses.",
-      skill_name: "SQL & Databases",
-      estimated_minutes: 15,
-      xp: 150,
+      id: "m-sql-1",
+      title: "SQL Window Functions & Aggregations",
+      skill_code: "SQL",
+      skill_name: "SQL",
       difficulty: "INTERMEDIATE",
+      estimated_minutes: 25,
+      xp: 120,
+      description: "Write queries using RANK(), DENSE_RANK(), and PARTITION BY to solve analytical business problems.",
     },
     {
-      id: "m-2",
-      title: "Python Data Transformation Script",
-      description: "Write a clean Python function to parse raw JSON logs and compute daily metrics.",
-      skill_name: "Python Programming",
-      estimated_minutes: 20,
-      xp: 200,
+      id: "m-py-1",
+      title: "Memory-Efficient JSON Streaming in Python",
+      skill_code: "PYTHON",
+      skill_name: "Python",
+      difficulty: "ADVANCED",
+      estimated_minutes: 35,
+      xp: 150,
+      description: "Build custom generator iterators to stream and transform large datasets without exceeding RAM constraints.",
+    },
+    {
+      id: "m-de-1",
+      title: "Designing Idempotent Pipeline Ingestion",
+      skill_code: "DATA_ENGINEERING",
+      skill_name: "Data Engineering",
       difficulty: "INTERMEDIATE",
+      estimated_minutes: 30,
+      xp: 140,
+      description: "Implement atomic staging table swaps and quarantine dead-letter isolation rules for robust ETL pipelines.",
     },
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-5xl space-y-8 py-2">
       {/* Header */}
-      <header className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b pb-6">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
-            Practice & Hands-on Projects
+          <div className="flex items-center gap-2 mb-1">
+            <Badge className="bg-primary/20 text-primary border-none text-[11px] font-semibold">
+              Practical Workspace
+            </Badge>
+            <span className="text-xs text-muted-foreground">Level up through real problem-solving</span>
+          </div>
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+            Practice & Portfolio
           </h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Engineering projects, diagnostics, and coding missions to build verified portfolio evidence.
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+            Build real software pipelines, defend your architecture in AI Mock Interviews, and complete targeted skill challenges.
           </p>
         </div>
 
@@ -103,7 +151,116 @@ function PracticeContent({ ci }: { ci: CareerIntelligence }) {
         </Badge>
       </header>
 
-      {/* 1. Hands-on Practical Projects Section */}
+      {/* 1. AI Mock Technical & Project Defense Interview (Step 6 Highlight) */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+              <Bot className="size-5 text-primary" />
+              AI Technical & Project Defense Mock Interview
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Turn-by-turn conversational interview testing technical knowledge, pipeline design, and completed project defense.
+            </p>
+          </div>
+          <Badge className="bg-primary/10 text-primary border-primary/20 text-xs font-semibold">
+            Adaptive 7-Question Flow
+          </Badge>
+        </div>
+
+        {primaryInterview ? (
+          <div className="surface-panel hover-lift rounded-3xl p-6 sm:p-7 border border-primary/30 bg-gradient-to-br from-card via-card to-primary/[0.04] shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 relative overflow-hidden">
+            <div className="space-y-3 max-w-2xl">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge className="bg-primary text-primary-foreground text-xs font-semibold">
+                  Technical + Project Defense
+                </Badge>
+
+                {primaryInterview.latest_score !== null && primaryInterview.latest_score !== undefined ? (
+                  <Badge
+                    variant="outline"
+                    className={`text-xs font-mono font-bold ${
+                      primaryInterview.latest_score >= 80
+                        ? "text-emerald-600 border-emerald-500/40 bg-emerald-500/10"
+                        : primaryInterview.latest_score >= 65
+                        ? "text-amber-600 border-amber-500/40 bg-amber-500/10"
+                        : "text-rose-600 border-rose-500/40 bg-rose-500/10"
+                    }`}
+                  >
+                    Latest Score: {primaryInterview.latest_score.toFixed(1)} / 100 ({primaryInterview.latest_readiness_level})
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="text-xs text-muted-foreground">
+                    Not Attempted Yet
+                  </Badge>
+                )}
+
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Clock className="size-3" />
+                  ~{primaryInterview.duration_minutes} mins · {primaryInterview.target_question_count} Questions
+                </span>
+              </div>
+
+              <div>
+                <h4 className="font-display text-lg font-bold text-foreground">
+                  {primaryInterview.title}
+                </h4>
+                <p className="text-xs text-muted-foreground leading-relaxed mt-1">
+                  {primaryInterview.description}
+                </p>
+              </div>
+
+              {/* Competencies Tested */}
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {primaryInterview.competencies.map((comp) => (
+                  <span
+                    key={comp}
+                    className="rounded-lg bg-secondary/80 px-2 py-0.5 text-[10px] font-medium text-foreground/80 border border-border/50"
+                  >
+                    {comp.replace("_", " ")}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:items-end gap-3 shrink-0">
+              <Button
+                size="lg"
+                variant="hero"
+                className="rounded-2xl font-bold text-xs gap-2"
+                onClick={() =>
+                  handleStartInterview(primaryInterview.code, primaryInterview.active_session_id)
+                }
+                disabled={startInterviewMutation.isPending}
+              >
+                {startInterviewMutation.isPending ? (
+                  <InlineSpinner className="size-4" />
+                ) : (
+                  <Bot className="size-4" />
+                )}
+                {primaryInterview.active_session_id
+                  ? "Resume Active Interview"
+                  : primaryInterview.attempt_count > 0
+                  ? `Retake Mock Interview (Attempt #${primaryInterview.attempt_count + 1})`
+                  : "Start Mock Interview"}
+                <ArrowRight className="size-4" />
+              </Button>
+
+              {primaryInterview.attempt_count > 0 && (
+                <span className="text-[11px] text-muted-foreground">
+                  {primaryInterview.attempt_count} completed attempt{primaryInterview.attempt_count > 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="p-6 rounded-2xl border text-center text-muted-foreground text-sm">
+            Mock interviews are being prepared for this pathway.
+          </div>
+        )}
+      </section>
+
+      {/* 2. Hands-on Practical Projects Section */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
@@ -194,43 +351,16 @@ function PracticeContent({ ci }: { ci: CareerIntelligence }) {
         </div>
       </section>
 
-      {/* 2. Baseline Diagnostic Banner */}
-      <section className="rounded-3xl border border-primary/40 bg-gradient-to-r from-primary/[0.08] via-card to-surface p-6 sm:p-8 backdrop-blur shadow-md">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-2 max-w-xl">
-            <div className="flex items-center gap-2">
-              <Badge className="bg-primary text-primary-foreground text-xs font-semibold">
-                Baseline Diagnostic
-              </Badge>
-              <span className="text-xs text-muted-foreground">10-15 minutes</span>
-            </div>
-            <h2 className="font-display text-xl font-bold text-foreground sm:text-2xl">
-              Career Readiness Diagnostic
-            </h2>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Assesses your technical reasoning, problem-solving, and foundational knowledge to calibrate your roadmap and calculate your starting readiness score.
-            </p>
-          </div>
-
-          <Button asChild size="lg" variant="hero" className="shrink-0 font-bold gap-2">
-            <Link to="/app/diagnostic">
-              Launch Diagnostic
-              <ArrowRight className="size-4" />
-            </Link>
-          </Button>
-        </div>
-      </section>
-
       {/* 3. Active Skill Missions */}
       <section className="space-y-4">
         <div>
-          <h3 className="font-display text-lg font-bold text-foreground">Active Skill Missions</h3>
+          <h3 className="font-display text-lg font-bold text-foreground">Targeted Skill Missions</h3>
           <p className="text-xs text-muted-foreground">
-            Complete targeted missions to fill identified skill gaps and earn verified evidence.
+            Complete focused exercises to fill identified skill gaps and earn verified evidence.
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-3">
           {missions.map((m) => (
             <div
               key={m.id}
@@ -251,7 +381,7 @@ function PracticeContent({ ci }: { ci: CareerIntelligence }) {
               <div className="mt-4 pt-3 border-t border-border/40 flex items-center justify-between">
                 <span className="text-[11px] text-muted-foreground flex items-center gap-1">
                   <Clock className="size-3" />
-                  ~{m.estimated_minutes} mins · {m.difficulty}
+                  ~{m.estimated_minutes} mins
                 </span>
 
                 <Button asChild size="sm" variant="outline" className="text-xs font-semibold gap-1">
@@ -268,12 +398,12 @@ function PracticeContent({ ci }: { ci: CareerIntelligence }) {
 
       {/* 4. Contextual SPAR Coach Widget */}
       <ContextualCoachCard
-        title="SPAR Coach on Practical Projects"
-        subtitle="Need help designing your pipeline architecture or passing the data-quality rubric?"
+        title="SPAR Coach for Technical Interviews & Projects"
+        subtitle="Need help preparing for interview follow-ups or answering pipeline scaling questions?"
         prompts={[
-          "How do I structure my data pipeline repository?",
-          "What validation checks are essential for order data?",
-          "Can you review my pipeline design before I submit?",
+          "How did I perform in my mock interview?",
+          "Explain how to design idempotent data pipelines in Python and SQL.",
+          "What questions will interviewers ask about my data pipeline project?",
         ]}
       />
     </div>

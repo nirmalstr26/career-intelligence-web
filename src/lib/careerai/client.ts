@@ -173,4 +173,26 @@ export const careerai = {
     }),
   getProjectSubmissions: (studentId: string, projectCode: string) =>
     api.get<ProjectSubmission[]>(`/students/${studentId}/projects/${projectCode}/submissions`),
-} as const;
+  // Mock Interviews (Domain 20)
+  listInterviews: (studentId: string, careerClusterCode?: string) =>
+    api.get<InterviewDefinitionSummary[]>(
+      `/students/${studentId}/interviews${careerClusterCode ? `?career_cluster_code=${careerClusterCode}` : ""}`
+    ),
+  getInterviewDetail: (studentId: string, code: string) =>
+    api.get<InterviewDefinitionDetail>(`/students/${studentId}/interviews/${code}`),
+  startInterview: (studentId: string, code: string) =>
+    api.post<{ session: InterviewSessionDetail; message: string }>(
+      `/students/${studentId}/interviews/${code}/start`
+    ),
+  getInterviewSession: (studentId: string, sessionId: string) =>
+    api.get<InterviewSessionDetail>(`/students/${studentId}/interviews/sessions/${sessionId}`),
+  submitInterviewAnswer: (
+    studentId: string,
+    sessionId: string,
+    body: { student_answer: string; is_dont_know?: boolean }
+  ) =>
+    api.post<{ session: InterviewSessionDetail; is_completed: boolean; message: string }>(
+      `/students/${studentId}/interviews/sessions/${sessionId}/answer`,
+      { body }
+    ),
+};

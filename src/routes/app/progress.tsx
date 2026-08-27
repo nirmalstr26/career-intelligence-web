@@ -11,7 +11,7 @@ import {
   Code,
   Award,
 } from "lucide-react";
-import { useCareerIntelligence, useCurriculum, useProjects } from "@/lib/careerai/hooks";
+import { useCareerIntelligence, useCurriculum, useProjects, useInterviews } from "@/lib/careerai/hooks";
 import { CareerIntelligence } from "@/lib/careerai/types";
 import { SectionCard, EmptyState, InlineSpinner, humanizeCode } from "@/components/app/ui";
 import { CareerReadinessRing } from "@/components/career/CareerReadinessRing";
@@ -57,6 +57,9 @@ function ProgressContent({ ci }: { ci: CareerIntelligence }) {
   const primaryCareerCode = ci?.career_direction?.primary_career ?? "DATA_ENGINEER";
   const currQuery = useCurriculum(primaryCareerCode);
   const projectsQuery = useProjects(primaryCareerCode);
+  const interviewsQuery = useInterviews(primaryCareerCode);
+  const interviews = interviewsQuery.data || [];
+  const latestInterview = interviews[0];
 
   const curr = currQuery.data;
   const projects = projectsQuery.data ?? [];
@@ -400,7 +403,56 @@ function ProgressContent({ ci }: { ci: CareerIntelligence }) {
         </div>
       </section>
 
-      {/* 5. Contextual SPAR Coach Widget */}
+
+      {/* 5. Mock Interview Readiness */}
+      {latestInterview && (
+        <section aria-label="Mock Interview Readiness" className="surface-panel rounded-3xl p-6 border border-primary/20 bg-gradient-to-br from-card via-card to-primary/[0.02] space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Badge className="bg-primary/20 text-primary border-none text-[10px] font-semibold">
+                  Mock Interview Signal
+                </Badge>
+                {latestInterview.latest_readiness_level && (
+                  <Badge variant="outline" className="text-[10px] text-foreground">
+                    {latestInterview.latest_readiness_level}
+                  </Badge>
+                )}
+              </div>
+              <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+                <Award className="size-5 text-primary" />
+                {latestInterview.title}
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Evaluates conversational reasoning, system design, and defense of your practical project solutions.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-4">
+              {latestInterview.latest_score !== null && latestInterview.latest_score !== undefined ? (
+                <div className="text-right">
+                  <div className="text-2xl font-extrabold text-primary">
+                    {latestInterview.latest_score.toFixed(1)}
+                    <span className="text-xs font-normal text-muted-foreground">/100</span>
+                  </div>
+                  <div className="text-[10px] text-muted-foreground">
+                    {latestInterview.attempt_count} attempt{latestInterview.attempt_count > 1 ? "s" : ""}
+                  </div>
+                </div>
+              ) : null}
+
+              <Button asChild size="sm" variant="hero" className="rounded-xl text-xs gap-1.5 font-semibold">
+                <Link to="/app/practice">
+                  {latestInterview.attempt_count > 0 ? "View / Retake Interview" : "Start Interview"}
+                  <ArrowRight className="size-3.5" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 6. Contextual SPAR Coach Widget */}
       <ContextualCoachCard
         title="SPAR AI Coach on Progress & Readiness"
         subtitle="Understand the scoring methodology or get tailored advice to reach 85+ readiness."

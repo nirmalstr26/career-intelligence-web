@@ -247,3 +247,83 @@ export function useSubmitProject() {
     },
   });
 }
+
+// ---------------------------------------------------------------------------
+// Domain 20 — AI Mock Interviews Hooks
+// ---------------------------------------------------------------------------
+
+export function useInterviews(careerClusterCode?: string) {
+  const { studentId } = useAuth();
+  return useQuery({
+    queryKey: ["interviews", studentId, careerClusterCode],
+    queryFn: () => careerAiClient.listInterviews(studentId!, careerClusterCode),
+    enabled: Boolean(studentId),
+    staleTime: 10_000,
+  });
+}
+
+export function useInterviewDetail(code: string) {
+  const { studentId } = useAuth();
+  return useQuery({
+    queryKey: ["interview-detail", studentId, code],
+    queryFn: () => careerAiClient.getInterviewDetail(studentId!, code),
+    enabled: Boolean(studentId && code),
+    staleTime: 10_000,
+  });
+}
+
+export function useInterviewSession(sessionId?: string) {
+  const { studentId } = useAuth();
+  return useQuery({
+    queryKey: ["interview-session", studentId, sessionId],
+    queryFn: () => careerAiClient.getInterviewSession(studentId!, sessionId!),
+    enabled: Boolean(studentId && sessionId),
+    staleTime: 2_000,
+  });
+}
+
+export function useStartInterview() {
+  const { studentId } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (code: string) => careerAiClient.startInterview(studentId!, code),
+    onSuccess: (data, code) => {
+      queryClient.invalidateQueries({ queryKey: ["interviews", studentId] });
+      queryClient.invalidateQueries({ queryKey: ["interview-detail", studentId, code] });
+      queryClient.setQueryData(["interview-session", studentId, data.session.id], data.session);
+    },
+  });
+}
+
+export function useSubmitInterviewAnswer() {
+  const { studentId } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      sessionId,
+      student_answer,
+      is_dont_know,
+    }: {
+      sessionId: string;
+      student_answer: string;
+      is_dont_know?: boolean;
+    }) =>
+      careerAiClient.submitInterviewAnswer(studentId!, sessionId, {
+        student_answer,
+        is_dont_know,
+      }),
+    onSuccess: (data, variables) => {
+      queryClient.setQueryData(
+        ["interview-session", studentId, variables.sessionId],
+        data.session
+      );
+      if (data.is_completed) {
+        queryClient.invalidateQueries({ queryKey: ["interviews", studentId] });
+        queryClient.invalidateQueries({ queryKey: ["interview-detail", studentId] });
+        queryClient.invalidateQueries({ queryKey: ["career-intelligence", studentId] });
+      }
+    },
+  });
+}
