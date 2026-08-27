@@ -105,7 +105,11 @@ function HomeContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: b
       </header>
 
       {/* 1. Your Career Plan & Continue Learning Hero */}
-      {curr ? (
+      {curriculumQuery.isLoading ? (
+        <div className="rounded-3xl border border-border/70 bg-card/60 p-8 text-center text-xs text-muted-foreground animate-pulse">
+          Loading your Career Plan & learning progress...
+        </div>
+      ) : curr ? (
         <section
           aria-label="Your Career Plan"
           className="relative overflow-hidden rounded-3xl border border-primary/40 bg-gradient-to-r from-primary/[0.08] via-card/90 to-surface p-6 sm:p-8 backdrop-blur shadow-xl"
