@@ -356,4 +356,104 @@ export const careerai = {
     api.post<StudentCollegeMembership>(`/students/${studentId}/college/join`, {
       body: { invite_code },
     }),
+  // Recruiter Pilot & Candidate Pipeline (Domain 24)
+  registerRecruiter: (body: {
+    name: string;
+    email: string;
+    company_name: string;
+    job_title?: string;
+    company_website?: string | null;
+    hiring_location?: string;
+  }) => api.post<RecruiterProfile>("/recruiter/register", { body }),
+  getRecruiterProfile: (recruiterId: string) =>
+    api.get<RecruiterProfile>(`/recruiter/profile/${recruiterId}`),
+  listRecruiterOpportunities: (recruiterId: string) =>
+    api.get<RecruiterOpportunitySummary[]>(`/recruiter/${recruiterId}/opportunities`),
+  createRecruiterOpportunity: (
+    recruiterId: string,
+    body: {
+      title: string;
+      opportunity_type?: string;
+      work_mode?: string;
+      location: string;
+      description: string;
+      responsibilities?: string[];
+      mandatory_skills?: string[];
+      preferred_skills?: string[];
+      min_proficiency_score?: number;
+      graduation_year_min?: number | null;
+      graduation_year_max?: number | null;
+      stipend_or_salary?: string | null;
+      application_deadline?: string | null;
+    }
+  ) =>
+    api.post<RecruiterOpportunitySummary>(`/recruiter/${recruiterId}/opportunities`, { body }),
+  listCandidateMatches: (recruiterId: string, opportunityId: string) =>
+    api.get<AnonymizedCandidateMatchItem[]>(
+      `/recruiter/${recruiterId}/opportunities/${opportunityId}/matches`
+    ),
+  inviteCandidateToOpportunity: (
+    recruiterId: string,
+    opportunityId: string,
+    studentId: string
+  ) =>
+    api.post<AnonymizedCandidateMatchItem>(
+      `/recruiter/${recruiterId}/opportunities/${opportunityId}/invite`,
+      { body: { student_id: studentId } }
+    ),
+  getConsentedCandidateProfile: (
+    recruiterId: string,
+    opportunityId: string,
+    studentId: string
+  ) =>
+    api.get<ConsentedCandidateProfile>(
+      `/recruiter/${recruiterId}/opportunities/${opportunityId}/candidates/${studentId}/profile`
+    ),
+  updateCandidatePipelineStage: (
+    recruiterId: string,
+    shortlistId: string,
+    body: {
+      new_stage: string;
+      notes?: string | null;
+      interview_date?: string | null;
+    }
+  ) =>
+    api.put<ConsentedCandidateProfile>(
+      `/recruiter/${recruiterId}/shortlists/${shortlistId}/stage`,
+      { body }
+    ),
+  recordRecruiterFeedback: (
+    recruiterId: string,
+    shortlistId: string,
+    body: {
+      technical_score: number;
+      communication_score: number;
+      problem_solving_score: number;
+      project_understanding_score: number;
+      recommendation: string;
+      feedback_notes: string;
+    }
+  ) =>
+    api.post<RecruiterFeedbackResult>(
+      `/recruiter/${recruiterId}/shortlists/${shortlistId}/feedback`,
+      { body }
+    ),
+  queryRecruiterIntelligence: (recruiterId: string, opportunityId: string, query: string) =>
+    api.post<RecruiterAgentQueryResult>(
+      `/recruiter/${recruiterId}/opportunities/${opportunityId}/agent-query`,
+      { body: { opportunity_id: opportunityId, query } }
+    ),
+  listStudentOpportunityInvitations: (studentId: string) =>
+    api.get<StudentOpportunityInvitationItem[]>(
+      `/students/${studentId}/recruiter-invitations`
+    ),
+  respondToOpportunityInvitation: (
+    studentId: string,
+    opportunityId: string,
+    interested: boolean
+  ) =>
+    api.post<StudentOpportunityInvitationItem>(
+      `/students/${studentId}/recruiter-invitations/${opportunityId}/respond`,
+      { body: { interested } }
+    ),
 };

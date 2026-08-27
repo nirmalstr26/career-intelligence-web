@@ -1178,3 +1178,136 @@ export interface CollegeAgentQueryResult {
   answer: string;
   data_snapshot: Record<string, any>;
 }
+
+// ---------------------------------------------------------------------------
+// Domain 24 — Recruiter Pilot & Candidate Pipeline
+// ---------------------------------------------------------------------------
+
+export interface RecruiterCompany {
+  id: string;
+  name: string;
+  website?: string | null;
+  location: string;
+  industry?: string | null;
+  verified: boolean;
+}
+
+export interface RecruiterProfile {
+  id: string;
+  company_id: string;
+  company_name: string;
+  name: string;
+  email: string;
+  job_title: string;
+  status: string;
+  role: string;
+  hiring_location?: string | null;
+}
+
+export interface RecruiterOpportunitySummary {
+  id: string;
+  company_id: string;
+  company_name: string;
+  title: string;
+  opportunity_type: string;
+  work_mode: string;
+  location: string;
+  mandatory_skills: string[];
+  preferred_skills: string[];
+  stipend_or_salary?: string | null;
+  application_deadline?: string | null;
+  total_matches_count: number;
+  invited_count: number;
+  interested_count: number;
+  shortlisted_count: number;
+  interview_count: number;
+  offer_count: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface AnonymizedCandidateMatchItem {
+  match_id: string;
+  student_id: string;
+  opportunity_id: string;
+  anonymized_alias: string;
+  graduation_year: number;
+  career_cluster: string;
+  match_score: number;
+  verified_skills_match: number;
+  project_evidence_score?: number | null;
+  interview_score?: number | null;
+  profile_score?: number | null;
+  fit_explanation: string;
+  risk_factors: string;
+  verified_strengths: string[];
+  missing_requirements: string[];
+  invitation_status?: string | null;
+  pipeline_stage?: string | null;
+  has_consented: boolean;
+}
+
+export interface VerifiedVsDeclaredSkillItem {
+  skill_name: string;
+  category: "VERIFIED" | "DECLARED";
+  score?: number | null;
+  provenance: string;
+}
+
+export interface ConsentedCandidateProfile {
+  student_id: string;
+  opportunity_id: string;
+  name: string;
+  email: string;
+  college_name: string;
+  department: string;
+  graduation_year: number;
+  career_goal: string;
+  match_score: number;
+  fit_explanation: string;
+  risk_factors: string;
+  skills_breakdown: VerifiedVsDeclaredSkillItem[];
+  project_title: string;
+  project_score?: number | null;
+  project_rubric_summary: string;
+  mock_interview_score?: number | null;
+  mock_interview_summary: string;
+  profile_readiness_score: number;
+  resume_summary: string;
+  pipeline_stage: string;
+  consent_granted_at: string;
+}
+
+export interface StudentOpportunityInvitationItem {
+  invitation_id: string;
+  opportunity_id: string;
+  role_title: string;
+  company_name: string;
+  company_location: string;
+  stipend_or_salary?: string | null;
+  work_mode: string;
+  match_score: number;
+  fit_explanation: string;
+  mandatory_skills: string[];
+  status: string;
+  invitation_sent_at: string;
+}
+
+export interface RecruiterFeedbackResult {
+  id: string;
+  shortlist_id: string;
+  recruiter_name: string;
+  technical_score: number;
+  communication_score: number;
+  problem_solving_score: number;
+  project_understanding_score: number;
+  recommendation: string;
+  feedback_notes: string;
+  created_at: string;
+}
+
+export interface RecruiterAgentQueryResult {
+  query: string;
+  answer: string;
+  data_snapshot: Record<string, any>;
+}

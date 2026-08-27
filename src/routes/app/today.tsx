@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { InlineSpinner } from "@/components/common/Loader";
 import { JourneyStrip } from "@/components/common/JourneyStrip";
 import { ContextualCoachCard } from "@/components/coach/ContextualCoachCard";
-import { useCareerIntelligence, useCurriculum, useStudentCollegeContext } from "@/lib/careerai/hooks";
+import { useCareerIntelligence, useCurriculum, useStudentCollegeContext, useStudentOpportunityInvitations, useRespondToOpportunityInvitation } from "@/lib/careerai/hooks";
 import { GraduationCap, Building2, Calendar, Video, ShieldCheck } from "lucide-react";
 import { resolveStudentJourney } from "@/lib/careerai/journeyResolver";
 import type { CareerIntelligence } from "@/lib/careerai/types";
@@ -71,6 +71,9 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
   const curr = curriculumQuery.data;
   const collegeQuery = useStudentCollegeContext();
   const collegeData = collegeQuery.data;
+  const invitesQuery = useStudentOpportunityInvitations();
+  const respondInviteMutation = useRespondToOpportunityInvitation();
+  const invitations = invitesQuery.data || [];
 
   // Resolve full guided journey
   const journey = resolveStudentJourney(ci, curr);

@@ -31,6 +31,8 @@ import { Route as AppReadinessRouteImport } from './routes/app/readiness'
 import { Route as AppSkillsRouteImport } from './routes/app/skills'
 import { Route as AppTodayRouteImport } from './routes/app/today'
 import { Route as CollegeDashboardRouteImport } from './routes/college/dashboard'
+import { Route as RecruiterDashboardRouteImport } from './routes/recruiter/dashboard'
+import { Route as RecruiterRegisterRouteImport } from './routes/recruiter/register'
 import { Route as AppInterviewInterviewIdRouteImport } from './routes/app/interview.$interviewId'
 import { Route as AppLearnModuleCodeRouteImport } from './routes/app/learn.$moduleCode'
 import { Route as AppProjectsProjectCodeRouteImport } from './routes/app/projects.$projectCode'
@@ -145,6 +147,16 @@ const CollegeDashboardRoute = CollegeDashboardRouteImport.update({
   path: '/college/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecruiterDashboardRoute = RecruiterDashboardRouteImport.update({
+  id: '/recruiter/dashboard',
+  path: '/recruiter/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecruiterRegisterRoute = RecruiterRegisterRouteImport.update({
+  id: '/recruiter/register',
+  path: '/recruiter/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppInterviewInterviewIdRoute = AppInterviewInterviewIdRouteImport.update({
   id: '/interview/$interviewId',
   path: '/interview/$interviewId',
@@ -183,6 +195,8 @@ export interface FileRoutesByFullPath {
   '/app/skills': typeof AppSkillsRoute
   '/app/today': typeof AppTodayRoute
   '/college/dashboard': typeof CollegeDashboardRoute
+  '/recruiter/dashboard': typeof RecruiterDashboardRoute
+  '/recruiter/register': typeof RecruiterRegisterRoute
   '/app/': typeof AppIndexRoute
   '/app/interview/$interviewId': typeof AppInterviewInterviewIdRoute
   '/app/learn/$moduleCode': typeof AppLearnModuleCodeRoute
@@ -209,6 +223,8 @@ export interface FileRoutesByTo {
   '/app/skills': typeof AppSkillsRoute
   '/app/today': typeof AppTodayRoute
   '/college/dashboard': typeof CollegeDashboardRoute
+  '/recruiter/dashboard': typeof RecruiterDashboardRoute
+  '/recruiter/register': typeof RecruiterRegisterRoute
   '/app': typeof AppIndexRoute
   '/app/interview/$interviewId': typeof AppInterviewInterviewIdRoute
   '/app/learn/$moduleCode': typeof AppLearnModuleCodeRoute
@@ -237,6 +253,8 @@ export interface FileRoutesById {
   '/app/skills': typeof AppSkillsRoute
   '/app/today': typeof AppTodayRoute
   '/college/dashboard': typeof CollegeDashboardRoute
+  '/recruiter/dashboard': typeof RecruiterDashboardRoute
+  '/recruiter/register': typeof RecruiterRegisterRoute
   '/app/': typeof AppIndexRoute
   '/app/interview/$interviewId': typeof AppInterviewInterviewIdRoute
   '/app/learn/$moduleCode': typeof AppLearnModuleCodeRoute
@@ -266,6 +284,8 @@ export interface FileRouteTypes {
     | '/app/skills'
     | '/app/today'
     | '/college/dashboard'
+    | '/recruiter/dashboard'
+    | '/recruiter/register'
     | '/app/'
     | '/app/interview/$interviewId'
     | '/app/learn/$moduleCode'
@@ -292,6 +312,8 @@ export interface FileRouteTypes {
     | '/app/skills'
     | '/app/today'
     | '/college/dashboard'
+    | '/recruiter/dashboard'
+    | '/recruiter/register'
     | '/app'
     | '/app/interview/$interviewId'
     | '/app/learn/$moduleCode'
@@ -319,6 +341,8 @@ export interface FileRouteTypes {
     | '/app/skills'
     | '/app/today'
     | '/college/dashboard'
+    | '/recruiter/dashboard'
+    | '/recruiter/register'
     | '/app/'
     | '/app/interview/$interviewId'
     | '/app/learn/$moduleCode'
@@ -330,6 +354,8 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
   CollegeDashboardRoute: typeof CollegeDashboardRoute
+  RecruiterDashboardRoute: typeof RecruiterDashboardRoute
+  RecruiterRegisterRoute: typeof RecruiterRegisterRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -488,6 +514,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CollegeDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recruiter/dashboard': {
+      id: '/recruiter/dashboard'
+      path: '/recruiter/dashboard'
+      fullPath: '/recruiter/dashboard'
+      preLoaderRoute: typeof RecruiterDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recruiter/register': {
+      id: '/recruiter/register'
+      path: '/recruiter/register'
+      fullPath: '/recruiter/register'
+      preLoaderRoute: typeof RecruiterRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/interview/$interviewId': {
       id: '/app/interview/$interviewId'
       path: '/interview/$interviewId'
@@ -567,6 +607,8 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
   CollegeDashboardRoute: CollegeDashboardRoute,
+  RecruiterDashboardRoute: RecruiterDashboardRoute,
+  RecruiterRegisterRoute: RecruiterRegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

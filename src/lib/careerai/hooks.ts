@@ -698,3 +698,181 @@ export function useJoinCollegeCohort() {
     },
   });
 }
+
+// ---------------------------------------------------------------------------
+// Domain 24 — Recruiter Pilot & Candidate Pipeline Hooks
+// ---------------------------------------------------------------------------
+
+export const PILOT_RECRUITER_ID = "518682a8-ce27-4575-afc9-e3ea0ae92096";
+export const PILOT_COMPANY_OPP_ID = "455dfda7-4d25-495a-b756-6c2d09a36b50";
+
+export function useRecruiterProfile(recruiterId = PILOT_RECRUITER_ID) {
+  return useQuery({
+    queryKey: ["recruiter-profile", recruiterId],
+    queryFn: () => careerai.getRecruiterProfile(recruiterId),
+    staleTime: 60_000,
+  });
+}
+
+export function useRecruiterOpportunities(recruiterId = PILOT_RECRUITER_ID) {
+  return useQuery({
+    queryKey: ["recruiter-opportunities", recruiterId],
+    queryFn: () => careerai.listRecruiterOpportunities(recruiterId),
+    staleTime: 5_000,
+  });
+}
+
+export function useCreateRecruiterOpportunity(recruiterId = PILOT_RECRUITER_ID) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: {
+      title: string;
+      opportunity_type?: string;
+      work_mode?: string;
+      location: string;
+      description: string;
+      responsibilities?: string[];
+      mandatory_skills?: string[];
+      preferred_skills?: string[];
+      min_proficiency_score?: number;
+      graduation_year_min?: number | null;
+      graduation_year_max?: number | null;
+      stipend_or_salary?: string | null;
+      application_deadline?: string | null;
+    }) => careerai.createRecruiterOpportunity(recruiterId, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["recruiter-opportunities", recruiterId] });
+    },
+  });
+}
+
+export function useCandidateMatches(
+  recruiterId = PILOT_RECRUITER_ID,
+  opportunityId = PILOT_COMPANY_OPP_ID
+) {
+  return useQuery({
+    queryKey: ["candidate-matches", recruiterId, opportunityId],
+    queryFn: () => careerai.listCandidateMatches(recruiterId, opportunityId),
+    enabled: Boolean(opportunityId),
+    staleTime: 5_000,
+  });
+}
+
+export function useInviteCandidate(
+  recruiterId = PILOT_RECRUITER_ID,
+  opportunityId = PILOT_COMPANY_OPP_ID
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (studentId: string) =>
+      careerai.inviteCandidateToOpportunity(recruiterId, opportunityId, studentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["candidate-matches", recruiterId, opportunityId] });
+      queryClient.invalidateQueries({ queryKey: ["recruiter-opportunities", recruiterId] });
+    },
+  });
+}
+
+export function useConsentedCandidateProfile(
+  recruiterId = PILOT_RECRUITER_ID,
+  opportunityId = PILOT_COMPANY_OPP_ID,
+  studentId?: string | null
+) {
+  return useQuery({
+    queryKey: ["consented-candidate-profile", recruiterId, opportunityId, studentId],
+    queryFn: () => careerai.getConsentedCandidateProfile(recruiterId, opportunityId, studentId!),
+    enabled: Boolean(opportunityId) && Boolean(studentId),
+    staleTime: 5_000,
+  });
+}
+
+export function useUpdateCandidatePipelineStage(recruiterId = PILOT_RECRUITER_ID) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      shortlistId,
+      newStage,
+      notes,
+      interviewDate,
+    }: {
+      shortlistId: string;
+      newStage: string;
+      notes?: string | null;
+      interviewDate?: string | null;
+    }) =>
+      careerai.updateCandidatePipelineStage(recruiterId, shortlistId, {
+        new_stage: newStage,
+        notes,
+        interview_date: interviewDate,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["candidate-matches"] });
+      queryClient.invalidateQueries({ queryKey: ["consented-candidate-profile"] });
+      queryClient.invalidateQueries({ queryKey: ["recruiter-opportunities"] });
+      queryClient.invalidateQueries({ queryKey: ["job-applications"] });
+      queryClient.invalidateQueries({ queryKey: ["placement-activity"] });
+    },
+  });
+}
+
+export function useRecordRecruiterFeedback(recruiterId = PILOT_RECRUITER_ID) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      shortlistId,
+      body,
+    }: {
+      shortlistId: string;
+      body: {
+        technical_score: number;
+        communication_score: number;
+        problem_solving_score: number;
+        project_understanding_score: number;
+        recommendation: string;
+        feedback_notes: string;
+      };
+    }) => careerai.recordRecruiterFeedback(recruiterId, shortlistId, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["consented-candidate-profile"] });
+    },
+  });
+}
+
+export function useQueryRecruiterIntelligence(
+  recruiterId = PILOT_RECRUITER_ID,
+  opportunityId = PILOT_COMPANY_OPP_ID
+) {
+  return useMutation({
+    mutationFn: (query: string) =>
+      careerai.queryRecruiterIntelligence(recruiterId, opportunityId, query),
+  });
+}
+
+export function useStudentOpportunityInvitations() {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["student-opportunity-invitations", studentId],
+    queryFn: () => careerai.listStudentOpportunityInvitations(studentId),
+    enabled: studentId !== "",
+    staleTime: 5_000,
+  });
+}
+
+export function useRespondToOpportunityInvitation() {
+  const studentId = useStudentId();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      opportunityId,
+      interested,
+    }: {
+      opportunityId: string;
+      interested: boolean;
+    }) => careerai.respondToOpportunityInvitation(studentId, opportunityId, interested),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["student-opportunity-invitations", studentId] });
+      queryClient.invalidateQueries({ queryKey: ["job-applications", studentId] });
+      queryClient.invalidateQueries({ queryKey: ["placement-activity", studentId] });
+    },
+  });
+}
