@@ -226,7 +226,7 @@ function PathContent({
                 Completing this module unlocks: <strong className="text-foreground">Python Fundamentals</strong>
               </span>
 
-              <Button asChild size="sm" className="font-bold text-xs gap-1.5 px-5">
+              <Button asChild size="sm" data-primary-action="true" className="font-bold text-xs gap-1.5 px-5">
                 <Link to="/app/learn/MOD-DE-SQL-01">
                   Continue Module <ArrowRight className="size-3.5" />
                 </Link>
