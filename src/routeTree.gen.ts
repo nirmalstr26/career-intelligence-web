@@ -21,6 +21,7 @@ import { Route as AppEvidenceRouteImport } from './routes/app/evidence'
 import { Route as AppExploreRouteImport } from './routes/app/explore'
 import { Route as AppHomeRouteImport } from './routes/app/home'
 import { Route as AppMissionsRouteImport } from './routes/app/missions'
+import { Route as AppOpportunitiesRouteImport } from './routes/app/opportunities'
 import { Route as AppPathRouteImport } from './routes/app/path'
 import { Route as AppPlanRouteImport } from './routes/app/plan'
 import { Route as AppPracticeRouteImport } from './routes/app/practice'
@@ -93,6 +94,11 @@ const AppMissionsRoute = AppMissionsRouteImport.update({
   path: '/missions',
   getParentRoute: () => AppRoute,
 } as any)
+const AppOpportunitiesRoute = AppOpportunitiesRouteImport.update({
+  id: '/opportunities',
+  path: '/opportunities',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPathRoute = AppPathRouteImport.update({
   id: '/path',
   path: '/path',
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/app/explore': typeof AppExploreRoute
   '/app/home': typeof AppHomeRoute
   '/app/missions': typeof AppMissionsRoute
+  '/app/opportunities': typeof AppOpportunitiesRoute
   '/app/path': typeof AppPathRoute
   '/app/plan': typeof AppPlanRoute
   '/app/practice': typeof AppPracticeRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/app/explore': typeof AppExploreRoute
   '/app/home': typeof AppHomeRoute
   '/app/missions': typeof AppMissionsRoute
+  '/app/opportunities': typeof AppOpportunitiesRoute
   '/app/path': typeof AppPathRoute
   '/app/plan': typeof AppPlanRoute
   '/app/practice': typeof AppPracticeRoute
@@ -211,6 +219,7 @@ export interface FileRoutesById {
   '/app/explore': typeof AppExploreRoute
   '/app/home': typeof AppHomeRoute
   '/app/missions': typeof AppMissionsRoute
+  '/app/opportunities': typeof AppOpportunitiesRoute
   '/app/path': typeof AppPathRoute
   '/app/plan': typeof AppPlanRoute
   '/app/practice': typeof AppPracticeRoute
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
     | '/app/explore'
     | '/app/home'
     | '/app/missions'
+    | '/app/opportunities'
     | '/app/path'
     | '/app/plan'
     | '/app/practice'
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/app/explore'
     | '/app/home'
     | '/app/missions'
+    | '/app/opportunities'
     | '/app/path'
     | '/app/plan'
     | '/app/practice'
@@ -287,6 +298,7 @@ export interface FileRouteTypes {
     | '/app/explore'
     | '/app/home'
     | '/app/missions'
+    | '/app/opportunities'
     | '/app/path'
     | '/app/plan'
     | '/app/practice'
@@ -393,6 +405,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMissionsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/opportunities': {
+      id: '/app/opportunities'
+      path: '/opportunities'
+      fullPath: '/app/opportunities'
+      preLoaderRoute: typeof AppOpportunitiesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/path': {
       id: '/app/path'
       path: '/path'
@@ -482,6 +501,7 @@ interface AppRouteChildren {
   AppExploreRoute: typeof AppExploreRoute
   AppHomeRoute: typeof AppHomeRoute
   AppMissionsRoute: typeof AppMissionsRoute
+  AppOpportunitiesRoute: typeof AppOpportunitiesRoute
   AppPathRoute: typeof AppPathRoute
   AppPlanRoute: typeof AppPlanRoute
   AppPracticeRoute: typeof AppPracticeRoute
@@ -505,6 +525,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppExploreRoute: AppExploreRoute,
   AppHomeRoute: AppHomeRoute,
   AppMissionsRoute: AppMissionsRoute,
+  AppOpportunitiesRoute: AppOpportunitiesRoute,
   AppPathRoute: AppPathRoute,
   AppPlanRoute: AppPlanRoute,
   AppPracticeRoute: AppPracticeRoute,

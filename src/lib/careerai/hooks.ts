@@ -429,3 +429,117 @@ export function useRestoreProfileVersion() {
     },
   });
 }
+
+// ---------------------------------------------------------------------------
+// Domain 22 — Opportunities, Matching & Application Tracking Hooks
+// ---------------------------------------------------------------------------
+
+export function useOpportunities(careerClusterCode = "DATA_ENGINEER") {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["opportunities", studentId, careerClusterCode],
+    queryFn: () => careerai.getMatchedOpportunities(studentId, careerClusterCode),
+    enabled: studentId !== "",
+    staleTime: 10_000,
+  });
+}
+
+export function useOpportunityFit(opportunityId?: string | null) {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["opportunity-fit", studentId, opportunityId],
+    queryFn: () => careerai.getOpportunityFit(studentId, opportunityId!),
+    enabled: studentId !== "" && Boolean(opportunityId),
+    staleTime: 5_000,
+  });
+}
+
+export function useParseJobDescription() {
+  const studentId = useStudentId();
+  return useMutation({
+    mutationFn: ({
+      raw_jd_text,
+      role_title,
+      company_name,
+    }: {
+      raw_jd_text: string;
+      role_title?: string;
+      company_name?: string;
+    }) => careerai.parseJobDescription(studentId, raw_jd_text, role_title, company_name),
+  });
+}
+
+export function useJobApplications() {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["job-applications", studentId],
+    queryFn: () => careerai.getJobApplications(studentId),
+    enabled: studentId !== "",
+    staleTime: 5_000,
+  });
+}
+
+export function useCreateJobApplication() {
+  const studentId = useStudentId();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (body: {
+      opportunity_id?: string | null;
+      company: string;
+      role: string;
+      job_url?: string | null;
+      status?: string;
+      notes?: string | null;
+      contact_name?: string | null;
+      contact_email?: string | null;
+      salary_or_stipend?: string | null;
+    }) => careerai.createJobApplication(studentId, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["job-applications", studentId] });
+      queryClient.invalidateQueries({ queryKey: ["placement-activity", studentId] });
+      queryClient.invalidateQueries({ queryKey: ["opportunity-fit"] });
+    },
+  });
+}
+
+export function useUpdateJobApplicationStatus() {
+  const studentId = useStudentId();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      applicationId,
+      status,
+      notes,
+      interview_date,
+      next_action_date,
+    }: {
+      applicationId: string;
+      status: string;
+      notes?: string | null;
+      interview_date?: string | null;
+      next_action_date?: string | null;
+    }) =>
+      careerai.updateJobApplicationStatus(studentId, applicationId, {
+        status,
+        notes,
+        interview_date,
+        next_action_date,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["job-applications", studentId] });
+      queryClient.invalidateQueries({ queryKey: ["placement-activity", studentId] });
+    },
+  });
+}
+
+export function usePlacementActivity() {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["placement-activity", studentId],
+    queryFn: () => careerai.getPlacementActivity(studentId),
+    enabled: studentId !== "",
+    staleTime: 5_000,
+  });
+}

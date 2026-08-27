@@ -224,4 +224,55 @@ export const careerai = {
     api.post<{ profile: ProfessionalProfileDetail; restored_version_number: number; message: string }>(
       `/students/${studentId}/professional-profile/versions/${versionId}/restore`
     ),
+  // Opportunity Matching & Application Tracking (Domain 22)
+  getMatchedOpportunities: (studentId: string, careerClusterCode = "DATA_ENGINEER") =>
+    api.get<OpportunitySummary[]>(
+      `/students/${studentId}/opportunities?career_cluster_code=${careerClusterCode}`
+    ),
+  getOpportunityFit: (studentId: string, opportunityId: string) =>
+    api.get<StudentOpportunityFit>(`/students/${studentId}/opportunities/${opportunityId}/fit`),
+  parseJobDescription: (
+    studentId: string,
+    raw_jd_text: string,
+    role_title?: string,
+    company_name?: string
+  ) =>
+    api.post<JobDescriptionParseResult>(`/students/${studentId}/opportunities/parse-jd`, {
+      body: { raw_jd_text, role_title, company_name },
+    }),
+  getJobApplications: (studentId: string) =>
+    api.get<JobApplicationItem[]>(`/students/${studentId}/opportunities/applications`),
+  createJobApplication: (
+    studentId: string,
+    body: {
+      opportunity_id?: string | null;
+      company: string;
+      role: string;
+      job_url?: string | null;
+      status?: string;
+      notes?: string | null;
+      contact_name?: string | null;
+      contact_email?: string | null;
+      salary_or_stipend?: string | null;
+    }
+  ) =>
+    api.post<JobApplicationItem>(`/students/${studentId}/opportunities/applications`, {
+      body,
+    }),
+  updateJobApplicationStatus: (
+    studentId: string,
+    applicationId: string,
+    body: {
+      status: string;
+      notes?: string | null;
+      interview_date?: string | null;
+      next_action_date?: string | null;
+    }
+  ) =>
+    api.put<JobApplicationItem>(
+      `/students/${studentId}/opportunities/applications/${applicationId}/status`,
+      { body }
+    ),
+  getPlacementActivity: (studentId: string) =>
+    api.get<PlacementActivitySummary>(`/students/${studentId}/opportunities/placement-activity`),
 };

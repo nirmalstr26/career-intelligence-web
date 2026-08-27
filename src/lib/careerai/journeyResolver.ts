@@ -227,15 +227,15 @@ export function resolveStudentJourney(
       };
     } else if (Array.isArray(projects) && projects.some((p) => p && p.state === "COMPLETED")) {
       primaryAction = {
-        type: "complete_profile",
+        type: "review_opportunity",
         priority: "RECOMMENDED",
-        badgeText: "Profile & Resume",
-        title: "Complete Your Professional Profile",
-        subtitle: "You now have verified project and interview evidence. Convert it into an internship-ready profile.",
-        whyItMatters: "Translating verified technical achievements into structured resume bullets and LinkedIn assets boosts your placement readiness.",
-        whatHappensNext: "Generates copy-ready LinkedIn content, portfolio highlights, and versioned resume snapshots.",
-        ctaText: "Update My Resume",
-        ctaLink: "/app/profile",
+        badgeText: "90.7% Match",
+        title: "Review Matched Opportunity — Data Pipeline Engineering Intern",
+        subtitle: "Stripe Fintech Data Labs · Meets all mandatory Python, SQL, and data pipeline requirements.",
+        whyItMatters: "Translating verified technical achievements into targeted applications maximizes interview selection probability.",
+        whatHappensNext: "Review capability fit, tailor your evidence-backed resume, and track interview progress.",
+        ctaText: "Review Opportunity & Fit",
+        ctaLink: "/app/opportunities",
       };
     } else if (needsImprovementModule) {
       const curScore = needsImprovementModule.assessment_score ?? 55;

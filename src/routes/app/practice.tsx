@@ -3,6 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Code,
   CheckCircle2,
+  Briefcase,
   Clock,
   ArrowRight,
   Sparkles,

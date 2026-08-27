@@ -7,6 +7,8 @@ import {
   Sparkles,
   ArrowRight,
   CheckCircle2,
+  Briefcase,
+  Target,
   FolderGit2,
   Code,
   Award,

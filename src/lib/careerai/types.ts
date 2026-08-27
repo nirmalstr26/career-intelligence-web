@@ -856,3 +856,146 @@ export interface ProfessionalProfileDetail {
   all_suggestions: ResumeSuggestion[];
   version_history: ResumeVersionSummary[];
 }
+
+// ---------------------------------------------------------------------------
+// Domain 22 — Opportunities, Matching & Application Tracking
+// ---------------------------------------------------------------------------
+
+export interface SkillMatchDetail {
+  skill_code: string;
+  skill_name: string;
+  is_mandatory: boolean;
+  status: "VERIFIED" | "LEARNING" | "MISSING";
+  student_score?: number | null;
+  min_required_score: number;
+  provenance_sources: string[];
+}
+
+export interface OpportunitySkillRequirement {
+  id: string;
+  skill_code: string;
+  skill_name: string;
+  is_mandatory: boolean;
+  min_proficiency_score: number;
+  weight: number;
+}
+
+export interface OpportunitySummary {
+  id: string;
+  career_cluster_code: string;
+  title: string;
+  company: string;
+  location: string;
+  work_mode: "REMOTE" | "HYBRID" | "ONSITE";
+  opportunity_type: "INTERNSHIP" | "FULL_TIME" | "GRADUATE_PROGRAM";
+  stipend_or_salary?: string | null;
+  application_deadline?: string | null;
+  graduation_year_min?: number | null;
+  graduation_year_max?: number | null;
+  match_score: number;
+  match_category: "READY_TO_APPLY" | "APPLY_WHILE_IMPROVING" | "PREPARE_FIRST";
+  verified_strengths_count: number;
+  learning_skills_count: number;
+  missing_skills_count: number;
+  key_skills: string[];
+}
+
+export interface OpportunityDetail {
+  id: string;
+  career_cluster_code: string;
+  title: string;
+  company: string;
+  location: string;
+  work_mode: string;
+  opportunity_type: string;
+  description: string;
+  responsibilities: string[];
+  stipend_or_salary?: string | null;
+  application_deadline?: string | null;
+  graduation_year_min?: number | null;
+  graduation_year_max?: number | null;
+  min_cgpa?: number | null;
+  source_url?: string | null;
+  skill_requirements: OpportunitySkillRequirement[];
+}
+
+export interface StudentOpportunityFit {
+  opportunity: OpportunityDetail;
+  match_score: number;
+  match_category: "READY_TO_APPLY" | "APPLY_WHILE_IMPROVING" | "PREPARE_FIRST";
+  fit_explanation: string;
+  risk_factors: string;
+  verified_strengths: SkillMatchDetail[];
+  learning_skills: SkillMatchDetail[];
+  missing_skills: SkillMatchDetail[];
+  suggested_resume_tailoring: string[];
+  has_existing_application: boolean;
+  existing_application_id?: string | null;
+  existing_application_status?: string | null;
+}
+
+export interface ParsedJDSkillItem {
+  skill_code: string;
+  skill_name: string;
+  is_mandatory: boolean;
+  status: "VERIFIED" | "LEARNING" | "MISSING";
+  student_score?: number | null;
+}
+
+export interface JobDescriptionParseResult {
+  extracted_title: string;
+  extracted_company: string;
+  extracted_experience: string;
+  extracted_responsibilities: string[];
+  extracted_skills: ParsedJDSkillItem[];
+  match_score: number;
+  match_category: "READY_TO_APPLY" | "APPLY_WHILE_IMPROVING" | "PREPARE_FIRST";
+  fit_explanation: string;
+  risk_factors: string;
+  suggested_resume_tailoring: string[];
+}
+
+export interface ApplicationStatusHistoryItem {
+  id: string;
+  from_status?: string | null;
+  to_status: string;
+  notes?: string | null;
+  changed_at: string;
+}
+
+export interface InterviewPrepPlan {
+  focus_modules_to_review: Array<{ code: string; title: string }>;
+  project_questions_to_prepare: string[];
+  technical_drill_areas: string[];
+  recommended_mock_interview_code: string;
+  coach_briefing: string;
+}
+
+export interface JobApplicationItem {
+  id: string;
+  student_id: string;
+  opportunity_id?: string | null;
+  company: string;
+  role: string;
+  job_url?: string | null;
+  status: "SAVED" | "PREPARING" | "APPLIED" | "ONLINE_ASSESSMENT" | "INTERVIEW" | "OFFER" | "REJECTED" | "WITHDRAWN";
+  applied_at?: string | null;
+  interview_date?: string | null;
+  next_action_date?: string | null;
+  notes?: string | null;
+  contact_name?: string | null;
+  contact_email?: string | null;
+  salary_or_stipend?: string | null;
+  interview_prep_plan?: InterviewPrepPlan | null;
+  status_history: ApplicationStatusHistoryItem[];
+  created_at: string;
+}
+
+export interface PlacementActivitySummary {
+  opportunities_reviewed: number;
+  applications_submitted: number;
+  active_interviews: number;
+  offers_received: number;
+  recent_applications: JobApplicationItem[];
+  active_interview_prep?: InterviewPrepPlan | null;
+}
