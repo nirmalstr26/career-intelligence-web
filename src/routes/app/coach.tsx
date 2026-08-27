@@ -1,27 +1,28 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Sparkles, Loader2, MessageSquare, ArrowRight } from "lucide-react";
-
-import { SectionCard } from "@/components/app/ui";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useStudentId, useCareerIntelligence, useCurriculum } from "@/lib/careerai/hooks";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
+import {
+  Sparkles,
+  Send,
+  Loader2,
+  Bot,
+  User,
+  ArrowRight,
+  BookOpen,
+  CheckCircle2,
+  HelpCircle,
+  Compass,
+} from "lucide-react";
+import { useCareerIntelligence, useCurriculum, useStudentId } from "@/lib/careerai/hooks";
 import { careerai } from "@/lib/careerai/client";
+import { AgentReply, RecommendedAction } from "@/lib/careerai/types";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { humanizeCode } from "@/lib/utils";
-import type { AgentReply } from "@/lib/careerai/types";
-
-interface CoachSearchParams {
-  prompt?: string;
-}
 
 export const Route = createFileRoute("/app/coach")({
-  validateSearch: (search: Record<string, unknown>): CoachSearchParams => {
-    return {
-      prompt: typeof search.prompt === "string" ? search.prompt : undefined,
-    };
-  },
-  head: () => ({
-    meta: [{ title: "SPAR Coach — AI Career Advisor · CareerAI" }],
+  validateSearch: (search: Record<string, unknown>) => ({
+    prompt: typeof search.prompt === "string" ? search.prompt : undefined,
+    moduleCode: typeof search.moduleCode === "string" ? search.moduleCode : undefined,
   }),
   component: CoachPage,
 });
@@ -31,10 +32,12 @@ interface Message {
   content: string;
   referencedCareers?: string[];
   referencedSkills?: string[];
+  recommendedAction?: RecommendedAction | null;
 }
 
 function CoachPage() {
-  const { prompt } = Route.useSearch();
+  const { prompt, moduleCode } = Route.useSearch();
+  const navigate = useNavigate();
   const studentId = useStudentId();
   const ciQuery = useCareerIntelligence();
   const ci = ciQuery.data;
@@ -42,29 +45,65 @@ function CoachPage() {
   const currQuery = useCurriculum(primaryCareerCode);
   const curr = currQuery.data;
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: `Hello! I'm your SPAR AI Career Coach. I am calibrated with your active pathway (${curr?.career_cluster_name || "Data Engineer"}), your current readiness score (${ci?.placement_readiness?.score ?? 79}/100), and your learning roadmap progress. How can I assist your career journey today?`,
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState(prompt || "");
   const [loading, setLoading] = useState(false);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const conversationId = useRef<string | undefined>(undefined);
   const initializedPrompt = useRef(false);
+
+  // Load conversation history on mount
+  useEffect(() => {
+    if (!studentId || historyLoaded) return;
+    careerai
+      .getLatestConversation(studentId)
+      .then((history) => {
+        if (history && history.messages && history.messages.length > 0) {
+          conversationId.current = history.conversation_id;
+          const loadedMsgs: Message[] = history.messages.map((m) => {
+            const meta = m.message_metadata || {};
+            return {
+              role: m.role.toLowerCase() === "user" ? "user" : "assistant",
+              content: m.content,
+              referencedCareers: meta.referenced_careers,
+              referencedSkills: meta.referenced_skills,
+              recommendedAction: meta.recommended_action,
+            };
+          });
+          setMessages(loadedMsgs);
+        } else {
+          setMessages([
+            {
+              role: "assistant",
+              content: `Hello! I'm your SPAR AI Career Coach. I am calibrated with your active pathway (${curr?.career_cluster_name || "Data Engineer"}), your current readiness score (${ci?.placement_readiness?.score ?? 79}/100), and your learning roadmap progress. How can I assist your career journey today?`,
+            },
+          ]);
+        }
+        setHistoryLoaded(true);
+      })
+      .catch(() => {
+        setMessages([
+          {
+            role: "assistant",
+            content: `Hello! I'm your SPAR AI Career Coach. I am calibrated with your active pathway (${curr?.career_cluster_name || "Data Engineer"}), your current readiness score (${ci?.placement_readiness?.score ?? 79}/100), and your learning roadmap progress. How can I assist your career journey today?`,
+          },
+        ]);
+        setHistoryLoaded(true);
+      });
+  }, [studentId, historyLoaded, curr, ci]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // If prompt was passed via search query, set input or automatically prepare it
+  // Handle incoming search prompt
   useEffect(() => {
-    if (prompt && !initializedPrompt.current) {
+    if (prompt && !initializedPrompt.current && historyLoaded) {
       setInput(prompt);
       initializedPrompt.current = true;
     }
-  }, [prompt]);
+  }, [prompt, historyLoaded]);
 
   async function handleSend(customText?: string) {
     const textToSend = (customText || input).trim();
@@ -76,8 +115,7 @@ function CoachPage() {
 
     try {
       const reply = await careerai.sendAgentMessage(studentId, textToSend, conversationId.current);
-      const replyAny = reply as AgentReply & { conversation_id?: string };
-      if (replyAny.conversation_id) conversationId.current = replyAny.conversation_id;
+      if (reply.conversation_id) conversationId.current = reply.conversation_id;
 
       setMessages((prev) => [
         ...prev,
@@ -86,6 +124,7 @@ function CoachPage() {
           content: reply.message,
           referencedCareers: reply.referenced_careers,
           referencedSkills: reply.referenced_skills,
+          recommendedAction: reply.recommended_action,
         },
       ]);
     } catch {
@@ -101,11 +140,25 @@ function CoachPage() {
     }
   }
 
+  function handleActionClick(action: RecommendedAction) {
+    if (action.type === "MODULE" && action.target) {
+      void navigate({ to: `/app/learn/${action.target}` });
+    } else if (action.type === "DIAGNOSTIC") {
+      void navigate({ to: "/app/diagnostic" });
+    } else if (action.type === "PRACTICE") {
+      void navigate({ to: "/app/practice" });
+    } else if (action.type === "CAREER_PATH") {
+      void navigate({ to: "/app/path" });
+    } else {
+      void navigate({ to: "/app/path" });
+    }
+  }
+
   const QUICK_PROMPTS = [
-    `What should I focus on next for ${curr?.career_cluster_name || "Data Engineering"}?`,
-    "Why is my Programming score lower than Databases?",
-    "How can I reach 85+ Placement Readiness?",
-    "Explain the difference between ETL and ELT simply.",
+    "What should I focus on today?",
+    "Why do I need SQL as a Data Engineer?",
+    "Quiz me on what I'm weak at.",
+    "What evidence will increase my readiness to 85+?",
   ];
 
   return (
@@ -118,7 +171,7 @@ function CoachPage() {
             SPAR AI Career Coach
           </h1>
           <p className="text-xs text-muted-foreground">
-            Contextual career intelligence, skill gap analysis, and placement guidance.
+            Grounded career guidance, real-time curriculum tutoring, and next-best actions.
           </p>
         </div>
 
@@ -146,7 +199,7 @@ function CoachPage() {
             )}
 
             <div
-              className={`max-w-[80%] rounded-2xl p-4 text-xs sm:text-sm leading-relaxed shadow-sm ${
+              className={`max-w-[85%] rounded-2xl p-4 text-xs sm:text-sm leading-relaxed shadow-sm space-y-2.5 ${
                 msg.role === "user"
                   ? "bg-primary text-primary-foreground font-medium rounded-tr-none"
                   : "bg-surface border border-border/70 text-foreground rounded-tl-none"
@@ -154,14 +207,42 @@ function CoachPage() {
             >
               <p className="whitespace-pre-wrap">{msg.content}</p>
 
+              {/* Skills Referenced Pills */}
               {msg.referencedSkills && msg.referencedSkills.length > 0 && (
-                <div className="mt-2.5 pt-2 border-t border-border/40 flex flex-wrap items-center gap-1.5">
+                <div className="mt-2 pt-2 border-t border-border/40 flex flex-wrap items-center gap-1.5">
                   <span className="text-[10px] text-muted-foreground">Skills referenced:</span>
                   {msg.referencedSkills.map((sk) => (
                     <Badge key={sk} variant="outline" className="text-[9px] bg-secondary">
                       {humanizeCode(sk)}
                     </Badge>
                   ))}
+                </div>
+              )}
+
+              {/* Structured Recommendation Action Card */}
+              {msg.recommendedAction && (
+                <div className="mt-3 rounded-xl border border-primary/40 bg-primary/10 p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
+                      <Sparkles className="size-3.5" />
+                      {msg.recommendedAction.title || "Recommended Next Step"}
+                    </div>
+                    {msg.recommendedAction.reason && (
+                      <p className="text-[11px] text-muted-foreground">
+                        {msg.recommendedAction.reason}
+                      </p>
+                    )}
+                  </div>
+
+                  <Button
+                    size="sm"
+                    variant="hero"
+                    onClick={() => handleActionClick(msg.recommendedAction!)}
+                    className="shrink-0 rounded-xl text-xs gap-1.5 shadow-sm"
+                  >
+                    {msg.recommendedAction.cta_text || msg.recommendedAction.title || "Take Action"}
+                    <ArrowRight className="size-3.5" />
+                  </Button>
                 </div>
               )}
             </div>
@@ -181,7 +262,7 @@ function CoachPage() {
             </span>
             <span className="flex items-center gap-1.5 bg-surface border border-border/60 rounded-2xl px-4 py-2.5">
               <Loader2 className="size-3.5 animate-spin text-primary" />
-              SPAR is formulating your guidance...
+              SPAR is formulating your tailored guidance...
             </span>
           </div>
         )}

@@ -113,6 +113,8 @@ export const careerai = {
     api.post<AgentReply>(`/students/${studentId}/career-agent/messages`, {
       body: { message, conversation_id: conversationId ?? null },
     }),
+  getLatestConversation: (studentId: string) =>
+    api.get<ConversationHistoryResponse | null>(`/students/${studentId}/career-agent/conversations/latest`),
 
   // Curriculum (Domain 18)
   getCurriculum: (studentId: string, careerClusterCode: string) =>

@@ -414,13 +414,42 @@ export interface AgentMessage {
   content: string;
 }
 
+export interface RecommendedAction {
+  type: "MODULE" | "DIAGNOSTIC" | "PRACTICE" | "CAREER_PATH" | string;
+  title: string;
+  target?: string;
+  reason?: string;
+  cta_text?: string;
+}
+
 export interface AgentReply {
+  conversation_id?: string;
   message: string;
   response_type: string;
   referenced_careers: string[];
   referenced_skills: string[];
-  suggested_action: string | null;
-  tool_calls: string[];
+  suggested_action: {
+    student_action_id?: string;
+    action_code: string;
+  } | null;
+  recommended_action?: RecommendedAction | null;
+  tool_calls: Array<{
+    name: string;
+    arguments: Record<string, string>;
+  }>;
+}
+
+export interface ConversationHistoryMessage {
+  id: string;
+  role: "USER" | "ASSISTANT" | "user" | "assistant";
+  content: string;
+  created_at: string;
+  message_metadata?: Record<string, any>;
+}
+
+export interface ConversationHistoryResponse {
+  conversation_id: string;
+  messages: ConversationHistoryMessage[];
 }
 
 // --- Intelligence Refresh ---------------------------------------------------
