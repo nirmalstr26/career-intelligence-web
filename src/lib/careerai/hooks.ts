@@ -328,26 +328,26 @@ export function useSubmitInterviewAnswer() {
   });
 }
 
-// ---------------------------------------------------------------------------
+// -------------------------------------------------------------------------// ---------------------------------------------------------------------------
 // Domain 21 — Professional Profile & Resume Intelligence Hooks
 // ---------------------------------------------------------------------------
 
 export function useProfessionalProfile() {
-  const { studentId } = useAuth();
+  const studentId = useStudentId();
   return useQuery({
     queryKey: ["professional-profile", studentId],
-    queryFn: () => careerAiClient.getProfessionalProfile(studentId!),
-    enabled: Boolean(studentId),
+    queryFn: () => careerai.getProfessionalProfile(studentId),
+    enabled: studentId !== "",
     staleTime: 5_000,
   });
 }
 
 export function useGenerateProfileSuggestions() {
-  const { studentId } = useAuth();
+  const studentId = useStudentId();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => careerAiClient.generateProfileSuggestions(studentId!),
+    mutationFn: () => careerai.generateProfileSuggestions(studentId),
     onSuccess: (data) => {
       queryClient.setQueryData(["professional-profile", studentId], data);
     },
@@ -355,7 +355,7 @@ export function useGenerateProfileSuggestions() {
 }
 
 export function useResolveProfileSuggestion() {
-  const { studentId } = useAuth();
+  const studentId = useStudentId();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -368,8 +368,8 @@ export function useResolveProfileSuggestion() {
       action: "ACCEPT" | "EDIT" | "REJECT";
       edited_content?: Record<string, any> | null;
     }) =>
-      careerAiClient.resolveProfileSuggestion(
-        studentId!,
+      careerai.resolveProfileSuggestion(
+        studentId,
         suggestionId,
         action,
         edited_content
@@ -382,7 +382,7 @@ export function useResolveProfileSuggestion() {
 }
 
 export function useUpdateProfileSection() {
-  const { studentId } = useAuth();
+  const studentId = useStudentId();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -392,7 +392,7 @@ export function useUpdateProfileSection() {
     }: {
       sectionType: string;
       content: Record<string, any>;
-    }) => careerAiClient.updateProfileSection(studentId!, sectionType, content),
+    }) => careerai.updateProfileSection(studentId, sectionType, content),
     onSuccess: (data) => {
       queryClient.setQueryData(["professional-profile", studentId], data);
     },
@@ -400,7 +400,7 @@ export function useUpdateProfileSection() {
 }
 
 export function useUpdateLinkedInProfile() {
-  const { studentId } = useAuth();
+  const studentId = useStudentId();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -410,7 +410,7 @@ export function useUpdateLinkedInProfile() {
     }: {
       headline: string;
       about: string;
-    }) => careerAiClient.updateLinkedInProfile(studentId!, headline, about),
+    }) => careerai.updateLinkedInProfile(studentId, headline, about),
     onSuccess: (data) => {
       queryClient.setQueryData(["professional-profile", studentId], data);
     },
@@ -418,12 +418,12 @@ export function useUpdateLinkedInProfile() {
 }
 
 export function useRestoreProfileVersion() {
-  const { studentId } = useAuth();
+  const studentId = useStudentId();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (versionId: string) =>
-      careerAiClient.restoreProfileVersion(studentId!, versionId),
+      careerai.restoreProfileVersion(studentId, versionId),
     onSuccess: (res) => {
       queryClient.setQueryData(["professional-profile", studentId], res.profile);
     },
