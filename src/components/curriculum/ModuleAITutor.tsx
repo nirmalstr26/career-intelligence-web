@@ -188,7 +188,11 @@ export function ModuleAITutor({
                       : "bg-card/80 text-foreground border border-border/60 rounded-tl-sm shadow-sm",
                   )}
                 >
-                  <p className="whitespace-pre-wrap">{m.content}</p>
+                  {m.role === "user" ? (
+                    <p className="whitespace-pre-wrap">{m.content}</p>
+                  ) : (
+                    <MarkdownRenderer content={m.content} />
+                  )}
                   <span
                     className={cn(
                       "mt-1.5 block text-[10px]",

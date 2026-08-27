@@ -205,7 +205,11 @@ function CoachPage() {
                   : "bg-surface border border-border/70 text-foreground rounded-tl-none"
               }`}
             >
-              <p className="whitespace-pre-wrap">{msg.content}</p>
+              {msg.role === "user" ? (
+                <p className="whitespace-pre-wrap">{msg.content}</p>
+              ) : (
+                <MarkdownRenderer content={msg.content} />
+              )}
 
               {/* Skills Referenced Pills */}
               {msg.referencedSkills && msg.referencedSkills.length > 0 && (
