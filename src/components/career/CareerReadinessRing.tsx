@@ -2,28 +2,35 @@ import { cn } from "@/lib/utils";
 
 interface CareerReadinessRingProps {
   /** 0-100 */
-  value: number;
+  value?: number;
+  score?: number;
   label?: string;
   caption?: string;
   size?: number;
+  strokeWidth?: number;
   className?: string;
 }
 
 /**
  * Signature CareerAI readiness ring. Communicates status with number + label,
- * never color alone.
+ * never color alone. Supports both `value` and `score` props safely.
  */
 export function CareerReadinessRing({
   value,
+  score,
   label = "Career Readiness",
   caption,
   size = 96,
+  strokeWidth,
   className,
 }: CareerReadinessRingProps) {
-  const stroke = Math.max(6, Math.round(size * 0.09));
+  const stroke = strokeWidth ?? Math.max(6, Math.round(size * 0.09));
   const r = (size - stroke) / 2;
   const circumference = 2 * Math.PI * r;
-  const clamped = Math.min(100, Math.max(0, value));
+  
+  const rawNum = value ?? score ?? 0;
+  const safeNum = typeof rawNum === "number" && !isNaN(rawNum) ? rawNum : 0;
+  const clamped = Math.min(100, Math.max(0, Math.round(safeNum)));
   const offset = circumference * (1 - clamped / 100);
 
   return (
@@ -66,19 +73,21 @@ export function CareerReadinessRing({
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="numeric text-lg font-bold leading-none">
+          <span className="numeric text-2xl font-bold leading-none font-display text-foreground">
             {clamped}
-            <span className="text-[0.6em] text-muted-foreground">%</span>
+            <span className="text-[0.6em] text-muted-foreground font-normal ml-0.5">%</span>
           </span>
           {caption ? (
-            <span className="mt-0.5 text-[10px] font-medium text-primary">{caption}</span>
+            <span className="mt-1 text-[10px] font-semibold text-primary">{caption}</span>
           ) : null}
         </div>
       </div>
-      <div className="min-w-0">
-        <p className="text-sm font-semibold">{label}</p>
-        <p className="text-xs text-muted-foreground">Updated today</p>
-      </div>
+      {label && label !== "hidden" ? (
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-foreground">{label}</p>
+          <p className="text-xs text-muted-foreground">Updated today</p>
+        </div>
+      ) : null}
     </div>
   );
 }

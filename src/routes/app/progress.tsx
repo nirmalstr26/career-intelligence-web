@@ -61,12 +61,12 @@ function ProgressContent({ ci }: { ci: CareerIntelligence }) {
   const curr = currQuery.data;
   const projects = projectsQuery.data ?? [];
 
-  const readinessScore = Math.round(
+  const rawScore =
     ci?.placement_readiness?.score ??
     ci?.primary_career_readiness?.score ??
     (ci as any)?.readiness?.overall_readiness ??
-    79
-  );
+    79;
+  const readinessScore = typeof rawScore === "number" && !isNaN(rawScore) ? Math.round(rawScore) : 79;
   const completedCount = (curr as any)?.completed_count ?? (curr as any)?.completed_modules ?? 4;
   const totalModules = (curr as any)?.total_count ?? (curr as any)?.total_modules ?? 15;
 
@@ -131,7 +131,7 @@ function ProgressContent({ ci }: { ci: CareerIntelligence }) {
           className="surface-panel rounded-3xl p-6 border border-border/80 flex flex-col items-center justify-center text-center space-y-4"
         >
           <h2 className="font-display text-base font-bold text-foreground">Placement Readiness</h2>
-          <CareerReadinessRing score={readinessScore} size={150} strokeWidth={12} />
+          <CareerReadinessRing value={readinessScore} score={readinessScore} size={140} strokeWidth={12} label="hidden" />
           <div className="space-y-1">
             <p className="text-xs font-semibold text-foreground">
               {readinessScore >= 85 ? "Interview Ready" : readinessScore >= 70 ? "On Track for Placement" : "Building Foundations"}
