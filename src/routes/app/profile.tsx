@@ -98,8 +98,20 @@ function ProfilePage() {
   const pro = proProfileQuery.data;
   const fallback = "—";
 
-  const pendingSuggestions = pro.pending_suggestions || [];
-  const readiness = pro.profile_readiness;
+  const pendingSuggestions = pro?.pending_suggestions || [];
+  const readiness = pro?.profile_readiness || {
+    overall_score: 0,
+    readiness_level: "DEVELOPING",
+    dimensions: [],
+    missing_items: [],
+    next_improvement_steps: [],
+  };
+  const verifiedSkills = pro?.skills_breakdown?.verified_skills || [];
+  const learningSkills = pro?.skills_breakdown?.learning_skills || [];
+  const selfDeclaredSkills = pro?.skills_breakdown?.self_declared_skills || [];
+  const portfolioItems = pro?.github_portfolio || [];
+  const versionHistory = pro?.version_history || [];
+  const resumeSections = pro?.sections || [];
 
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
@@ -239,7 +251,7 @@ function ProfilePage() {
           }`}
         >
           <Github className="size-3.5" />
-          GitHub & Projects ({pro.github_portfolio.length})
+          GitHub & Projects ({portfolioItems.length})
         </button>
 
         <button
@@ -476,7 +488,7 @@ function ProfilePage() {
                     <span className="text-[10px] text-muted-foreground">Demonstrated</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {pro.skills_breakdown.verified_skills.map((sk) => (
+                    {verifiedSkills.map((sk) => (
                       <Badge
                         key={sk.skill_code}
                         variant="outline"
@@ -498,7 +510,7 @@ function ProfilePage() {
                     <span className="text-[10px] text-muted-foreground">Curriculum</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {pro.skills_breakdown.learning_skills.map((sk) => (
+                    {learningSkills.map((sk) => (
                       <Badge
                         key={sk.skill_code}
                         variant="outline"
@@ -520,7 +532,7 @@ function ProfilePage() {
                     <span className="text-[10px] text-muted-foreground">Tools</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {pro.skills_breakdown.self_declared_skills.map((sk) => (
+                    {selfDeclaredSkills.map((sk) => (
                       <Badge key={sk} variant="secondary" className="text-[11px]">
                         {sk}
                       </Badge>
@@ -538,7 +550,7 @@ function ProfilePage() {
               </h3>
 
               {(() => {
-                const projSec = pro.sections.find((s) => s.section_type === "PROJECTS");
+                const projSec = resumeSections.find((s) => s.section_type === "PROJECTS");
                 const items = projSec?.content?.items || [];
                 if (items.length === 0) {
                   return (
@@ -624,7 +636,7 @@ function ProfilePage() {
             </p>
 
             <div className="space-y-2">
-              {pro.version_history.map((ver) => (
+              {versionHistory.map((ver) => (
                 <div
                   key={ver.id}
                   className="flex items-center justify-between p-3 rounded-xl border bg-card text-xs hover:border-primary/30 transition-colors"
@@ -824,7 +836,7 @@ function ProfilePage() {
           </div>
 
           <div className="grid gap-4">
-            {pro.github_portfolio.map((proj) => (
+            {portfolioItems.map((proj) => (
               <div
                 key={proj.project_code}
                 className="surface-panel rounded-2xl p-6 border border-border/80 space-y-4 shadow-sm"
