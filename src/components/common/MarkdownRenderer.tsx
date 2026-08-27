@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Check, Copy } from "lucide-react";
@@ -8,7 +8,7 @@ interface MarkdownRendererProps {
   className?: string;
 }
 
-function CodeBlock({ children, className }: { children?: React.ReactNode; className?: string }) {
+function CodeBlock({ children, className }: { children?: ReactNode; className?: string }) {
   const [copied, setCopied] = useState(false);
   const codeText = String(children).replace(/\n$/, "");
   const match = /language-(\w+)/.exec(className || "");
@@ -31,7 +31,7 @@ function CodeBlock({ children, className }: { children?: React.ReactNode; classN
         <button
           type="button"
           onClick={handleCopy}
-          className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] hover:bg-secondary hover:text-foreground transition-colors"
+          className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] hover:bg-secondary hover:text-foreground transition-colors cursor-pointer"
           title="Copy code"
         >
           {copied ? (
@@ -56,7 +56,7 @@ function CodeBlock({ children, className }: { children?: React.ReactNode; classN
 
 export function MarkdownRenderer({ content, className = "" }: MarkdownRendererProps) {
   // Clean lingering raw action tags or empty action blocks
-  const cleanContent = content
+  const cleanContent = (content || "")
     .replace(/\[ACTION:\s*\{[^}]*\}\]/gi, "")
     .replace(/```json\s*\{[\s\S]*?\}\s*```/gi, (match) => {
       if (match.includes('"type"') && match.includes('"title"')) {
@@ -149,18 +149,24 @@ export function MarkdownRenderer({ content, className = "" }: MarkdownRendererPr
           td: ({ children }) => (
             <td className="px-3 py-2 text-foreground/90">{children}</td>
           ),
-          code: ({ inline, className, children, ...props }: any) => {
-            if (inline) {
-              return (
-                <code
-                  className="rounded-md bg-secondary/80 px-1.5 py-0.5 font-mono text-[11px] font-medium text-primary border border-border/50"
-                  {...props}
-                >
-                  {children}
-                </code>
-              );
+          pre: ({ children }) => <>{children}</>,
+          code: ({ className, children, ...props }: any) => {
+            const codeStr = String(children).replace(/\n$/, "");
+            const hasLang = /language-(\w+)/.test(className || "");
+            const isMultiLine = codeStr.includes("\n");
+
+            if (hasLang || isMultiLine) {
+              return <CodeBlock className={className}>{children}</CodeBlock>;
             }
-            return <CodeBlock className={className}>{children}</CodeBlock>;
+
+            return (
+              <code
+                className="rounded-md bg-secondary/80 px-1.5 py-0.5 font-mono text-[11px] font-medium text-primary border border-border/50"
+                {...props}
+              >
+                {children}
+              </code>
+            );
           },
           a: ({ href, children }) => (
             <a
