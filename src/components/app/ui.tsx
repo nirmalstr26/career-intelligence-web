@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+export { InlineSpinner } from "@/components/common/Loader";
 import { InlineSpinner } from "@/components/common/Loader";
 import { cn } from "@/lib/utils";
 

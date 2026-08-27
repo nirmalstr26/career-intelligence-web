@@ -156,4 +156,21 @@ export const careerai = {
     api.get<Record<string, unknown>>(
       `/students/${studentId}/curriculum/${careerClusterCode}/agent-context`,
     ),
+  // Projects (Domain 19)
+  listProjects: (studentId: string, careerClusterCode?: string) =>
+    api.get<ProjectSummary[]>(`/students/${studentId}/projects${careerClusterCode ? `?career_cluster_code=${careerClusterCode}` : ""}`),
+  getProject: (studentId: string, projectCode: string) =>
+    api.get<ProjectDetail>(`/students/${studentId}/projects/${projectCode}`),
+  startProject: (studentId: string, projectCode: string) =>
+    api.post<ProjectDetail>(`/students/${studentId}/projects/${projectCode}/start`),
+  saveProjectStage: (studentId: string, projectCode: string, stage: string, data: Record<string, any>) =>
+    api.put<ProjectDetail>(`/students/${studentId}/projects/${projectCode}/stage`, {
+      body: { stage, data },
+    }),
+  submitProject: (studentId: string, projectCode: string, submissionPayload?: Record<string, any>) =>
+    api.post<ProjectSubmission>(`/students/${studentId}/projects/${projectCode}/submit`, {
+      body: { submission_payload: submissionPayload },
+    }),
+  getProjectSubmissions: (studentId: string, projectCode: string) =>
+    api.get<ProjectSubmission[]>(`/students/${studentId}/projects/${projectCode}/submissions`),
 } as const;

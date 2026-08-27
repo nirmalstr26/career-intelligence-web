@@ -190,6 +190,20 @@ export function resolveStudentJourney(
       ctaText: "Select Career Path",
       ctaLink: "/app/path",
     };
+  } else if (projects && projects.find((p) => p.state === "IN_PROGRESS" || p.state === "NEEDS_IMPROVEMENT")) {
+    const actProj = projects.find((p) => p.state === "IN_PROGRESS" || p.state === "NEEDS_IMPROVEMENT")!;
+    primaryAction = {
+      type: "continue_project",
+      priority: actProj.state === "NEEDS_IMPROVEMENT" ? "URGENT" : "RECOMMENDED",
+      badgeText: actProj.state === "NEEDS_IMPROVEMENT" ? "Fix Project" : "Continue Project",
+      title: actProj.title,
+      subtitle: `Current stage: ${actProj.current_stage.toUpperCase()} · ~20 mins estimated`,
+      estimatedMinutes: 20,
+      whyItMatters: "Hands-on data pipeline projects prove practical engineering ability beyond theoretical quizzes.",
+      whatHappensNext: "Submitting your solution triggers AI rubric review, creating verified evidence that updates your readiness score.",
+      ctaText: actProj.state === "NEEDS_IMPROVEMENT" ? "Improve Project" : "Continue Project",
+      ctaLink: `/app/projects/${actProj.code}`,
+    };
   } else if (needsImprovementModule) {
     const curScore = needsImprovementModule.assessment_score ?? 55;
     const reqScore = needsImprovementModule.min_pass_score ?? 65;

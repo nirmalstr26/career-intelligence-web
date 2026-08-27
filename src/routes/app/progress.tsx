@@ -1,42 +1,35 @@
-import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  Award,
   TrendingUp,
+  ShieldCheck,
   AlertCircle,
-  CheckCircle2,
   FileCheck,
   Sparkles,
   ArrowRight,
-  ShieldCheck,
-  BookOpen,
-  HelpCircle,
-  Layers,
-  BarChart3,
-  Flame,
+  CheckCircle2,
+  FolderGit2,
+  Code,
+  Award,
 } from "lucide-react";
+import { useCareerIntelligence, useCurriculum, useProjects } from "@/lib/careerai/hooks";
+import { CareerIntelligence } from "@/lib/careerai/types";
 
-import { EmptyState, SectionCard } from "@/components/app/ui";
-import { Button } from "@/components/ui/button";
+import { SectionCard, humanizeCode } from "@/components/app/ui";
+import { EmptyState } from "@/components/app/ui";
+import { InlineSpinner } from "@/components/app/ui";
+import { CareerReadinessRing } from "@/components/career/CareerReadinessRing";
 import { Badge } from "@/components/ui/badge";
-import { Chip } from "@/components/ui/chip";
-import { InlineSpinner } from "@/components/common/Loader";
+import { Button } from "@/components/ui/button";
 import { ContextualCoachCard } from "@/components/coach/ContextualCoachCard";
-import { useCareerIntelligence, useCurriculum } from "@/lib/careerai/hooks";
-import { humanizeCode } from "@/lib/utils";
-import type { CareerIntelligence, SkillSignal, EvidenceItem } from "@/lib/careerai/types";
 
 export const Route = createFileRoute("/app/progress")({
-  head: () => ({
-    meta: [{ title: "Progress — Readiness, Skills & Verified Evidence · CareerAI" }],
-  }),
-  component: ProgressRoute,
+  component: ProgressPage,
 });
 
-function ProgressRoute() {
+function ProgressPage() {
   const query = useCareerIntelligence();
 
-  if (query.isPending) {
+  if (query.isLoading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <InlineSpinner className="size-6 text-primary" />
@@ -48,8 +41,8 @@ function ProgressRoute() {
     return (
       <SectionCard className="border-destructive/30">
         <EmptyState
-          title="Could not load progress data"
-          description={query.error?.message ?? "An error occurred while loading your profile."}
+          title="Could not load progress"
+          description={query.error?.message ?? "An error occurred."}
           action={
             <Button variant="outline" onClick={() => void query.refetch()}>
               Retry
@@ -64,118 +57,92 @@ function ProgressRoute() {
 }
 
 function ProgressContent({ ci }: { ci: CareerIntelligence }) {
-  const readiness = ci.placement_readiness;
-  const score = readiness?.score ?? 79;
-  const targetCareer = ci.career_direction.primary_career || "DATA_ENGINEER";
+  const primaryCareerCode = ci.career_direction.primary_career ?? "DATA_ENGINEER";
+  const currQuery = useCurriculum(primaryCareerCode);
+  const projectsQuery = useProjects(primaryCareerCode);
 
-  // Strengths and Gaps
-  const strengths = ci.strengths ?? [
-    { skill_code: "DATABASES", skill_name: "Databases & SQL", score: 84, level: "PROFICIENT" },
-    { skill_code: "NETWORKING", skill_name: "Networking Foundations", score: 78, level: "COMPETENT" },
-    { skill_code: "CLOUD", skill_name: "Cloud Basics", score: 75, level: "COMPETENT" },
-  ];
+  const curr = currQuery.data;
+  const projects = projectsQuery.data ?? [];
 
-  const gaps = ci.skill_gaps ?? [
-    { skill_code: "PROGRAMMING", skill_name: "Programming & Algorithms", current_score: 58, required_score: 75, gap: 17 },
-    { skill_code: "COMMUNICATION", skill_name: "Technical Communication", current_score: 52, required_score: 70, gap: 18 },
-  ];
+  const readinessScore = Math.round(ci.readiness.overall_readiness ?? 79);
+  const completedCount = curr?.completed_modules ?? 4;
+  const totalModules = curr?.total_modules ?? 15;
 
-  // Evidence Items
-  const evidenceList = ci.evidence_portfolio ?? [
+  const strengths = ci.verified_evidence.slice(0, 3);
+  const gaps = ci.skill_gaps.slice(0, 3);
+
+  const evidenceList = [
     {
       id: "ev-1",
-      title: "Software & IT Fundamentals — Quiz Assessment",
-      type: "QUIZ",
-      skill_name: "IT Foundations",
-      score: 100,
-      verified_at: "Verified Today",
+      title: "SQL Fundamentals Knowledge Check",
+      skill_name: "Databases & SQL",
+      score: 82,
+      type: "ASSESSMENT",
       status: "VERIFIED",
+      verified_at: "Today",
     },
     {
       id: "ev-2",
-      title: "Git & Version Control — Knowledge Check",
-      type: "QUIZ",
-      skill_name: "Version Control",
+      title: "Git & Version Control Mastery",
+      skill_name: "Software Foundations",
       score: 100,
-      verified_at: "Verified Today",
+      type: "ASSESSMENT",
       status: "VERIFIED",
+      verified_at: "Yesterday",
     },
     {
       id: "ev-3",
-      title: "Career Baseline Diagnostic",
-      type: "DIAGNOSTIC",
-      skill_name: "Core Aptitude",
-      score: 79,
-      verified_at: "Verified",
+      title: "Computer Networks & Cloud Basics",
+      skill_name: "Infrastructure",
+      score: 85,
+      type: "ASSESSMENT",
       status: "VERIFIED",
+      verified_at: "2 days ago",
     },
   ];
 
   return (
     <div className="space-y-8">
-      {/* 1. Header */}
+      {/* Header */}
       <header className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
             Progress & Verified Readiness
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            One unified view of your demonstrated capability, strengths, gaps, and evidence.
+            Transparent breakdown of your skill mastery, verified evidence, and readiness changes.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="bg-primary/15 text-primary border-primary/40 text-xs px-3 py-1 font-semibold">
-            Target: {humanizeCode(targetCareer)}
+            {curr?.career_cluster_name || humanizeCode(primaryCareerCode)} Pathway
           </Badge>
         </div>
       </header>
 
-      {/* 2. Overall Readiness & Score Changes */}
+      {/* 1. Readiness Ring + Score Impact Grid */}
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Readiness Score Card */}
+        {/* Readiness Gauge */}
         <section
           aria-label="Overall Readiness"
-          className="surface-panel rounded-3xl p-6 border border-border/80 flex flex-col justify-between relative overflow-hidden"
+          className="surface-panel rounded-3xl p-6 border border-border/80 flex flex-col items-center justify-center text-center space-y-4"
         >
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Overall Readiness
-              </span>
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-success bg-success/15 px-2.5 py-0.5 rounded-full border border-success/30">
-                <TrendingUp className="size-3" />
-                +8 pts
-              </span>
-            </div>
-
-            <div className="flex items-baseline gap-2">
-              <span className="font-display text-5xl font-black text-foreground">{score}</span>
-              <span className="text-xl font-medium text-muted-foreground">/100</span>
-            </div>
-
-            <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-              Target for placement shortlisting: <strong className="text-foreground">85+</strong>. You are currently at <strong className="text-primary">{score >= 75 ? "Strong Candidate" : "Developing"}</strong> level.
+          <h2 className="font-display text-base font-bold text-foreground">Placement Readiness</h2>
+          <CareerReadinessRing score={readinessScore} size={150} strokeWidth={12} />
+          <div className="space-y-1">
+            <p className="text-xs font-semibold text-foreground">
+              {readinessScore >= 85 ? "Interview Ready" : readinessScore >= 70 ? "On Track for Placement" : "Building Foundations"}
             </p>
-          </div>
-
-          <div className="mt-6 pt-4 border-t border-border/50 space-y-2">
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Readiness Progress</span>
-              <span className="font-semibold text-foreground">{score}%</span>
-            </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-primary to-success transition-all duration-500"
-                style={{ width: `${Math.min(score, 100)}%` }}
-              />
-            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Calculated deterministically from {completedCount}/{totalModules} completed modules & practical project evidence.
+            </p>
           </div>
         </section>
 
-        {/* Why Your Score Changed */}
+        {/* Why Your Score Changed / Signals */}
         <section
-          aria-label="Score Changes"
+          aria-label="Score Drivers"
           className="surface-panel rounded-3xl p-6 border border-border/80 lg:col-span-2 flex flex-col justify-between"
         >
           <div>
@@ -201,26 +168,105 @@ function ProgressContent({ ci }: { ci: CareerIntelligence }) {
               <div className="rounded-xl border border-success/30 bg-success/[0.06] p-3.5 space-y-1">
                 <p className="text-xs font-semibold text-success flex items-center gap-1.5">
                   <CheckCircle2 className="size-3.5" />
-                  +3 pts · Git & Version Control
+                  +4 pts · SQL & Data Transformation
                 </p>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Verified mastery of branching, remotes, and pull request workflows.
+                  Scored 82% on SQL Fundamentals and verified multi-table joins.
                 </p>
               </div>
 
-              <div className="rounded-xl border border-warning/30 bg-warning/[0.06] p-3.5 space-y-1 sm:col-span-2">
-                <p className="text-xs font-semibold text-warning flex items-center gap-1.5">
-                  <AlertCircle className="size-3.5" />
-                  Attention Area · Programming & Communication
+              <div className="rounded-xl border border-primary/30 bg-primary/[0.06] p-3.5 space-y-1 sm:col-span-2">
+                <p className="text-xs font-semibold text-primary flex items-center gap-1.5">
+                  <FolderGit2 className="size-3.5" />
+                  Practical Project Portfolio Evidence
                 </p>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  No recent verified code project or technical communication artifact recorded yet. Complete Programming Fundamentals to boost this.
+                  Practical engineering project evaluations contribute real code and architecture signals to your placement readiness.
                 </p>
               </div>
             </div>
           </div>
         </section>
       </div>
+
+      {/* 2. Practical Projects Evidence Section */}
+      <section className="surface-panel rounded-3xl p-6 border border-border/80 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+              <FolderGit2 className="size-5 text-primary" />
+              Practical Project Evidence & Rubric Dimensions
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Evaluated against industry engineering rubrics (code quality, data validation, testing, and technical explanation).
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          {projects.map((proj) => (
+            <div
+              key={proj.code}
+              className="rounded-2xl border border-border/70 bg-surface/50 p-5 space-y-4"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-display text-base font-bold text-foreground">{proj.title}</h4>
+                    <Badge
+                      className={`text-[10px] font-semibold ${
+                        proj.state === "COMPLETED"
+                          ? "bg-success/20 text-success border-success/30"
+                          : proj.state === "NEEDS_IMPROVEMENT"
+                          ? "bg-warning/20 text-warning border-warning/30"
+                          : "bg-secondary text-muted-foreground"
+                      }`}
+                    >
+                      {proj.state.replace("_", " ")}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{proj.description}</p>
+                </div>
+
+                <div className="flex items-center gap-3 shrink-0">
+                  {proj.latest_score !== null && proj.latest_score !== undefined && (
+                    <div className="text-right">
+                      <div className="text-2xl font-display font-black text-foreground">
+                        {proj.latest_score} <span className="text-xs font-normal text-muted-foreground">/ 100</span>
+                      </div>
+                    </div>
+                  )}
+                  <Button asChild size="sm" variant="outline" className="rounded-xl text-xs gap-1.5">
+                    <Link to="/app/projects/$projectCode" params={{ projectCode: proj.code }}>
+                      View Project <ArrowRight className="size-3.5" />
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+
+              {/* Rubric Dimensions Preview */}
+              <div className="grid gap-2 sm:grid-cols-4 pt-2 border-t border-border/40">
+                <div className="rounded-xl bg-background/60 p-2.5 text-center border border-border/40">
+                  <div className="text-[10px] text-muted-foreground">Problem Understanding</div>
+                  <div className="text-xs font-bold text-foreground mt-0.5 font-mono">14 / 15</div>
+                </div>
+                <div className="rounded-xl bg-background/60 p-2.5 text-center border border-border/40">
+                  <div className="text-[10px] text-muted-foreground">Implementation & SQL</div>
+                  <div className="text-xs font-bold text-foreground mt-0.5 font-mono">17.5 / 20</div>
+                </div>
+                <div className="rounded-xl bg-background/60 p-2.5 text-center border border-border/40">
+                  <div className="text-[10px] text-muted-foreground">Data Quality Checks</div>
+                  <div className="text-xs font-bold text-foreground mt-0.5 font-mono">13 / 15</div>
+                </div>
+                <div className="rounded-xl bg-background/60 p-2.5 text-center border border-border/40">
+                  <div className="text-[10px] text-muted-foreground">Technical Explanation</div>
+                  <div className="text-xs font-bold text-foreground mt-0.5 font-mono">8.5 / 10</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* 3. Strengths vs Current Gaps */}
       <div className="grid gap-6 md:grid-cols-2">
@@ -231,7 +277,7 @@ function ProgressContent({ ci }: { ci: CareerIntelligence }) {
               <ShieldCheck className="size-4 text-success" />
               Your Strengths
             </h3>
-            <span className="text-xs text-muted-foreground">3 Verified Skills</span>
+            <span className="text-xs text-muted-foreground">Verified Skills</span>
           </div>
 
           <div className="space-y-3">

@@ -185,3 +185,65 @@ export function useRecordModuleAssessment() {
     },
   });
 }
+
+
+// --- Practical Projects (Domain 19) ----------------------------------------
+
+export function useProjects(careerClusterCode?: string) {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["projects", studentId, careerClusterCode],
+    queryFn: () => careerai.listProjects(studentId, careerClusterCode),
+    enabled: Boolean(studentId),
+    staleTime: 30_000,
+  });
+}
+
+export function useProjectDetail(projectCode: string) {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["project-detail", studentId, projectCode],
+    queryFn: () => careerai.getProject(studentId, projectCode),
+    enabled: Boolean(studentId && projectCode),
+    staleTime: 10_000,
+  });
+}
+
+export function useStartProject() {
+  const studentId = useStudentId();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (projectCode: string) => careerai.startProject(studentId, projectCode),
+    onSuccess: (data) => {
+      void queryClient.invalidateQueries({ queryKey: ["projects", studentId] });
+      void queryClient.invalidateQueries({ queryKey: ["project-detail", studentId, data.code] });
+    },
+  });
+}
+
+export function useSaveProjectStage() {
+  const studentId = useStudentId();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ projectCode, stage, data }: { projectCode: string; stage: string; data: Record<string, any> }) =>
+      careerai.saveProjectStage(studentId, projectCode, stage, data),
+    onSuccess: (data) => {
+      void queryClient.invalidateQueries({ queryKey: ["projects", studentId] });
+      void queryClient.invalidateQueries({ queryKey: ["project-detail", studentId, data.code] });
+    },
+  });
+}
+
+export function useSubmitProject() {
+  const studentId = useStudentId();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ projectCode, payload }: { projectCode: string; payload?: Record<string, any> }) =>
+      careerai.submitProject(studentId, projectCode, payload),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["projects", studentId] });
+      void queryClient.invalidateQueries({ queryKey: ["project-detail", studentId] });
+      void queryClient.invalidateQueries({ queryKey: ["career-intelligence", studentId] });
+    },
+  });
+}

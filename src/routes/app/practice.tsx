@@ -1,37 +1,34 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  Wrench,
-  Sparkles,
-  ArrowRight,
+  Code,
   CheckCircle2,
   Clock,
-  Target,
-  FileCode2,
-  MessageSquare,
+  ArrowRight,
+  Sparkles,
   Bot,
   Layers,
+  Award,
+  AlertTriangle,
+  FolderGit2,
 } from "lucide-react";
+import { useCareerIntelligence, useCurriculum, useProjects } from "@/lib/careerai/hooks";
+import { CareerIntelligence } from "@/lib/careerai/types";
 
-import { SectionCard, EmptyState } from "@/components/app/ui";
-import { Button } from "@/components/ui/button";
+import { SectionCard, humanizeCode } from "@/components/app/ui";
+import { EmptyState } from "@/components/app/ui";
+import { InlineSpinner } from "@/components/app/ui";
 import { Badge } from "@/components/ui/badge";
-import { InlineSpinner } from "@/components/common/Loader";
+import { Button } from "@/components/ui/button";
 import { ContextualCoachCard } from "@/components/coach/ContextualCoachCard";
-import { useCareerIntelligence, useCurriculum } from "@/lib/careerai/hooks";
-import { humanizeCode } from "@/lib/utils";
-import type { CareerIntelligence } from "@/lib/careerai/types";
 
 export const Route = createFileRoute("/app/practice")({
-  head: () => ({
-    meta: [{ title: "Practice — Challenges, Diagnostic & Missions · CareerAI" }],
-  }),
-  component: PracticeRoute,
+  component: PracticePage,
 });
 
-function PracticeRoute() {
+function PracticePage() {
   const query = useCareerIntelligence();
 
-  if (query.isPending) {
+  if (query.isLoading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <InlineSpinner className="size-6 text-primary" />
@@ -61,7 +58,10 @@ function PracticeRoute() {
 function PracticeContent({ ci }: { ci: CareerIntelligence }) {
   const primaryCareerCode = ci.career_direction.primary_career ?? "DATA_ENGINEER";
   const currQuery = useCurriculum(primaryCareerCode);
+  const projectsQuery = useProjects(primaryCareerCode);
+
   const curr = currQuery.data;
+  const projects = projectsQuery.data ?? [];
 
   // Active missions
   const missions = ci.active_missions ?? [
@@ -91,10 +91,10 @@ function PracticeContent({ ci }: { ci: CareerIntelligence }) {
       <header className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
-            Practice & Challenges
+            Practice & Hands-on Projects
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Hands-on exercises, diagnostics, and coding missions to build verified portfolio evidence.
+            Engineering projects, diagnostics, and coding missions to build verified portfolio evidence.
           </p>
         </div>
 
@@ -103,7 +103,98 @@ function PracticeContent({ ci }: { ci: CareerIntelligence }) {
         </Badge>
       </header>
 
-      {/* 1. Baseline Diagnostic Banner */}
+      {/* 1. Hands-on Practical Projects Section */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+              <FolderGit2 className="size-5 text-primary" />
+              Practical Engineering Projects
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              End-to-end portfolio projects evaluated by AI rubrics to create verified platform evidence.
+            </p>
+          </div>
+          <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
+            {projects.length} Project Available
+          </Badge>
+        </div>
+
+        <div className="grid gap-4">
+          {projects.map((proj) => (
+            <div
+              key={proj.code}
+              className="surface-panel hover-lift rounded-3xl p-6 sm:p-7 border border-border/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 relative overflow-hidden"
+            >
+              <div className="space-y-3 max-w-2xl">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge
+                    className={`text-xs font-semibold ${
+                      proj.state === "COMPLETED"
+                        ? "bg-success/20 text-success border-success/30"
+                        : proj.state === "NEEDS_IMPROVEMENT"
+                        ? "bg-warning/20 text-warning border-warning/30"
+                        : proj.state === "IN_PROGRESS"
+                        ? "bg-primary/20 text-primary border-primary/30"
+                        : "bg-secondary text-muted-foreground"
+                    }`}
+                  >
+                    {proj.state.replace("_", " ")}
+                  </Badge>
+
+                  {proj.latest_score !== null && proj.latest_score !== undefined && (
+                    <Badge variant="outline" className="text-xs font-mono font-bold text-foreground">
+                      Score: {proj.latest_score} / 100
+                    </Badge>
+                  )}
+
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Clock className="size-3" />
+                    ~{proj.estimated_hours} hours · {proj.difficulty}
+                  </span>
+                </div>
+
+                <div>
+                  <h4 className="font-display text-lg font-bold text-foreground">{proj.title}</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed mt-1">{proj.description}</p>
+                </div>
+
+                {/* Skills Tested */}
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {proj.skill_codes.map((sk) => (
+                    <span
+                      key={sk}
+                      className="rounded-lg bg-secondary/70 px-2 py-0.5 text-[10px] font-medium text-foreground/80"
+                    >
+                      {sk.replace("_", " ")}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:items-end gap-3 shrink-0">
+                <Button asChild size="lg" variant="hero" className="rounded-2xl font-bold text-xs gap-2">
+                  <Link to="/app/projects/$projectCode" params={{ projectCode: proj.code }}>
+                    {proj.state === "COMPLETED"
+                      ? "View Project Submission"
+                      : proj.state === "IN_PROGRESS"
+                      ? "Continue Workspace"
+                      : "Open Project Workspace"}
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
+                {proj.attempt_count > 0 && (
+                  <span className="text-[11px] text-muted-foreground">
+                    {proj.attempt_count} submission attempt{proj.attempt_count > 1 ? "s" : ""}
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 2. Baseline Diagnostic Banner */}
       <section className="rounded-3xl border border-primary/40 bg-gradient-to-r from-primary/[0.08] via-card to-surface p-6 sm:p-8 backdrop-blur shadow-md">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2 max-w-xl">
@@ -130,7 +221,7 @@ function PracticeContent({ ci }: { ci: CareerIntelligence }) {
         </div>
       </section>
 
-      {/* 2. Active Skill Missions */}
+      {/* 3. Active Skill Missions */}
       <section className="space-y-4">
         <div>
           <h3 className="font-display text-lg font-bold text-foreground">Active Skill Missions</h3>
@@ -175,55 +266,14 @@ function PracticeContent({ ci }: { ci: CareerIntelligence }) {
         </div>
       </section>
 
-      {/* 3. Upcoming Practice Simulations (Preview) */}
-      <section className="surface-panel rounded-3xl p-6 border border-border/70 space-y-4">
-        <div>
-          <h3 className="font-display text-base font-bold text-foreground flex items-center gap-2">
-            <Sparkles className="size-4 text-primary" />
-            Upcoming Practice Modules (In Development)
-          </h3>
-          <p className="text-xs text-muted-foreground">
-            Advanced practice experiences scheduled for your upcoming preparation milestones.
-          </p>
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl border border-border/60 bg-surface/50 p-4 space-y-1.5 opacity-85">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                <Bot className="size-4 text-primary" />
-                AI Mock Technical Interview
-              </span>
-              <Badge variant="outline" className="text-[9px]">Unlocks at Phase 4</Badge>
-            </div>
-            <p className="text-[11px] text-muted-foreground leading-relaxed">
-              Real-time voice & coding interview simulator covering SQL, Python data structures, and pipeline architecture questions.
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-border/60 bg-surface/50 p-4 space-y-1.5 opacity-85">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                <FileCode2 className="size-4 text-primary" />
-                End-to-End Capstone Project Review
-              </span>
-              <Badge variant="outline" className="text-[9px]">Unlocks at Phase 5</Badge>
-            </div>
-            <p className="text-[11px] text-muted-foreground leading-relaxed">
-              Submit your GitHub repository for automated code review, data quality scoring, and architectural evaluation.
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* 4. Contextual SPAR Coach Widget */}
       <ContextualCoachCard
-        title="SPAR Coach on Practice"
-        subtitle="Need hints for a challenge or want custom practice problems?"
+        title="SPAR Coach on Practical Projects"
+        subtitle="Need help designing your pipeline architecture or passing the data-quality rubric?"
         prompts={[
-          "Can you give me a SQL challenge involving CTEs?",
-          "How do I prepare for technical assessments?",
-          "What is the best way to practice Python for data engineering?",
+          "How do I structure my data pipeline repository?",
+          "What validation checks are essential for order data?",
+          "Can you review my pipeline design before I submit?",
         ]}
       />
     </div>

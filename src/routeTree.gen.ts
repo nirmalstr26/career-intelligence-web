@@ -30,6 +30,7 @@ import { Route as AppReadinessRouteImport } from './routes/app/readiness'
 import { Route as AppSkillsRouteImport } from './routes/app/skills'
 import { Route as AppTodayRouteImport } from './routes/app/today'
 import { Route as AppLearnModuleCodeRouteImport } from './routes/app/learn.$moduleCode'
+import { Route as AppProjectsProjectCodeRouteImport } from './routes/app/projects.$projectCode'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -136,6 +137,11 @@ const AppLearnModuleCodeRoute = AppLearnModuleCodeRouteImport.update({
   path: '/learn/$moduleCode',
   getParentRoute: () => AppRoute,
 } as any)
+const AppProjectsProjectCodeRoute = AppProjectsProjectCodeRouteImport.update({
+  id: '/projects/$projectCode',
+  path: '/projects/$projectCode',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/app/today': typeof AppTodayRoute
   '/app/': typeof AppIndexRoute
   '/app/learn/$moduleCode': typeof AppLearnModuleCodeRoute
+  '/app/projects/$projectCode': typeof AppProjectsProjectCodeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/app/today': typeof AppTodayRoute
   '/app': typeof AppIndexRoute
   '/app/learn/$moduleCode': typeof AppLearnModuleCodeRoute
+  '/app/projects/$projectCode': typeof AppProjectsProjectCodeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/app/today': typeof AppTodayRoute
   '/app/': typeof AppIndexRoute
   '/app/learn/$moduleCode': typeof AppLearnModuleCodeRoute
+  '/app/projects/$projectCode': typeof AppProjectsProjectCodeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -230,6 +239,7 @@ export interface FileRouteTypes {
     | '/app/today'
     | '/app/'
     | '/app/learn/$moduleCode'
+    | '/app/projects/$projectCode'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -252,6 +262,7 @@ export interface FileRouteTypes {
     | '/app/today'
     | '/app'
     | '/app/learn/$moduleCode'
+    | '/app/projects/$projectCode'
   id:
     | '__root__'
     | '/'
@@ -275,6 +286,7 @@ export interface FileRouteTypes {
     | '/app/today'
     | '/app/'
     | '/app/learn/$moduleCode'
+    | '/app/projects/$projectCode'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -432,6 +444,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLearnModuleCodeRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/projects/$projectCode': {
+      id: '/app/projects/$projectCode'
+      path: '/projects/$projectCode'
+      fullPath: '/app/projects/$projectCode'
+      preLoaderRoute: typeof AppProjectsProjectCodeRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -454,6 +473,7 @@ interface AppRouteChildren {
   AppTodayRoute: typeof AppTodayRoute
   AppIndexRoute: typeof AppIndexRoute
   AppLearnModuleCodeRoute: typeof AppLearnModuleCodeRoute
+  AppProjectsProjectCodeRoute: typeof AppProjectsProjectCodeRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -475,6 +495,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppTodayRoute: AppTodayRoute,
   AppIndexRoute: AppIndexRoute,
   AppLearnModuleCodeRoute: AppLearnModuleCodeRoute,
+  AppProjectsProjectCodeRoute: AppProjectsProjectCodeRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

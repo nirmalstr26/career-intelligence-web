@@ -571,3 +571,77 @@ export interface RecordAssessmentResult {
   state: string;
   message: string;
 }
+
+
+// --- Practical Projects (Domain 19) ----------------------------------------
+
+export interface ProjectRubricCriterion {
+  id: string;
+  name: string;
+  max_score: number;
+  description: string;
+}
+
+export interface ProjectRubricScoreItem {
+  criterion_id: string;
+  criterion_name: string;
+  max_score: number;
+  score: number;
+  feedback: string;
+}
+
+export interface ProjectSummary {
+  id: string;
+  code: string;
+  title: string;
+  career_cluster_code: string;
+  difficulty: string;
+  estimated_hours: number;
+  description: string;
+  skill_codes: string[];
+  min_pass_score: number;
+  state: "NOT_STARTED" | "IN_PROGRESS" | "SUBMITTED" | "UNDER_REVIEW" | "NEEDS_IMPROVEMENT" | "COMPLETED";
+  current_stage: "understand" | "design" | "build" | "test" | "explain" | "review";
+  latest_score?: number | null;
+  attempt_count: number;
+}
+
+export interface ProjectSubmission {
+  id: string;
+  attempt_number: number;
+  status: "UNDER_REVIEW" | "NEEDS_IMPROVEMENT" | "COMPLETED";
+  total_score: number;
+  rubric_scores: ProjectRubricScoreItem[];
+  strengths: string[];
+  gaps: string[];
+  required_improvements: string[];
+  interview_questions: string[];
+  overall_feedback: string;
+  submitted_at: string;
+}
+
+export interface ProjectDetail {
+  id: string;
+  code: string;
+  title: string;
+  career_cluster_code: string;
+  difficulty: string;
+  estimated_hours: number;
+  description: string;
+  business_scenario: string;
+  requirements: string[];
+  input_data_spec: Record<string, any>;
+  expected_output_spec: Record<string, any>;
+  constraints: string[];
+  rubric: ProjectRubricCriterion[];
+  skill_codes: string[];
+  min_pass_score: number;
+  state: "NOT_STARTED" | "IN_PROGRESS" | "SUBMITTED" | "UNDER_REVIEW" | "NEEDS_IMPROVEMENT" | "COMPLETED";
+  current_stage: "understand" | "design" | "build" | "test" | "explain" | "review";
+  stage_data: Record<string, any>;
+  started_at?: string | null;
+  completed_at?: string | null;
+  latest_score?: number | null;
+  attempt_count: number;
+  latest_submission?: ProjectSubmission | null;
+}
