@@ -456,4 +456,31 @@ export const careerai = {
       `/students/${studentId}/recruiter-invitations/${opportunityId}/respond`,
       { body: { interested } }
     ),
+  // Admin Operations, AI Telemetry & Pilot Safety (Domain 25)
+  getAdminOverview: () => api.get<AdminOverviewResponse>("/admin/overview"),
+  listAdminUsers: () => api.get<UserManagementItem[]>("/admin/users"),
+  approveRecruiterStatus: (recruiterId: string, status: string, notes?: string | null) =>
+    api.put<{ status: string; message: string }>(`/admin/recruiters/${recruiterId}/status`, {
+      body: { status, notes },
+    }),
+  getAIOperations: () => api.get<AIOperationsResponse>("/admin/ai-operations"),
+  getSystemHealth: () => api.get<SystemHealthResponse>("/admin/health"),
+  listPilotFeedbacks: () => api.get<PilotFeedbackItem[]>("/admin/feedback"),
+  submitPilotFeedback: (body: {
+    category?: string;
+    rating: number;
+    comment?: string | null;
+    milestone_context?: string | null;
+  }) => api.post<PilotFeedbackItem>("/admin/feedback", { body }),
+  updateFeedbackStatus: (feedbackId: string, status: string) =>
+    api.put<{ status: string; message: string }>(`/admin/feedback/${feedbackId}/status`, {
+      body: { status },
+    }),
+  listFeatureFlags: () => api.get<FeatureFlagItem[]>("/admin/feature-flags"),
+  toggleFeatureFlag: (flag_name: string, is_enabled: boolean) =>
+    api.post<{ status: string; message: string }>("/admin/feature-flags/toggle", {
+      body: { flag_name, is_enabled },
+    }),
+  runDataIntegrityCheck: () => api.get<DataIntegrityReportResponse>("/admin/integrity-check"),
+  listSystemAuditLogs: () => api.get<SystemAuditLogItem[]>("/admin/audit-logs"),
 };

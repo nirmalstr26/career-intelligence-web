@@ -876,3 +876,127 @@ export function useRespondToOpportunityInvitation() {
     },
   });
 }
+
+// ---------------------------------------------------------------------------
+// Domain 25 — Admin Operations, Telemetry, and Pilot Safety Hooks
+// ---------------------------------------------------------------------------
+
+export function useAdminOverview() {
+  return useQuery({
+    queryKey: ["admin-overview"],
+    queryFn: () => careerai.getAdminOverview(),
+    staleTime: 5_000,
+  });
+}
+
+export function useAdminUsers() {
+  return useQuery({
+    queryKey: ["admin-users"],
+    queryFn: () => careerai.listAdminUsers(),
+    staleTime: 10_000,
+  });
+}
+
+export function useApproveRecruiter() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      recruiterId,
+      status,
+      notes,
+    }: {
+      recruiterId: string;
+      status: string;
+      notes?: string | null;
+    }) => careerai.approveRecruiterStatus(recruiterId, status, notes),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
+    },
+  });
+}
+
+export function useAIOperations() {
+  return useQuery({
+    queryKey: ["admin-ai-operations"],
+    queryFn: () => careerai.getAIOperations(),
+    staleTime: 5_000,
+  });
+}
+
+export function useSystemHealth() {
+  return useQuery({
+    queryKey: ["admin-system-health"],
+    queryFn: () => careerai.getSystemHealth(),
+    staleTime: 10_000,
+  });
+}
+
+export function usePilotFeedbacks() {
+  return useQuery({
+    queryKey: ["admin-feedbacks"],
+    queryFn: () => careerai.listPilotFeedbacks(),
+    staleTime: 5_000,
+  });
+}
+
+export function useSubmitPilotFeedback() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: {
+      category?: string;
+      rating: number;
+      comment?: string | null;
+      milestone_context?: string | null;
+    }) => careerai.submitPilotFeedback(body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-feedbacks"] });
+    },
+  });
+}
+
+export function useUpdateFeedbackStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ feedbackId, status }: { feedbackId: string; status: string }) =>
+      careerai.updateFeedbackStatus(feedbackId, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-feedbacks"] });
+    },
+  });
+}
+
+export function useFeatureFlags() {
+  return useQuery({
+    queryKey: ["admin-feature-flags"],
+    queryFn: () => careerai.listFeatureFlags(),
+    staleTime: 5_000,
+  });
+}
+
+export function useToggleFeatureFlag() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ flagName, isEnabled }: { flagName: string; isEnabled: boolean }) =>
+      careerai.toggleFeatureFlag(flagName, isEnabled),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-feature-flags"] });
+    },
+  });
+}
+
+export function useDataIntegrityCheck() {
+  return useQuery({
+    queryKey: ["admin-integrity-check"],
+    queryFn: () => careerai.runDataIntegrityCheck(),
+    staleTime: 10_000,
+  });
+}
+
+export function useSystemAuditLogs() {
+  return useQuery({
+    queryKey: ["admin-audit-logs"],
+    queryFn: () => careerai.listSystemAuditLogs(),
+    staleTime: 10_000,
+  });
+}

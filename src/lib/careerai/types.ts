@@ -1311,3 +1311,128 @@ export interface RecruiterAgentQueryResult {
   answer: string;
   data_snapshot: Record<string, any>;
 }
+
+// ---------------------------------------------------------------------------
+// Domain 25 — Admin Operations, AI Telemetry, Feedback & Pilot Safety
+// ---------------------------------------------------------------------------
+
+export interface FunnelStageItem {
+  stage_name: string;
+  count: number;
+  conversion_pct: number;
+  drop_off_pct: number;
+  description: string;
+}
+
+export interface AdminOverviewResponse {
+  total_students: number;
+  total_colleges: number;
+  total_recruiters: number;
+  total_opportunities: number;
+  diagnostic_completion_pct: number;
+  module_completion_pct: number;
+  project_completion_pct: number;
+  mock_interview_completion_pct: number;
+  baseline_readiness_avg: number;
+  current_readiness_avg: number;
+  readiness_improvement_avg: number;
+  total_applications: number;
+  interview_stage_count: number;
+  offer_count: number;
+  ai_requests_count: number;
+  ai_success_rate: number;
+  ai_avg_latency_sec: number;
+  ai_estimated_cost_usd: number;
+  pending_recruiters_count: number;
+  new_feedbacks_count: number;
+  inactive_students_count: number;
+  funnel: FunnelStageItem[];
+}
+
+export interface UserManagementItem {
+  id: string;
+  name: string;
+  email: string;
+  role: "STUDENT" | "COORDINATOR" | "RECRUITER" | "ADMIN";
+  organization: string;
+  status: string;
+  readiness_or_activity: string;
+  last_active_at: string;
+  created_at: string;
+}
+
+export interface AIInvocationLogItem {
+  id: string;
+  feature: string;
+  provider: string;
+  model: string;
+  latency_ms: number;
+  success: boolean;
+  prompt_tokens: number;
+  completion_tokens: number;
+  estimated_cost_usd: number;
+  retry_count: number;
+  context_id?: string | null;
+  error_category?: string | null;
+  created_at: string;
+}
+
+export interface AIOperationsResponse {
+  total_requests: number;
+  success_rate_pct: number;
+  average_latency_ms: number;
+  total_estimated_cost_usd: number;
+  feature_breakdown: Record<string, number>;
+  recent_logs: AIInvocationLogItem[];
+}
+
+export interface SystemHealthResponse {
+  database_status: string;
+  neo4j_status: string;
+  llm_provider_status: string;
+  api_status: string;
+  overall_health: string;
+  recent_errors: string[];
+}
+
+export interface PilotFeedbackItem {
+  id: string;
+  student_name: string;
+  category: string;
+  rating: number;
+  comment?: string | null;
+  milestone_context?: string | null;
+  status: string;
+  created_at: string;
+}
+
+export interface FeatureFlagItem {
+  flag_name: string;
+  is_enabled: boolean;
+  description: string;
+}
+
+export interface DataIntegrityIssueItem {
+  category: string;
+  severity: "WARNING" | "ERROR";
+  description: string;
+  affected_entity: string;
+  recommendation: string;
+}
+
+export interface DataIntegrityReportResponse {
+  is_clean: boolean;
+  total_issues: number;
+  issues: DataIntegrityIssueItem[];
+  checked_at: string;
+}
+
+export interface SystemAuditLogItem {
+  id: string;
+  actor_role: string;
+  action: string;
+  resource_type: string;
+  resource_id: string;
+  details?: string | null;
+  created_at: string;
+}
