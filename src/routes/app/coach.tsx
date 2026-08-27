@@ -41,7 +41,7 @@ function CoachPage() {
   const studentId = useStudentId();
   const ciQuery = useCareerIntelligence();
   const ci = ciQuery.data;
-  const primaryCareerCode = ci?.career_direction.primary_career ?? "DATA_ENGINEER";
+  const primaryCareerCode = ci?.career_direction?.primary_career ?? "DATA_ENGINEER";
   const currQuery = useCurriculum(primaryCareerCode);
   const curr = currQuery.data;
 
@@ -212,14 +212,17 @@ function CoachPage() {
               )}
 
               {/* Skills Referenced Pills */}
-              {msg.referencedSkills && msg.referencedSkills.length > 0 && (
+              {Array.isArray(msg.referencedSkills) && msg.referencedSkills.length > 0 && (
                 <div className="mt-2 pt-2 border-t border-border/40 flex flex-wrap items-center gap-1.5">
                   <span className="text-[10px] text-muted-foreground">Skills referenced:</span>
-                  {msg.referencedSkills.map((sk) => (
-                    <Badge key={sk} variant="outline" className="text-[9px] bg-secondary">
-                      {humanizeCode(sk)}
-                    </Badge>
-                  ))}
+                  {msg.referencedSkills.map((sk, skIdx) => {
+                    const skLabel = typeof sk === "string" ? humanizeCode(sk) : (sk as any)?.name || (sk as any)?.code || "Skill";
+                    return (
+                      <Badge key={skIdx} variant="outline" className="text-[9px] bg-secondary">
+                        {skLabel}
+                      </Badge>
+                    );
+                  })}
                 </div>
               )}
 
