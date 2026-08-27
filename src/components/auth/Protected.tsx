@@ -39,7 +39,7 @@ export function Protected({ mode, children }: { mode: ProtectedMode; children: R
       return;
     }
     if (mode === "onboarding" && !onboardingRequired) {
-      void navigate({ to: "/app/home" });
+      void navigate({ to: "/app/today" });
     }
   }, [status, onboardingRequired, mode, navigate]);
 

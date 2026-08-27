@@ -1,22 +1,29 @@
 import { useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { LogOut, Menu, X } from "lucide-react";
+import {
+  LogOut,
+  Menu,
+  X,
+  Sun,
+  Compass,
+  Wrench,
+  TrendingUp,
+  Bot,
+  User,
+  Sparkles,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-  { to: "/app/home", label: "Home" },
-  { to: "/app/plan", label: "Career Plan" },
-  { to: "/app/career", label: "Career" },
-  { to: "/app/explore", label: "Explore" },
-  { to: "/app/readiness", label: "Readiness" },
-  { to: "/app/missions", label: "Missions" },
-  { to: "/app/skills", label: "Skills" },
-  { to: "/app/evidence", label: "Evidence" },
-  { to: "/app/agent", label: "AI Advisor" },
-  { to: "/app/profile", label: "Profile" },
+  { to: "/app/today", label: "Today", icon: Sun },
+  { to: "/app/path", label: "My Path", icon: Compass },
+  { to: "/app/practice", label: "Practice", icon: Wrench },
+  { to: "/app/progress", label: "Progress", icon: TrendingUp },
+  { to: "/app/coach", label: "SPAR Coach", icon: Bot },
+  { to: "/app/profile", label: "Profile", icon: User },
 ] as const;
 
 function initialsOf(name: string): string {
@@ -26,25 +33,26 @@ function initialsOf(name: string): string {
   return (first + second).toUpperCase() || "?";
 }
 
-/** Authenticated app chrome: brand, primary navigation, user, and logout. */
+/** Authenticated app chrome: brand, 6-item guided student navigation, user, and logout. */
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      "rounded-full px-4 py-2 text-sm font-medium transition-colors",
+      "rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all flex items-center gap-1.5",
       isActive
-        ? "bg-secondary text-foreground"
-        : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground",
+        ? "bg-primary text-primary-foreground shadow-sm"
+        : "text-muted-foreground hover:bg-secondary hover:text-foreground",
     );
 
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur">
-        <div className="mx-auto flex h-16 w-full max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6">
+        <div className="mx-auto flex h-16 w-full max-w-[1240px] items-center justify-between gap-4 px-4 sm:px-6">
+          {/* Brand */}
           <div className="flex items-center gap-2.5">
-            <Link to="/app/home" className="flex items-center gap-2.5">
+            <Link to="/app/today" className="flex items-center gap-2.5">
               <span
                 className="grid size-8 shrink-0 place-items-center rounded-lg"
                 style={{ backgroundImage: "var(--gradient-primary)" }}
@@ -60,14 +68,21 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
           </div>
 
+          {/* Desktop Navigation */}
           <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
             {NAV_ITEMS.map((item) => (
               <Link key={item.to} to={item.to} activeProps={{ "aria-current": "page" }}>
-                {({ isActive }) => <span className={navLinkClass({ isActive })}>{item.label}</span>}
+                {({ isActive }) => (
+                  <span className={navLinkClass({ isActive })}>
+                    <item.icon className="size-3.5" />
+                    {item.label}
+                  </span>
+                )}
               </Link>
             ))}
           </nav>
 
+          {/* User Profile & Sign Out */}
           <div className="flex items-center gap-3">
             {user !== null ? (
               <div className="hidden items-center gap-2.5 sm:flex">
@@ -83,20 +98,22 @@ export function AppShell({ children }: { children: ReactNode }) {
                     {initialsOf(user.name)}
                   </span>
                 )}
-                <span className="max-w-[140px] truncate text-sm text-muted-foreground">
+                <span className="max-w-[140px] truncate text-xs font-medium text-muted-foreground">
                   {user.name}
                 </span>
               </div>
             ) : null}
+
             <Button
               variant="outline"
               size="sm"
-              className="rounded-full"
+              className="rounded-full text-xs font-semibold"
               onClick={() => void logout()}
             >
-              <LogOut />
+              <LogOut className="size-3.5 sm:mr-1" />
               <span className="hidden sm:inline">Sign out</span>
             </Button>
+
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
@@ -109,6 +126,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
 
+        {/* Mobile Navigation Dropdown */}
         {open ? (
           <nav aria-label="Primary mobile" className="border-t border-border px-4 py-2 md:hidden">
             {NAV_ITEMS.map((item) => (
@@ -116,11 +134,12 @@ export function AppShell({ children }: { children: ReactNode }) {
                 key={item.to}
                 to={item.to}
                 onClick={() => setOpen(false)}
-                className="block rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-secondary hover:text-foreground"
+                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-xs font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
                 activeProps={{
-                  className: "block rounded-lg px-3 py-2.5 text-sm bg-secondary text-foreground",
+                  className: "flex items-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold bg-primary text-primary-foreground",
                 }}
               >
+                <item.icon className="size-4" />
                 {item.label}
               </Link>
             ))}
@@ -128,7 +147,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         ) : null}
       </header>
 
-      <main className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6">{children}</main>
+      <main className="mx-auto w-full max-w-[1240px] px-4 py-8 sm:px-6">{children}</main>
     </div>
   );
 }

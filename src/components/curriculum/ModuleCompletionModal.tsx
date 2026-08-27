@@ -6,6 +6,8 @@ import {
   Award,
   Layers,
   BookOpen,
+  TrendingUp,
+  Sun,
 } from "lucide-react";
 
 import {
@@ -17,7 +19,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { humanizeCode } from "@/components/app/ui";
+import { Badge } from "@/components/ui/badge";
 import type { CurriculumModule } from "@/lib/careerai/types";
 
 interface ModuleCompletionModalProps {
@@ -49,13 +51,13 @@ export function ModuleCompletionModal({
         params: { moduleCode: nextRecommended.code },
       });
     } else {
-      void navigate({ to: "/app/plan" });
+      void navigate({ to: "/app/today" });
     }
   };
 
-  const handleReturnPlan = () => {
+  const handleReturnToday = () => {
     onOpenChange(false);
-    void navigate({ to: "/app/plan" });
+    void navigate({ to: "/app/today" });
   };
 
   return (
@@ -66,42 +68,54 @@ export function ModuleCompletionModal({
             <CheckCircle2 className="size-8" />
           </div>
           <DialogTitle className="font-display text-2xl font-bold tracking-tight text-foreground">
-            Module Completed!
+            Nice Progress!
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground mt-1">
-            {score !== null && score !== undefined ? (
-              <span>
-                You scored <strong className="text-foreground">{score}%</strong> on{" "}
-                <span className="text-primary font-medium">{completedModule.title}</span>.
-              </span>
-            ) : (
-              <span>
-                Great job completing{" "}
-                <span className="text-primary font-medium">{completedModule.title}</span>.
-              </span>
-            )}
+            <strong className="text-foreground">{completedModule.title}</strong> completed successfully.
           </DialogDescription>
         </DialogHeader>
 
+        {/* Score & Skill Improvement Summary */}
+        <div className="my-2 grid grid-cols-2 gap-2.5">
+          <div className="rounded-2xl border border-border/70 bg-card/80 p-3.5 text-center">
+            <span className="text-[10px] uppercase font-bold text-muted-foreground block">Assessment Score</span>
+            <span className="font-display text-2xl font-bold text-foreground">
+              {score !== null && score !== undefined ? `${score}%` : "Passed"}
+            </span>
+          </div>
+
+          <div className="rounded-2xl border border-success/30 bg-success/[0.08] p-3.5 text-center">
+            <span className="text-[10px] uppercase font-bold text-success block">Skill Signal</span>
+            <span className="font-display text-base font-bold text-success flex items-center justify-center gap-1 mt-1">
+              <TrendingUp className="size-4" />
+              Verified & Updated
+            </span>
+          </div>
+        </div>
+
         {/* Newly Unlocked Modules */}
         {newlyUnlocked.length > 0 ? (
-          <div className="my-3 rounded-2xl border border-primary/30 bg-primary/[0.04] p-4 space-y-2.5">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
-              <Sparkles className="size-3.5" />
-              Newly Unlocked Modules
+          <div className="my-2 rounded-2xl border border-primary/30 bg-primary/[0.04] p-4 space-y-2.5">
+            <div className="flex items-center justify-between text-xs font-semibold text-primary">
+              <span className="flex items-center gap-1.5">
+                <Sparkles className="size-3.5" />
+                Unlocked Next Step:
+              </span>
+              <Badge className="bg-primary text-primary-foreground text-[10px]">Ready to Start</Badge>
             </div>
+
             <div className="space-y-2">
               {newlyUnlocked.map((mod) => (
                 <div
                   key={mod.code}
-                  className="flex items-center justify-between rounded-xl border border-border/60 bg-card/80 px-3 py-2 text-xs"
+                  className="flex items-center justify-between rounded-xl border border-border/60 bg-card/90 px-3.5 py-2.5 text-xs shadow-sm"
                 >
                   <div className="min-w-0 pr-2">
-                    <p className="font-semibold text-foreground truncate">{mod.title}</p>
-                    <p className="text-[10px] text-muted-foreground">{mod.estimated_minutes} mins</p>
+                    <p className="font-bold text-foreground truncate">{mod.title}</p>
+                    <p className="text-[10px] text-muted-foreground">Phase: {mod.phase_name} · ~{mod.estimated_minutes} mins</p>
                   </div>
-                  <span className="shrink-0 rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                    Available
+                  <span className="shrink-0 rounded-full bg-primary/20 px-2.5 py-0.5 text-[10px] font-bold text-primary">
+                    Unlocked
                   </span>
                 </div>
               ))}
@@ -109,29 +123,42 @@ export function ModuleCompletionModal({
           </div>
         ) : (
           <div className="my-2 rounded-xl border border-border/60 bg-card/50 p-3 text-center text-xs text-muted-foreground">
-            Your learning plan progress has been updated!
+            Your learning plan progress and Career Readiness have been updated!
           </div>
         )}
 
-        <DialogFooter className="flex flex-col gap-2 sm:flex-col sm:space-x-0 mt-2">
+        {/* Footer CTAs */}
+        <DialogFooter className="flex flex-col gap-2.5 sm:flex-col sm:space-x-0 mt-3">
           {nextRecommended ? (
             <Button
               size="lg"
               variant="hero"
               onClick={handleContinueNext}
-              className="w-full font-semibold gap-2"
+              className="w-full font-bold gap-2 text-sm shadow-lg"
             >
-              <span>Continue to {nextRecommended.title}</span>
+              <span>Continue My Journey ({nextRecommended.title})</span>
               <ArrowRight className="size-4" />
             </Button>
-          ) : null}
+          ) : (
+            <Button
+              size="lg"
+              variant="hero"
+              onClick={handleReturnToday}
+              className="w-full font-bold gap-2 text-sm"
+            >
+              <span>Continue My Journey</span>
+              <ArrowRight className="size-4" />
+            </Button>
+          )}
+
           <Button
             variant="outline"
-            size="lg"
-            onClick={handleReturnPlan}
-            className="w-full text-xs font-medium"
+            size="sm"
+            onClick={handleReturnToday}
+            className="w-full text-xs font-semibold gap-1.5"
           >
-            Return to Career Plan
+            <Sun className="size-3.5 text-primary" />
+            Back to Today Dashboard
           </Button>
         </DialogFooter>
       </DialogContent>

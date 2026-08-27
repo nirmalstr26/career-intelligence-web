@@ -15,15 +15,20 @@ import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppAgentRouteImport } from './routes/app/agent'
 import { Route as AppCareerRouteImport } from './routes/app/career'
+import { Route as AppCoachRouteImport } from './routes/app/coach'
 import { Route as AppDiagnosticRouteImport } from './routes/app/diagnostic'
 import { Route as AppEvidenceRouteImport } from './routes/app/evidence'
 import { Route as AppExploreRouteImport } from './routes/app/explore'
 import { Route as AppHomeRouteImport } from './routes/app/home'
 import { Route as AppMissionsRouteImport } from './routes/app/missions'
+import { Route as AppPathRouteImport } from './routes/app/path'
 import { Route as AppPlanRouteImport } from './routes/app/plan'
+import { Route as AppPracticeRouteImport } from './routes/app/practice'
 import { Route as AppProfileRouteImport } from './routes/app/profile'
+import { Route as AppProgressRouteImport } from './routes/app/progress'
 import { Route as AppReadinessRouteImport } from './routes/app/readiness'
 import { Route as AppSkillsRouteImport } from './routes/app/skills'
+import { Route as AppTodayRouteImport } from './routes/app/today'
 import { Route as AppLearnModuleCodeRouteImport } from './routes/app/learn.$moduleCode'
 
 const IndexRoute = IndexRouteImport.update({
@@ -56,6 +61,11 @@ const AppCareerRoute = AppCareerRouteImport.update({
   path: '/career',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCoachRoute = AppCoachRouteImport.update({
+  id: '/coach',
+  path: '/coach',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDiagnosticRoute = AppDiagnosticRouteImport.update({
   id: '/diagnostic',
   path: '/diagnostic',
@@ -81,14 +91,29 @@ const AppMissionsRoute = AppMissionsRouteImport.update({
   path: '/missions',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPathRoute = AppPathRouteImport.update({
+  id: '/path',
+  path: '/path',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPlanRoute = AppPlanRouteImport.update({
   id: '/plan',
   path: '/plan',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPracticeRoute = AppPracticeRouteImport.update({
+  id: '/practice',
+  path: '/practice',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProfileRoute = AppProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProgressRoute = AppProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
   getParentRoute: () => AppRoute,
 } as any)
 const AppReadinessRoute = AppReadinessRouteImport.update({
@@ -99,6 +124,11 @@ const AppReadinessRoute = AppReadinessRouteImport.update({
 const AppSkillsRoute = AppSkillsRouteImport.update({
   id: '/skills',
   path: '/skills',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTodayRoute = AppTodayRouteImport.update({
+  id: '/today',
+  path: '/today',
   getParentRoute: () => AppRoute,
 } as any)
 const AppLearnModuleCodeRoute = AppLearnModuleCodeRouteImport.update({
@@ -113,15 +143,20 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/app/agent': typeof AppAgentRoute
   '/app/career': typeof AppCareerRoute
+  '/app/coach': typeof AppCoachRoute
   '/app/diagnostic': typeof AppDiagnosticRoute
   '/app/evidence': typeof AppEvidenceRoute
   '/app/explore': typeof AppExploreRoute
   '/app/home': typeof AppHomeRoute
   '/app/missions': typeof AppMissionsRoute
+  '/app/path': typeof AppPathRoute
   '/app/plan': typeof AppPlanRoute
+  '/app/practice': typeof AppPracticeRoute
   '/app/profile': typeof AppProfileRoute
+  '/app/progress': typeof AppProgressRoute
   '/app/readiness': typeof AppReadinessRoute
   '/app/skills': typeof AppSkillsRoute
+  '/app/today': typeof AppTodayRoute
   '/app/': typeof AppIndexRoute
   '/app/learn/$moduleCode': typeof AppLearnModuleCodeRoute
 }
@@ -130,15 +165,20 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/app/agent': typeof AppAgentRoute
   '/app/career': typeof AppCareerRoute
+  '/app/coach': typeof AppCoachRoute
   '/app/diagnostic': typeof AppDiagnosticRoute
   '/app/evidence': typeof AppEvidenceRoute
   '/app/explore': typeof AppExploreRoute
   '/app/home': typeof AppHomeRoute
   '/app/missions': typeof AppMissionsRoute
+  '/app/path': typeof AppPathRoute
   '/app/plan': typeof AppPlanRoute
+  '/app/practice': typeof AppPracticeRoute
   '/app/profile': typeof AppProfileRoute
+  '/app/progress': typeof AppProgressRoute
   '/app/readiness': typeof AppReadinessRoute
   '/app/skills': typeof AppSkillsRoute
+  '/app/today': typeof AppTodayRoute
   '/app': typeof AppIndexRoute
   '/app/learn/$moduleCode': typeof AppLearnModuleCodeRoute
 }
@@ -149,15 +189,20 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/app/agent': typeof AppAgentRoute
   '/app/career': typeof AppCareerRoute
+  '/app/coach': typeof AppCoachRoute
   '/app/diagnostic': typeof AppDiagnosticRoute
   '/app/evidence': typeof AppEvidenceRoute
   '/app/explore': typeof AppExploreRoute
   '/app/home': typeof AppHomeRoute
   '/app/missions': typeof AppMissionsRoute
+  '/app/path': typeof AppPathRoute
   '/app/plan': typeof AppPlanRoute
+  '/app/practice': typeof AppPracticeRoute
   '/app/profile': typeof AppProfileRoute
+  '/app/progress': typeof AppProgressRoute
   '/app/readiness': typeof AppReadinessRoute
   '/app/skills': typeof AppSkillsRoute
+  '/app/today': typeof AppTodayRoute
   '/app/': typeof AppIndexRoute
   '/app/learn/$moduleCode': typeof AppLearnModuleCodeRoute
 }
@@ -169,15 +214,20 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/app/agent'
     | '/app/career'
+    | '/app/coach'
     | '/app/diagnostic'
     | '/app/evidence'
     | '/app/explore'
     | '/app/home'
     | '/app/missions'
+    | '/app/path'
     | '/app/plan'
+    | '/app/practice'
     | '/app/profile'
+    | '/app/progress'
     | '/app/readiness'
     | '/app/skills'
+    | '/app/today'
     | '/app/'
     | '/app/learn/$moduleCode'
   fileRoutesByTo: FileRoutesByTo
@@ -186,15 +236,20 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/app/agent'
     | '/app/career'
+    | '/app/coach'
     | '/app/diagnostic'
     | '/app/evidence'
     | '/app/explore'
     | '/app/home'
     | '/app/missions'
+    | '/app/path'
     | '/app/plan'
+    | '/app/practice'
     | '/app/profile'
+    | '/app/progress'
     | '/app/readiness'
     | '/app/skills'
+    | '/app/today'
     | '/app'
     | '/app/learn/$moduleCode'
   id:
@@ -204,15 +259,20 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/app/agent'
     | '/app/career'
+    | '/app/coach'
     | '/app/diagnostic'
     | '/app/evidence'
     | '/app/explore'
     | '/app/home'
     | '/app/missions'
+    | '/app/path'
     | '/app/plan'
+    | '/app/practice'
     | '/app/profile'
+    | '/app/progress'
     | '/app/readiness'
     | '/app/skills'
+    | '/app/today'
     | '/app/'
     | '/app/learn/$moduleCode'
   fileRoutesById: FileRoutesById
@@ -267,6 +327,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCareerRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/coach': {
+      id: '/app/coach'
+      path: '/coach'
+      fullPath: '/app/coach'
+      preLoaderRoute: typeof AppCoachRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/diagnostic': {
       id: '/app/diagnostic'
       path: '/diagnostic'
@@ -302,6 +369,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMissionsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/path': {
+      id: '/app/path'
+      path: '/path'
+      fullPath: '/app/path'
+      preLoaderRoute: typeof AppPathRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/plan': {
       id: '/app/plan'
       path: '/plan'
@@ -309,11 +383,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPlanRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/practice': {
+      id: '/app/practice'
+      path: '/practice'
+      fullPath: '/app/practice'
+      preLoaderRoute: typeof AppPracticeRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/profile': {
       id: '/app/profile'
       path: '/profile'
       fullPath: '/app/profile'
       preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/progress': {
+      id: '/app/progress'
+      path: '/progress'
+      fullPath: '/app/progress'
+      preLoaderRoute: typeof AppProgressRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/readiness': {
@@ -330,6 +418,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSkillsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/today': {
+      id: '/app/today'
+      path: '/today'
+      fullPath: '/app/today'
+      preLoaderRoute: typeof AppTodayRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/learn/$moduleCode': {
       id: '/app/learn/$moduleCode'
       path: '/learn/$moduleCode'
@@ -343,15 +438,20 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppAgentRoute: typeof AppAgentRoute
   AppCareerRoute: typeof AppCareerRoute
+  AppCoachRoute: typeof AppCoachRoute
   AppDiagnosticRoute: typeof AppDiagnosticRoute
   AppEvidenceRoute: typeof AppEvidenceRoute
   AppExploreRoute: typeof AppExploreRoute
   AppHomeRoute: typeof AppHomeRoute
   AppMissionsRoute: typeof AppMissionsRoute
+  AppPathRoute: typeof AppPathRoute
   AppPlanRoute: typeof AppPlanRoute
+  AppPracticeRoute: typeof AppPracticeRoute
   AppProfileRoute: typeof AppProfileRoute
+  AppProgressRoute: typeof AppProgressRoute
   AppReadinessRoute: typeof AppReadinessRoute
   AppSkillsRoute: typeof AppSkillsRoute
+  AppTodayRoute: typeof AppTodayRoute
   AppIndexRoute: typeof AppIndexRoute
   AppLearnModuleCodeRoute: typeof AppLearnModuleCodeRoute
 }
@@ -359,15 +459,20 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAgentRoute: AppAgentRoute,
   AppCareerRoute: AppCareerRoute,
+  AppCoachRoute: AppCoachRoute,
   AppDiagnosticRoute: AppDiagnosticRoute,
   AppEvidenceRoute: AppEvidenceRoute,
   AppExploreRoute: AppExploreRoute,
   AppHomeRoute: AppHomeRoute,
   AppMissionsRoute: AppMissionsRoute,
+  AppPathRoute: AppPathRoute,
   AppPlanRoute: AppPlanRoute,
+  AppPracticeRoute: AppPracticeRoute,
   AppProfileRoute: AppProfileRoute,
+  AppProgressRoute: AppProgressRoute,
   AppReadinessRoute: AppReadinessRoute,
   AppSkillsRoute: AppSkillsRoute,
+  AppTodayRoute: AppTodayRoute,
   AppIndexRoute: AppIndexRoute,
   AppLearnModuleCodeRoute: AppLearnModuleCodeRoute,
 }

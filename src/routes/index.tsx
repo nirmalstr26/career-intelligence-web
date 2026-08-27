@@ -34,7 +34,7 @@ function Landing() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      void navigate({ to: onboardingRequired ? "/onboarding" : "/app/home" });
+      void navigate({ to: onboardingRequired ? "/onboarding" : "/app/today" });
     }
   }, [status, onboardingRequired, navigate]);
 

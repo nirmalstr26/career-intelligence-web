@@ -111,11 +111,11 @@ function ModuleLearningPage() {
       {/* Breadcrumb Navigation */}
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-muted-foreground">
         <Link
-          to="/app/plan"
+          to="/app/path"
           className="flex items-center gap-1.5 hover:text-foreground transition-colors font-medium"
         >
           <ArrowLeft className="size-3.5" />
-          Career Plan
+          My Path
         </Link>
         <ChevronRight className="size-3 text-muted-foreground/50" />
         <span className="truncate max-w-[160px] sm:max-w-none">{module.track_name}</span>
