@@ -81,8 +81,8 @@ function TodayRoute() {
 }
 
 function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: boolean }) {
-  const student = ci.student;
-  const primaryCareerCode = ci.career_direction.primary_career ?? "DATA_ENGINEER";
+  const student = ci?.student || ({} as any);
+  const primaryCareerCode = ci?.career_direction?.primary_career ?? "DATA_ENGINEER";
   const curriculumQuery = useCurriculum(primaryCareerCode);
   const curr = curriculumQuery.data;
 
@@ -97,8 +97,8 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
   const journey = resolveStudentJourney(ci, curr);
   const primary = journey.primaryAction;
 
-  const readinessScore = Math.round(ci.readiness.overall_score ?? 78);
-  const firstName = student.first_name || "Nirmal";
+  const readinessScore = Math.round(ci.placement_readiness?.score ?? ci.primary_career_readiness?.readiness_score ?? (ci as any)?.readiness?.overall_score ?? 78);
+  const firstName = student?.first_name || "Nirmal";
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -193,16 +193,16 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
                 YOUR NEXT MOVE
               </span>
               <Badge variant="outline" className="text-xs">
-                {primary.phaseName || "Phase 2: Programming & SQL"}
+                {primary?.phaseName || "Phase 2: Programming & SQL"}
               </Badge>
             </div>
 
             <div>
               <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-                {primary.title}
+                {primary?.title || 'Continue Learning'}
               </h2>
               <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                {primary.subtitle}
+                {primary?.subtitle || 'Continue your guided career curriculum.'}
               </p>
             </div>
 
@@ -245,8 +245,8 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
           {/* Action CTAs */}
           <div className="flex flex-col gap-3 shrink-0 lg:w-72">
             <Button asChild size="lg" className="w-full gap-2 text-sm font-bold shadow-lg py-6">
-              <Link to={primary.ctaLink}>
-                {primary.ctaText}
+              <Link to={primary?.ctaLink || '/app/path'}>
+                {primary?.ctaText || 'Continue'}
                 <ArrowRight className="size-4" />
               </Link>
             </Button>
@@ -425,11 +425,11 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
             <div className="space-y-2">
               <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                 <Target className="size-3.5 text-primary" />
-                Assigned Preparation Activities ({collegeData.active_assignments.length})
+                Assigned Preparation Activities ({(collegeData.active_assignments || []).length})
               </span>
 
               <div className="space-y-2">
-                {collegeData.active_assignments.map((asgn) => (
+                {(collegeData.active_assignments || []).map((asgn) => (
                   <div
                     key={asgn.assignment_id}
                     className="p-3.5 rounded-2xl border bg-card/80 flex items-center justify-between text-xs space-x-2"
@@ -459,11 +459,11 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
             <div className="space-y-2">
               <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                 <Calendar className="size-3.5 text-primary" />
-                Upcoming Placement Workshops ({collegeData.upcoming_sessions.length})
+                Upcoming Placement Workshops ({(collegeData.upcoming_sessions || []).length})
               </span>
 
               <div className="space-y-2">
-                {collegeData.upcoming_sessions.map((ses) => (
+                {(collegeData.upcoming_sessions || []).map((ses) => (
                   <div
                     key={ses.id}
                     className="p-3.5 rounded-2xl border bg-card/80 flex items-center justify-between text-xs space-x-2"

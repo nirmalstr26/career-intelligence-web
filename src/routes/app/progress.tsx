@@ -66,12 +66,12 @@ function ProgressPage() {
 }
 
 function ProgressContent({ ci }: { ci: CareerIntelligence }) {
-  const primaryCareerCode = ci?.career_direction?.primary_career ?? "DATA_ENGINEER";
+  const primaryCareerCode = ci?.career_direction?.primary_career || "DATA_ENGINEER";
   const currQuery = useCurriculum(primaryCareerCode);
   const projectsQuery = useProjects();
   const interviewsQuery = useInterviews();
 
-  const readinessScore = Math.round(ci.readiness.overall_score ?? 78);
+  const readinessScore = Math.round(ci?.placement_readiness?.score ?? ci?.primary_career_readiness?.readiness_score ?? (ci as any)?.readiness?.overall_score ?? 78);
 
   // Skill Evolution Data (Baseline vs Current vs Placement Target)
   const skillsEvolution = [
