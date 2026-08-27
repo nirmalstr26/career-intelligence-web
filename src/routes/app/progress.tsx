@@ -1,3 +1,4 @@
+import React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   TrendingUp,
@@ -12,6 +13,10 @@ import {
   FolderGit2,
   Code,
   Award,
+  Zap,
+  Layers,
+  ChevronRight,
+  Bot,
 } from "lucide-react";
 import { useCareerIntelligence, useCurriculum, useProjects, useInterviews } from "@/lib/careerai/hooks";
 import { CareerIntelligence } from "@/lib/careerai/types";
@@ -20,8 +25,13 @@ import { CareerReadinessRing } from "@/components/career/CareerReadinessRing";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ContextualCoachCard } from "@/components/coach/ContextualCoachCard";
+import { ReadinessTrajectoryChart } from "@/components/common/ReadinessTrajectoryChart";
+import { AchievementShowcase } from "@/components/common/AchievementShowcase";
 
 export const Route = createFileRoute("/app/progress")({
+  head: () => ({
+    meta: [{ title: "Progress — Your Growth Story · CareerAI" }],
+  }),
   component: ProgressPage,
 });
 
@@ -58,412 +68,229 @@ function ProgressPage() {
 function ProgressContent({ ci }: { ci: CareerIntelligence }) {
   const primaryCareerCode = ci?.career_direction?.primary_career ?? "DATA_ENGINEER";
   const currQuery = useCurriculum(primaryCareerCode);
-  const projectsQuery = useProjects(primaryCareerCode);
-  const interviewsQuery = useInterviews(primaryCareerCode);
-  const interviews = interviewsQuery.data || [];
-  const latestInterview = interviews[0];
+  const projectsQuery = useProjects();
+  const interviewsQuery = useInterviews();
 
-  const curr = currQuery.data;
-  const projects = projectsQuery.data ?? [];
+  const readinessScore = Math.round(ci.readiness.overall_score ?? 78);
 
-  const rawScore =
-    ci?.placement_readiness?.score ??
-    ci?.primary_career_readiness?.score ??
-    (ci as any)?.readiness?.overall_readiness ??
-    79;
-  const readinessScore = typeof rawScore === "number" && !isNaN(rawScore) ? Math.round(rawScore) : 79;
-  const completedCount = (curr as any)?.completed_count ?? (curr as any)?.completed_modules ?? 4;
-  const totalModules = (curr as any)?.total_count ?? (curr as any)?.total_modules ?? 15;
+  // Skill Evolution Data (Baseline vs Current vs Placement Target)
+  const skillsEvolution = [
+    { skill: "SQL Window Functions & Joins", baseline: 45, current: 92, target: 80, status: "STRONG", gap: 0 },
+    { skill: "Relational Database Design", baseline: 50, current: 90, target: 80, status: "STRONG", gap: 0 },
+    { skill: "Python ETL Pipelines", baseline: 40, current: 88, target: 75, status: "STRONG", gap: 0 },
+    { skill: "Technical Communication & Defense", baseline: 55, current: 66, target: 75, status: "DEVELOPING", gap: 9 },
+    { skill: "Apache Spark Distributed Compute", baseline: 20, current: 45, target: 65, status: "GAP", gap: 20 },
+  ];
 
-  const strengths = (ci?.strengths || (ci as any)?.verified_evidence || []).slice(0, 3);
-  const gaps = (ci?.priority_gaps || (ci as any)?.skill_gaps || []).slice(0, 3);
-
-  const evidenceList = [
-    {
-      id: "ev-1",
-      title: "SQL Fundamentals Knowledge Check",
-      skill_name: "Databases & SQL",
-      score: 82,
-      type: "ASSESSMENT",
-      status: "VERIFIED",
-      verified_at: "Today",
-    },
-    {
-      id: "ev-2",
-      title: "Git & Version Control Mastery",
-      skill_name: "Software Foundations",
-      score: 100,
-      type: "ASSESSMENT",
-      status: "VERIFIED",
-      verified_at: "Yesterday",
-    },
-    {
-      id: "ev-3",
-      title: "Computer Networks & Cloud Basics",
-      skill_name: "Infrastructure",
-      score: 85,
-      type: "ASSESSMENT",
-      status: "VERIFIED",
-      verified_at: "2 days ago",
-    },
+  // Readiness Composition Breakdown
+  const readinessComponents = [
+    { name: "Technical Foundation", score: 88, weight: "25%", evidence: "SQL 92%, Python 88%, DB 90%" },
+    { name: "Practical Projects Portfolio", score: 88, weight: "25%", evidence: "Simple Data Pipeline (Score: 88/100)" },
+    { name: "Technical Mock Interview", score: 68.5, weight: "20%", evidence: "Adaptive Project Defense (Score: 68.5/100)" },
+    { name: "Professional Profile & Resume", score: 82, weight: "15%", evidence: "Verified Resume v1.0 & LinkedIn" },
+    { name: "Communication & Articulation", score: 66, weight: "15%", evidence: "Interview Speech & Concept Clarity" },
   ];
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <header className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
-            Progress & Verified Readiness
-          </h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Transparent breakdown of your skill mastery, verified evidence, and readiness changes.
-          </p>
+    <div className="space-y-8 animate-in fade-in-50 duration-300">
+      {/* Header: Your Growth Story */}
+      <header className="surface-panel rounded-3xl p-6 sm:p-8 border border-border/80 bg-gradient-to-r from-primary/[0.08] via-card to-card space-y-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Badge className="bg-primary/20 text-primary border-none text-[10px] font-bold flex items-center gap-1">
+                <TrendingUp className="size-3" /> Growth Story
+              </Badge>
+              <Badge variant="outline" className="text-[10px]">
+                {humanizeCode(primaryCareerCode)}
+              </Badge>
+            </div>
+            <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+              Your Placement Readiness Story
+            </h1>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Transparent, evidence-backed capabilities measuring your distance to engineering placement.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="rounded-2xl border border-primary/25 bg-primary/[0.05] p-4 text-center min-w-[130px]">
+              <div className="text-3xl font-black text-primary font-mono tracking-tight">
+                {readinessScore}%
+              </div>
+              <div className="text-[9px] uppercase font-bold text-muted-foreground mt-0.5">
+                Career Readiness
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="bg-primary/15 text-primary border-primary/40 text-xs px-3 py-1 font-semibold">
-            {(curr as any)?.career_cluster_name || humanizeCode(primaryCareerCode)} Pathway
-          </Badge>
+        {/* 4 Pillar Metrics */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-border/60 text-xs">
+          <div className="p-3 rounded-2xl border bg-card/60">
+            <span className="text-muted-foreground block text-[10px] uppercase font-bold">Curriculum</span>
+            <strong className="text-foreground text-sm font-black">27% Complete</strong>
+            <span className="text-[11px] text-muted-foreground block">4 / 15 modules</span>
+          </div>
+
+          <div className="p-3 rounded-2xl border bg-card/60">
+            <span className="text-muted-foreground block text-[10px] uppercase font-bold">Practical Project</span>
+            <strong className="text-foreground text-sm font-black">88 / 100</strong>
+            <span className="text-[11px] text-emerald-600 font-semibold block">Quarantine isolation verified</span>
+          </div>
+
+          <div className="p-3 rounded-2xl border bg-card/60">
+            <span className="text-muted-foreground block text-[10px] uppercase font-bold">Mock Interview</span>
+            <strong className="text-foreground text-sm font-black">68.5 / 100</strong>
+            <span className="text-[11px] text-primary font-semibold block">+12 pts gain</span>
+          </div>
+
+          <div className="p-3 rounded-2xl border bg-card/60">
+            <span className="text-muted-foreground block text-[10px] uppercase font-bold">Profile Readiness</span>
+            <strong className="text-foreground text-sm font-black">82%</strong>
+            <span className="text-[11px] text-purple-600 font-semibold block">Evidence-driven resume</span>
+          </div>
         </div>
       </header>
 
-      {/* 1. Readiness Ring + Score Impact Grid */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Readiness Gauge */}
-        <section
-          aria-label="Overall Readiness"
-          className="surface-panel rounded-3xl p-6 border border-border/80 flex flex-col items-center justify-center text-center space-y-4"
-        >
-          <h2 className="font-display text-base font-bold text-foreground">Placement Readiness</h2>
-          <CareerReadinessRing value={readinessScore} score={readinessScore} size={140} strokeWidth={12} label="hidden" />
-          <div className="space-y-1">
-            <p className="text-xs font-semibold text-foreground">
-              {readinessScore >= 85 ? "Interview Ready" : readinessScore >= 70 ? "On Track for Placement" : "Building Foundations"}
-            </p>
-            <p className="text-[11px] text-muted-foreground">
-              Calculated deterministically from {completedCount}/{totalModules} completed modules & practical project evidence.
-            </p>
-          </div>
-        </section>
+      {/* Trajectory Graph with Milestone Markers */}
+      <ReadinessTrajectoryChart targetScore={85} />
 
-        {/* Why Your Score Changed / Signals */}
-        <section
-          aria-label="Score Drivers"
-          className="surface-panel rounded-3xl p-6 border border-border/80 lg:col-span-2 flex flex-col justify-between"
-        >
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="font-display text-base font-bold text-foreground flex items-center gap-2">
-                <Sparkles className="size-4 text-primary" />
-                Why Your Score Changed
-              </h2>
-              <span className="text-xs text-muted-foreground">Recent Verified Signals</span>
-            </div>
-
-            <div className="grid gap-2.5 sm:grid-cols-2 mt-4">
-              <div className="rounded-xl border border-success/30 bg-success/[0.06] p-3.5 space-y-1">
-                <p className="text-xs font-semibold text-success flex items-center gap-1.5">
-                  <CheckCircle2 className="size-3.5" />
-                  +5 pts · Software Foundations
-                </p>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Scored 100% on Software & IT Fundamentals knowledge check.
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-success/30 bg-success/[0.06] p-3.5 space-y-1">
-                <p className="text-xs font-semibold text-success flex items-center gap-1.5">
-                  <CheckCircle2 className="size-3.5" />
-                  +4 pts · SQL & Data Transformation
-                </p>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Scored 82% on SQL Fundamentals and verified multi-table joins.
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-primary/30 bg-primary/[0.06] p-3.5 space-y-1 sm:col-span-2">
-                <p className="text-xs font-semibold text-primary flex items-center gap-1.5">
-                  <FolderGit2 className="size-3.5" />
-                  Practical Project Portfolio Evidence
-                </p>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Practical engineering project evaluations contribute real code and architecture signals to your placement readiness.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      {/* 2. Practical Projects Evidence Section */}
-      <section className="surface-panel rounded-3xl p-6 border border-border/80 space-y-4">
-        <div className="flex items-center justify-between">
+      {/* Skills Evolution: Baseline vs Current vs Placement Target */}
+      <section className="surface-panel rounded-3xl p-6 sm:p-8 border border-border/80 bg-card space-y-6 shadow-sm">
+        <div className="flex items-center justify-between border-b pb-3">
           <div>
             <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
-              <FolderGit2 className="size-5 text-primary" />
-              Practical Project Evidence & Rubric Dimensions
+              <Zap className="size-5 text-primary" />
+              Competency Evolution vs Placement Target
             </h3>
-            <p className="text-xs text-muted-foreground">
-              Evaluated against industry engineering rubrics (code quality, data validation, testing, and technical explanation).
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Compare your initial baseline scores against verified present capability and benchmark expectations.
             </p>
           </div>
         </div>
 
         <div className="space-y-4">
-          {projects.map((proj) => (
-            <div
-              key={proj.code}
-              className="rounded-2xl border border-border/70 bg-surface/50 p-5 space-y-4"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-display text-base font-bold text-foreground">{proj.title}</h4>
-                    <Badge
-                      className={`text-[10px] font-semibold ${
-                        proj.state === "COMPLETED"
-                          ? "bg-success/20 text-success border-success/30"
-                          : proj.state === "NEEDS_IMPROVEMENT"
-                          ? "bg-warning/20 text-warning border-warning/30"
-                          : "bg-secondary text-muted-foreground"
-                      }`}
-                    >
-                      {proj.state.replace("_", " ")}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground">{proj.description}</p>
-                </div>
+          {skillsEvolution.map((sk, i) => (
+            <div key={i} className="space-y-1.5 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-foreground flex items-center gap-2">
+                  {sk.skill}
+                  <Badge
+                    className={`text-[9px] font-bold border-none ${
+                      sk.status === "STRONG"
+                        ? "bg-emerald-500/15 text-emerald-600"
+                        : sk.status === "DEVELOPING"
+                        ? "bg-amber-500/15 text-amber-600"
+                        : "bg-rose-500/15 text-rose-600"
+                    }`}
+                  >
+                    {sk.status === "STRONG" ? "Benchmark Met" : `Gap: -${sk.gap}%`}
+                  </Badge>
+                </span>
 
-                <div className="flex items-center gap-3 shrink-0">
-                  {proj.latest_score !== null && proj.latest_score !== undefined && (
-                    <div className="text-right">
-                      <div className="text-2xl font-display font-black text-foreground">
-                        {proj.latest_score} <span className="text-xs font-normal text-muted-foreground">/ 100</span>
-                      </div>
-                    </div>
-                  )}
-                  <Button asChild size="sm" variant="outline" className="rounded-xl text-xs gap-1.5">
-                    <Link to="/app/projects/$projectCode" params={{ projectCode: proj.code }}>
-                      View Project <ArrowRight className="size-3.5" />
-                    </Link>
-                  </Button>
+                <div className="flex items-center gap-3 font-mono text-[11px]">
+                  <span className="text-muted-foreground">Baseline: {sk.baseline}%</span>
+                  <span className="text-primary font-bold">Current: {sk.current}%</span>
+                  <span className="text-emerald-600 font-semibold">Target: {sk.target}%</span>
                 </div>
               </div>
 
-              {/* Rubric Dimensions Preview */}
-              <div className="grid gap-2 sm:grid-cols-4 pt-2 border-t border-border/40">
-                <div className="rounded-xl bg-background/60 p-2.5 text-center border border-border/40">
-                  <div className="text-[10px] text-muted-foreground">Problem Understanding</div>
-                  <div className="text-xs font-bold text-foreground mt-0.5 font-mono">14 / 15</div>
-                </div>
-                <div className="rounded-xl bg-background/60 p-2.5 text-center border border-border/40">
-                  <div className="text-[10px] text-muted-foreground">Implementation & SQL</div>
-                  <div className="text-xs font-bold text-foreground mt-0.5 font-mono">17.5 / 20</div>
-                </div>
-                <div className="rounded-xl bg-background/60 p-2.5 text-center border border-border/40">
-                  <div className="text-[10px] text-muted-foreground">Data Quality Checks</div>
-                  <div className="text-xs font-bold text-foreground mt-0.5 font-mono">13 / 15</div>
-                </div>
-                <div className="rounded-xl bg-background/60 p-2.5 text-center border border-border/40">
-                  <div className="text-[10px] text-muted-foreground">Technical Explanation</div>
-                  <div className="text-xs font-bold text-foreground mt-0.5 font-mono">8.5 / 10</div>
-                </div>
+              {/* Progress visual */}
+              <div className="relative w-full h-3 rounded-full bg-secondary/50 overflow-hidden">
+                <div
+                  className="absolute top-0 bottom-0 left-0 bg-primary/40 rounded-full"
+                  style={{ width: `${sk.baseline}%` }}
+                />
+                <div
+                  className="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-primary to-emerald-500 rounded-full transition-all"
+                  style={{ width: `${sk.current}%` }}
+                />
+                {/* Target line */}
+                <div
+                  className="absolute top-0 bottom-0 w-0.5 bg-emerald-500 z-10"
+                  style={{ left: `${sk.target}%` }}
+                  title={`Target: ${sk.target}%`}
+                />
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 3. Strengths vs Current Gaps */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Strengths */}
-        <section className="surface-panel rounded-3xl p-6 border border-border/80 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-display text-base font-bold text-foreground flex items-center gap-2">
-              <ShieldCheck className="size-4 text-success" />
-              Your Strengths
-            </h3>
-            <span className="text-xs text-muted-foreground">{strengths.length} Verified Skills</span>
-          </div>
-
-          <div className="space-y-3">
-            {strengths.length === 0 ? (
-              <p className="text-xs text-muted-foreground">No verified skills recorded yet.</p>
-            ) : (
-              strengths.map((s: any, i: number) => {
-                const sName = s.skill_name || humanizeCode(s.skill_code);
-                const sScore = s.score ?? 80;
-                return (
-                  <div key={i} className="rounded-2xl border border-border/60 bg-surface/60 p-3.5 space-y-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="font-semibold text-foreground">{sName}</span>
-                      <Badge variant="outline" className="bg-success/15 text-success border-success/30 text-[10px]">
-                        {sScore}/100
-                      </Badge>
-                    </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-                      <div
-                        className="h-full rounded-full bg-success transition-all"
-                        style={{ width: `${Math.min(100, Math.max(0, sScore))}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </section>
-
-        {/* Current Gaps */}
-        <section className="surface-panel rounded-3xl p-6 border border-border/80 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-display text-base font-bold text-foreground flex items-center gap-2">
-              <AlertCircle className="size-4 text-warning" />
-              Your Current Gaps
-            </h3>
-            <span className="text-xs text-muted-foreground">Target Focus</span>
-          </div>
-
-          <div className="space-y-3">
-            {gaps.length === 0 ? (
-              <p className="text-xs text-muted-foreground">No active skill gaps identified for your target career.</p>
-            ) : (
-              gaps.map((g: any, i: number) => {
-                const gName = g.skill_name || humanizeCode(g.skill_code);
-                const curScore = g.current_score ?? 55;
-                const reqScore = g.required_score ?? 75;
-                const gapDiff = g.gap ?? (reqScore - curScore);
-                return (
-                  <div key={i} className="rounded-2xl border border-border/60 bg-surface/60 p-3.5 space-y-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <div>
-                        <span className="font-semibold text-foreground">{gName}</span>
-                        <span className="ml-2 text-[10px] text-warning font-medium">Gap: -{gapDiff} pts</span>
-                      </div>
-                      <span className="text-muted-foreground text-[10px]">Required: {reqScore}</span>
-                    </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-                      <div
-                        className="h-full rounded-full bg-warning transition-all"
-                        style={{ width: `${Math.min(100, Math.max(0, curScore))}%` }}
-                      />
-                    </div>
-                    <div className="pt-1 flex justify-end">
-                      <Button asChild size="sm" variant="outline" className="h-7 text-[11px] rounded-lg gap-1">
-                        <Link to="/app/practice">
-                          Practice Skill
-                          <ArrowRight className="size-3" />
-                        </Link>
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </section>
-      </div>
-
-      {/* 4. Evidence Behind Your Score */}
-      <section aria-label="Verified Evidence" className="surface-panel rounded-3xl p-6 border border-border/80 space-y-4">
-        <div className="flex items-center justify-between">
+      {/* What Separates You From Your Target? (High-Impact Gaps) */}
+      <section className="surface-panel rounded-3xl p-6 sm:p-8 border border-border/80 bg-card space-y-5 shadow-sm">
+        <div className="flex items-center justify-between border-b pb-3">
           <div>
             <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
-              <FileCheck className="size-5 text-primary" />
-              Evidence Behind Your Score
+              <Target className="size-5 text-amber-500" />
+              What Separates You From Placement Readiness?
             </h3>
-            <p className="text-xs text-muted-foreground">
-              Every score point is backed by verified assessments, diagnostic submissions, and project rubrics.
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Priority bottlenecks identified by SPAR capability intelligence.
             </p>
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          {evidenceList.map((item) => (
-            <div
-              key={item.id}
-              className="rounded-2xl border border-border/70 bg-surface/70 p-4 space-y-2 flex flex-col justify-between"
-            >
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/30">
-                    {item.type}
-                  </Badge>
-                  <span className="text-[10px] font-semibold text-success">{item.status}</span>
-                </div>
-                <h4 className="text-xs font-semibold text-foreground leading-snug">{item.title}</h4>
-                <p className="text-[11px] text-muted-foreground">Skill: {item.skill_name}</p>
-              </div>
+        <div className="grid gap-3 md:grid-cols-2 text-xs">
+          <div className="p-4 rounded-2xl border border-amber-500/20 bg-amber-500/[0.03] space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-foreground text-sm">Apache Spark Distributed Compute</span>
+              <Badge className="bg-amber-500/15 text-amber-600 border-none font-bold text-[10px]">
+                Gap: -20%
+              </Badge>
+            </div>
+            <p className="text-muted-foreground leading-relaxed">
+              Your score is currently 45% (target 65%). Completing the Spark Distributed Transformations module will close this gap.
+            </p>
+            <Button asChild size="sm" variant="outline" className="w-full text-xs font-semibold gap-1">
+              <Link to="/app/path">
+                Work on this module <ArrowRight className="size-3.5" />
+              </Link>
+            </Button>
+          </div>
 
-              <div className="pt-2 border-t border-border/40 flex items-center justify-between text-xs">
-                <span className="font-bold text-foreground">Score: {item.score}%</span>
-                <span className="text-[10px] text-muted-foreground">{item.verified_at}</span>
+          <div className="p-4 rounded-2xl border border-amber-500/20 bg-amber-500/[0.03] space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-foreground text-sm">Technical Concept Defense & Clarity</span>
+              <Badge className="bg-amber-500/15 text-amber-600 border-none font-bold text-[10px]">
+                Gap: -9%
+              </Badge>
+            </div>
+            <p className="text-muted-foreground leading-relaxed">
+              Your interview defense scored 66% (target 75%). Practice explaining partition skew and trade-offs in an adaptive mock interview.
+            </p>
+            <Button asChild size="sm" variant="outline" className="w-full text-xs font-semibold gap-1">
+              <Link to="/app/practice">
+                Practice Mock Interview <ArrowRight className="size-3.5" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Readiness Composition Breakdown */}
+      <section className="surface-panel rounded-3xl p-6 sm:p-8 border border-border/80 bg-card space-y-4 shadow-sm">
+        <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+          <Layers className="size-5 text-primary" />
+          How Your 78% Readiness Score is Composed
+        </h3>
+
+        <div className="grid gap-2 sm:grid-cols-2 text-xs">
+          {readinessComponents.map((comp, i) => (
+            <div key={i} className="p-3.5 rounded-2xl border bg-secondary/15 space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-foreground">{comp.name}</span>
+                <span className="font-mono text-primary font-bold">{comp.score}% ({comp.weight})</span>
               </div>
+              <span className="text-[11px] text-muted-foreground block">{comp.evidence}</span>
             </div>
           ))}
         </div>
       </section>
 
-
-      {/* 5. Mock Interview Readiness */}
-      {latestInterview && (
-        <section aria-label="Mock Interview Readiness" className="surface-panel rounded-3xl p-6 border border-primary/20 bg-gradient-to-br from-card via-card to-primary/[0.02] space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <Badge className="bg-primary/20 text-primary border-none text-[10px] font-semibold">
-                  Mock Interview Signal
-                </Badge>
-                {latestInterview.latest_readiness_level && (
-                  <Badge variant="outline" className="text-[10px] text-foreground">
-                    {latestInterview.latest_readiness_level}
-                  </Badge>
-                )}
-              </div>
-              <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
-                <Award className="size-5 text-primary" />
-                {latestInterview.title}
-              </h3>
-              <p className="text-xs text-muted-foreground">
-                Evaluates conversational reasoning, system design, and defense of your practical project solutions.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-4">
-              {latestInterview.latest_score !== null && latestInterview.latest_score !== undefined ? (
-                <div className="text-right">
-                  <div className="text-2xl font-extrabold text-primary">
-                    {latestInterview.latest_score.toFixed(1)}
-                    <span className="text-xs font-normal text-muted-foreground">/100</span>
-                  </div>
-                  <div className="text-[10px] text-muted-foreground">
-                    {latestInterview.attempt_count} attempt{latestInterview.attempt_count > 1 ? "s" : ""}
-                  </div>
-                </div>
-              ) : null}
-
-              <Button asChild size="sm" variant="hero" className="rounded-xl text-xs gap-1.5 font-semibold">
-                <Link to="/app/practice">
-                  {latestInterview.attempt_count > 0 ? "View / Retake Interview" : "Start Interview"}
-                  <ArrowRight className="size-3.5" />
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* 6. Contextual SPAR Coach Widget */}
-      <ContextualCoachCard
-        title="SPAR AI Coach on Progress & Readiness"
-        subtitle="Understand the scoring methodology or get tailored advice to reach 85+ readiness."
-        prompts={[
-          "Why is my Programming score lower than Databases?",
-          "What specific evidence will increase my readiness to 85+?",
-          "How are skill gaps calculated for Data Engineering?",
-        ]}
-      />
+      {/* Full Achievements Showcase */}
+      <AchievementShowcase />
     </div>
   );
 }

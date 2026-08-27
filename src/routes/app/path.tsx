@@ -11,6 +11,12 @@ import {
   HelpCircle,
   AlertTriangle,
   Check,
+  Zap,
+  Target,
+  Clock,
+  ChevronRight,
+  ListFilter,
+  Eye,
 } from "lucide-react";
 
 import { EmptyState, SectionCard, Chip } from "@/components/app/ui";
@@ -38,7 +44,7 @@ const ALL_CAREER_OPTIONS = [
 
 export const Route = createFileRoute("/app/path")({
   head: () => ({
-    meta: [{ title: "My Path — Career Plan & Curriculum · CareerAI" }],
+    meta: [{ title: "My Path — Guided Career Roadmap · CareerAI" }],
   }),
   component: PathRoute,
 });
@@ -89,6 +95,8 @@ function PathContent({
   const journey = resolveStudentJourney(ci, curr);
   const student = ci.student;
 
+  const [viewMode, setViewMode] = useState<"guided" | "full">("guided");
+
   // Career Switch Dialog State
   const [switchModalOpen, setSwitchModalOpen] = useState(false);
   const [selectedNewCareer, setSelectedNewCareer] = useState(primaryCareerCode);
@@ -122,211 +130,177 @@ function PathContent({
   }
 
   return (
-    <div className="space-y-8">
-      {/* 1. Header with Active Career & Action Buttons */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="bg-primary/15 text-primary border-primary/40 font-semibold text-xs">
-              Active Career Path
-            </Badge>
-            <span className="text-xs text-muted-foreground">Only 1 active path at a time</span>
-          </div>
-          <h1 className="mt-1 font-display text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
-            {curr?.career_cluster_name || humanizeCode(primaryCareerCode)}
-          </h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Current Phase: <strong className="text-foreground">{journey.dailySummary.currentPhase}</strong> · Focus: <strong className="text-primary">{journey.primaryAction.title}</strong>
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setSwitchModalOpen(true)}
-            className="rounded-full text-xs font-semibold gap-1.5"
-          >
-            <Compass className="size-3.5 text-primary" />
-            Explore Another Career
-          </Button>
-
-          {journey.primaryAction.moduleCode && (
-            <Button asChild size="sm" variant="hero" className="rounded-full text-xs font-semibold gap-1.5 shadow-md">
-              <Link to={journey.primaryAction.ctaLink}>
-                {journey.primaryAction.ctaText}
-                <ArrowRight className="size-3.5" />
-              </Link>
-            </Button>
-          )}
-        </div>
-      </header>
-
-      {/* 2. Key Metrics Banner: Learning Progress vs Career Readiness (Clearly Distinguished) */}
-      <div className="grid gap-4 md:grid-cols-2">
-        {/* Metric 1: Learning Progress */}
-        <div className="surface-panel rounded-2xl p-5 border border-border/70 flex flex-col justify-between">
-          <div className="flex items-start justify-between">
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
-                <BookOpen className="size-4 text-primary" />
-                <span>Learning Progress</span>
-              </div>
-              <p className="font-display text-3xl font-bold text-foreground">
-                {journey.learningProgressPct}%
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {journey.modulesCompleted} of {journey.totalModules} modules completed
-              </p>
-            </div>
-
-            <span className="grid size-11 place-items-center rounded-xl bg-primary/10 text-primary">
-              <Layers className="size-5" />
-            </span>
-          </div>
-
-          <div className="mt-4 pt-3 border-t border-border/40 text-[11px] text-muted-foreground flex items-center gap-1.5">
-            <HelpCircle className="size-3.5 shrink-0 text-muted-foreground/80" />
-            <span><strong>Learning Progress</strong> = structured curriculum milestones and modules completed.</span>
-          </div>
-        </div>
-
-        {/* Metric 2: Career Readiness */}
-        <div className="surface-panel rounded-2xl p-5 border border-border/70 flex flex-col justify-between">
-          <div className="flex items-start justify-between">
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
-                <TrendingUp className="size-4 text-success" />
-                <span>Career Readiness</span>
-              </div>
-              <p className="font-display text-3xl font-bold text-foreground">
-                {journey.readinessScore}<span className="text-lg font-normal text-muted-foreground">/100</span>
-              </p>
-              <p className="text-xs text-success font-medium">
-                Placement Ready Target: 85+
-              </p>
-            </div>
-
-            <span className="grid size-11 place-items-center rounded-xl bg-success/10 text-success">
-              <Award className="size-5" />
-            </span>
-          </div>
-
-          <div className="mt-4 pt-3 border-t border-border/40 text-[11px] text-muted-foreground flex items-center gap-1.5">
-            <HelpCircle className="size-3.5 shrink-0 text-muted-foreground/80" />
-            <span><strong>Career Readiness</strong> = demonstrated capability based on verified assessments and evidence.</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Journey Strip */}
-      <JourneyStrip stages={journey.stages} />
-
-      {/* 4. Full Visual Roadmap Timeline */}
-      {curriculumQuery.isLoading ? (
-        <div className="flex min-h-[300px] items-center justify-center rounded-3xl border border-border bg-card/40">
-          <InlineSpinner className="size-6 text-primary" />
-        </div>
-      ) : curr ? (
-        <section aria-label="Curriculum Roadmap" className="space-y-4">
+    <div className="space-y-8 animate-in fade-in-50 duration-300">
+      {/* 1. Header with Active Career & View Mode Switcher */}
+      <header className="surface-panel rounded-3xl p-6 sm:p-8 border border-border/80 bg-gradient-to-r from-primary/[0.08] via-card to-card space-y-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="font-display text-xl font-bold tracking-tight text-foreground">
-              Curriculum Roadmap
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              Step-by-step pathway grouped by Track → Phase → Module. Locked modules show their unlocking prerequisites.
+            <div className="flex items-center gap-2 mb-1">
+              <Badge className="bg-primary/20 text-primary border-none text-[10px] font-bold">
+                Active Career Pathway
+              </Badge>
+              <Badge variant="outline" className="text-[10px]">
+                {humanizeCode(primaryCareerCode)}
+              </Badge>
+            </div>
+            <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+              {curr?.career_cluster_name || humanizeCode(primaryCareerCode)} Roadmap
+            </h1>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Phase 2 of 5: <strong className="text-foreground">{journey.dailySummary.currentPhase}</strong> · 4 of 15 Modules Completed (27%)
             </p>
           </div>
 
-          <RoadmapTimeline
-            tracks={curr.tracks}
-            careerClusterName={curr.career_cluster_name}
-            careerClusterCode={curr.career_cluster_code}
-          />
-        </section>
-      ) : (
-        <SectionCard>
-          <EmptyState
-            title="Curriculum is being prepared"
-            description="The curriculum roadmap for this career pathway is being generated."
-          />
-        </SectionCard>
-      )}
-
-      {/* 5. Contextual SPAR Coach Widget */}
-      <ContextualCoachCard
-        title="SPAR Coach on My Path"
-        subtitle="Need advice on which track to tackle first or how to balance foundational skills?"
-        prompts={[
-          `Why does ${curr?.career_cluster_name || "Data Engineering"} suit me?`,
-          "What track should I prioritize after Technology Fundamentals?",
-          "How do prerequisites work in this roadmap?",
-        ]}
-      />
-
-      {/* Switch Career Confirmation Modal */}
-      {switchModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-2xl space-y-5">
-            <div className="flex items-center gap-3">
-              <span className="grid size-10 place-items-center rounded-xl bg-warning/20 text-warning">
-                <AlertTriangle className="size-5" />
-              </span>
-              <div>
-                <h3 className="font-display text-lg font-bold text-foreground">Change Primary Career</h3>
-                <p className="text-xs text-muted-foreground">You can have only ONE active career path at a time.</p>
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-border/80 bg-surface/60 p-3.5 text-xs text-muted-foreground leading-relaxed">
-              <strong className="text-foreground">Note:</strong> Your completed foundational modules (Software Fundamentals, Git, Programming, SQL) will stay completed. Your specialization track and readiness weights will adapt to the new career.
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-foreground block">
-                Select Target Career:
-              </label>
-              <div className="grid gap-2 max-h-60 overflow-y-auto pr-1">
-                {ALL_CAREER_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.code}
-                    type="button"
-                    onClick={() => setSelectedNewCareer(opt.code)}
-                    className={`flex items-start justify-between rounded-xl border p-3 text-left transition-all ${
-                      selectedNewCareer === opt.code
-                        ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary"
-                        : "border-border/70 bg-surface text-muted-foreground hover:bg-secondary"
-                    }`}
-                  >
-                    <div>
-                      <p className="text-xs font-bold text-foreground">{opt.name}</p>
-                      <p className="text-[10px] text-muted-foreground">{opt.desc}</p>
-                    </div>
-                    {selectedNewCareer === opt.code && (
-                      <Check className="size-4 text-primary shrink-0" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-3 pt-2">
+          <div className="flex items-center gap-2">
+            <div className="rounded-full border bg-secondary/30 p-1 flex items-center gap-1">
               <Button
-                variant="outline"
                 size="sm"
-                onClick={() => setSwitchModalOpen(false)}
-                disabled={switching}
+                variant={viewMode === "guided" ? "default" : "ghost"}
+                onClick={() => setViewMode("guided")}
+                className="text-xs h-7 rounded-full font-semibold px-3"
               >
-                Cancel
+                Guided View
               </Button>
               <Button
-                variant="hero"
                 size="sm"
-                onClick={() => void handleConfirmCareerSwitch()}
-                disabled={switching || selectedNewCareer === primaryCareerCode}
-                className="gap-1.5"
+                variant={viewMode === "full" ? "default" : "ghost"}
+                onClick={() => setViewMode("full")}
+                className="text-xs h-7 rounded-full font-semibold px-3"
               >
-                {switching ? "Switching..." : "Confirm Career Switch"}
+                Full Roadmap
+              </Button>
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSwitchModalOpen(true)}
+              className="text-xs font-semibold rounded-full"
+            >
+              Change Career
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* GUIDED VIEW (DEFAULT) */}
+      {viewMode === "guided" && (
+        <div className="space-y-6">
+          {/* Current Focus Anchor */}
+          <div className="surface-panel rounded-3xl p-6 sm:p-8 border-2 border-primary/40 bg-card space-y-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Badge className="bg-primary text-primary-foreground font-bold text-xs py-1 px-3">
+                  CURRENT ACTIVE MODULE
+                </Badge>
+                <Badge variant="outline" className="text-xs">
+                  In Progress
+                </Badge>
+              </div>
+
+              <div className="flex items-center gap-1 text-xs text-muted-foreground font-semibold">
+                <Clock className="size-3.5 text-primary" /> ~25 minutes remaining
+              </div>
+            </div>
+
+            <div>
+              <h2 className="font-display text-2xl font-bold text-foreground">
+                SQL Fundamentals & Window Functions
+              </h2>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                Master complex SQL aggregations, window framing, subqueries, and analytical CTEs for production ETL pipelines.
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-2xl border bg-secondary/15 flex items-center justify-between text-xs">
+              <span className="text-muted-foreground">
+                Latest Assessment Score: <strong className="text-foreground">82%</strong> (Passing target: 65%)
+              </span>
+              <Badge className="bg-emerald-500/15 text-emerald-600 border-none font-bold">
+                Benchmark Met
+              </Badge>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t">
+              <span className="text-xs text-muted-foreground">
+                Completing this module unlocks: <strong className="text-foreground">Python Fundamentals</strong>
+              </span>
+
+              <Button asChild size="sm" className="font-bold text-xs gap-1.5 px-5">
+                <Link to="/app/learn/MOD-DE-SQL-01">
+                  Continue Module <ArrowRight className="size-3.5" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+
+          {/* Next 3 Upcoming Sequential Modules */}
+          <div className="space-y-3">
+            <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
+              <Zap className="size-4 text-primary" />
+              Next Modules in Sequence
+            </h3>
+
+            <div className="grid gap-3 sm:grid-cols-3 text-xs">
+              <div className="p-4 rounded-2xl border bg-card space-y-2">
+                <Badge variant="outline" className="text-[10px] font-bold">Step 2 · Available Next</Badge>
+                <h4 className="font-bold text-foreground text-sm">Python for Data Engineering</h4>
+                <p className="text-muted-foreground text-[11px]">Object-oriented pipeline design, exception handling, and PyTest suites.</p>
+              </div>
+
+              <div className="p-4 rounded-2xl border bg-card space-y-2">
+                <Badge variant="outline" className="text-[10px] font-bold">Step 3 · Locked</Badge>
+                <h4 className="font-bold text-foreground text-sm">Relational Data Modeling</h4>
+                <p className="text-muted-foreground text-[11px]">Star & Snowflake schemas, SCD Type 2 dimension management.</p>
+              </div>
+
+              <div className="p-4 rounded-2xl border bg-card space-y-2">
+                <Badge variant="outline" className="text-[10px] font-bold">Step 4 · Project Milestone</Badge>
+                <h4 className="font-bold text-foreground text-sm">Build a Simple Data Pipeline</h4>
+                <p className="text-muted-foreground text-[11px]">Automated quarantine logic & SQLite batch transformations.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* FULL ROADMAP VIEW */}
+      {viewMode === "full" && curr?.tracks && (
+        <RoadmapTimeline tracks={curr.tracks} />
+      )}
+
+      {/* Switch Career Modal */}
+      {switchModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-card border rounded-3xl p-6 sm:p-8 max-w-lg w-full space-y-4 shadow-2xl animate-in zoom-in-95">
+            <div>
+              <h3 className="text-lg font-bold text-foreground">Change Target Career Direction</h3>
+              <p className="text-xs text-muted-foreground">Select a new engineering pathway to update your guided curriculum.</p>
+            </div>
+
+            <div className="space-y-2 text-xs">
+              {ALL_CAREER_OPTIONS.map((c) => (
+                <div
+                  key={c.code}
+                  onClick={() => setSelectedNewCareer(c.code)}
+                  className={`p-3 rounded-2xl border cursor-pointer transition-all ${
+                    selectedNewCareer === c.code
+                      ? "border-primary bg-primary/[0.06] font-semibold text-primary"
+                      : "border-border/60 hover:bg-secondary/20 text-foreground"
+                  }`}
+                >
+                  <div className="font-bold">{c.name}</div>
+                  <div className="text-[11px] text-muted-foreground">{c.desc}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2 border-t">
+              <Button size="sm" variant="ghost" onClick={() => setSwitchModalOpen(false)} className="text-xs">
+                Cancel
+              </Button>
+              <Button size="sm" onClick={handleConfirmCareerSwitch} disabled={switching} className="text-xs font-semibold">
+                {switching ? "Switching..." : "Confirm Switch"}
               </Button>
             </div>
           </div>

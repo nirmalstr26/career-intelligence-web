@@ -11,6 +11,10 @@ import {
   CheckCircle2,
   HelpCircle,
   Compass,
+  Zap,
+  Target,
+  Clock,
+  Layers,
 } from "lucide-react";
 import { useCareerIntelligence, useCurriculum, useStudentId } from "@/lib/careerai/hooks";
 import { careerai } from "@/lib/careerai/client";
@@ -73,50 +77,42 @@ function CoachPage() {
             };
           });
           setMessages(loadedMsgs);
-        } else {
-          setMessages([
-            {
-              role: "assistant",
-              content: `Hello! I'm your SPAR AI Career Coach. I am calibrated with your active pathway (${curr?.career_cluster_name || "Data Engineer"}), your current readiness score (${ci?.placement_readiness?.score ?? 79}/100), and your learning roadmap progress. How can I assist your career journey today?`,
-            },
-          ]);
         }
         setHistoryLoaded(true);
       })
-      .catch(() => {
-        setMessages([
-          {
-            role: "assistant",
-            content: `Hello! I'm your SPAR AI Career Coach. I am calibrated with your active pathway (${curr?.career_cluster_name || "Data Engineer"}), your current readiness score (${ci?.placement_readiness?.score ?? 79}/100), and your learning roadmap progress. How can I assist your career journey today?`,
-          },
-        ]);
-        setHistoryLoaded(true);
-      });
-  }, [studentId, historyLoaded, curr, ci]);
+      .catch(() => setHistoryLoaded(true));
+  }, [studentId, historyLoaded]);
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  // Handle incoming search prompt
+  // Handle URL pre-seeded prompt
   useEffect(() => {
     if (prompt && !initializedPrompt.current && historyLoaded) {
-      setInput(prompt);
       initializedPrompt.current = true;
+      void handleSend(prompt);
     }
   }, [prompt, historyLoaded]);
 
-  async function handleSend(customText?: string) {
-    const textToSend = (customText || input).trim();
-    if (!textToSend || loading || !studentId) return;
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
+
+  async function handleSend(text?: string) {
+    const messageToSend = text || input;
+    if (!messageToSend.trim() || loading || !studentId) return;
 
     setInput("");
-    setMessages((prev) => [...prev, { role: "user", content: textToSend }]);
+    setMessages((prev) => [...prev, { role: "user", content: messageToSend }]);
     setLoading(true);
 
     try {
-      const reply = await careerai.sendAgentMessage(studentId, textToSend, conversationId.current);
-      if (reply.conversation_id) conversationId.current = reply.conversation_id;
+      const reply: AgentReply = await careerai.chat({
+        student_id: studentId,
+        message: messageToSend,
+        conversation_id: conversationId.current,
+      });
+
+      if (reply.conversation_id) {
+        conversationId.current = reply.conversation_id;
+      }
 
       setMessages((prev) => [
         ...prev,
@@ -155,39 +151,95 @@ function CoachPage() {
     }
   }
 
-  const QUICK_PROMPTS = [
-    "What should I focus on today?",
-    "Why do I need SQL as a Data Engineer?",
-    "Quiz me on what I'm weak at.",
-    "What evidence will increase my readiness to 85+?",
+  const STARTER_ACTIONS = [
+    { title: "Plan My Day", desc: "Give me an optimal 30-minute study session plan.", query: "What should I focus on for 30 minutes today?" },
+    { title: "Explain My Gap", desc: "Why is Spark my biggest remaining skill gap?", query: "Why is Apache Spark my biggest remaining skill gap and how do I close it?" },
+    { title: "Practice With Me", desc: "Quiz me on SQL joins and window aggregations.", query: "Quiz me on SQL window functions and subquery aggregations." },
+    { title: "Placement Fit", desc: "Am I ready to apply for Data Engineering internships?", query: "Am I ready to apply for Data Engineer internships? What are my strongest evidence signals?" },
   ];
 
   return (
-    <div className="flex h-[calc(100vh-130px)] flex-col gap-3">
+    <div className="flex h-[calc(100vh-130px)] flex-col gap-3 animate-in fade-in-50 duration-300">
       {/* Contextual Header */}
-      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <div>
-          <h1 className="font-display text-2xl font-bold sm:text-3xl flex items-center gap-2 text-foreground">
-            <Sparkles className="size-6 text-primary" />
-            SPAR AI Career Coach
-          </h1>
-          <p className="text-xs text-muted-foreground">
-            Grounded career guidance, real-time curriculum tutoring, and next-best actions.
-          </p>
+      <header className="surface-panel rounded-3xl p-4 sm:p-5 border border-border/80 bg-card shadow-sm space-y-3 shrink-0">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <h1 className="font-display text-xl sm:text-2xl font-bold flex items-center gap-2 text-foreground">
+              <Sparkles className="size-5 text-primary" />
+              SPAR AI Career Coach
+            </h1>
+            <p className="text-xs text-muted-foreground">
+              Grounded conversational guidance, real-time code tutoring, and evidence-driven next steps.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="bg-primary/15 text-primary border-primary/30 text-xs">
+              Path: {curr?.career_cluster_name || "Data Engineer"}
+            </Badge>
+            <Badge variant="outline" className="bg-emerald-500/15 text-emerald-600 border-emerald-500/30 text-xs">
+              Readiness: {ci?.placement_readiness?.score ?? 78}/100
+            </Badge>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="bg-primary/15 text-primary border-primary/30 text-xs">
-            Path: {curr?.career_cluster_name || "Data Engineer"}
-          </Badge>
-          <Badge variant="outline" className="bg-success/15 text-success border-success/30 text-xs">
-            Readiness: {ci?.placement_readiness?.score ?? 79}/100
-          </Badge>
+        {/* Compact Persistent Context Strip: What SPAR Knows About You */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-border/60 text-[11px]">
+          <div className="p-2 rounded-xl border bg-secondary/15">
+            <span className="text-muted-foreground block text-[9px] uppercase font-bold">Current Focus</span>
+            <strong className="text-foreground truncate block">SQL Fundamentals (82%)</strong>
+          </div>
+
+          <div className="p-2 rounded-xl border bg-secondary/15">
+            <span className="text-muted-foreground block text-[9px] uppercase font-bold">Top Verified Skill</span>
+            <strong className="text-emerald-600 truncate block">SQL Windowing (92%)</strong>
+          </div>
+
+          <div className="p-2 rounded-xl border bg-secondary/15">
+            <span className="text-muted-foreground block text-[9px] uppercase font-bold">Priority Gap</span>
+            <strong className="text-amber-600 truncate block">Spark Compute (-20%)</strong>
+          </div>
+
+          <div className="p-2 rounded-xl border bg-secondary/15">
+            <span className="text-muted-foreground block text-[9px] uppercase font-bold">Next Milestone</span>
+            <strong className="text-primary truncate block">Data Pipeline Project</strong>
+          </div>
         </div>
       </header>
 
       {/* Chat Transcript Panel */}
-      <div className="surface-panel flex-1 overflow-y-auto rounded-3xl border border-border/80 p-4 sm:p-6 space-y-4">
+      <div className="surface-panel flex-1 overflow-y-auto rounded-3xl border border-border/80 p-4 sm:p-6 space-y-4 bg-card">
+        {messages.length === 0 && (
+          <div className="py-6 space-y-6">
+            <div className="text-center space-y-2 max-w-md mx-auto">
+              <div className="size-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto">
+                <Bot className="size-6" />
+              </div>
+              <h3 className="font-bold text-base text-foreground">How can SPAR assist your journey today?</h3>
+              <p className="text-xs text-muted-foreground">
+                Ask about your career plan, practice technical questions, or get targeted advice on closing skill gaps.
+              </p>
+            </div>
+
+            {/* Starter Action Cards */}
+            <div className="grid gap-3 sm:grid-cols-2 max-w-2xl mx-auto">
+              {STARTER_ACTIONS.map((st, i) => (
+                <div
+                  key={i}
+                  onClick={() => handleSend(st.query)}
+                  className="p-4 rounded-2xl border border-border/70 hover:border-primary/40 bg-secondary/10 hover:bg-primary/[0.04] cursor-pointer transition-all space-y-1 text-xs"
+                >
+                  <div className="font-bold text-foreground flex items-center justify-between">
+                    <span>{st.title}</span>
+                    <ArrowRight className="size-3.5 text-primary" />
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">{st.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {messages.map((msg, i) => (
           <div
             key={i}
@@ -219,7 +271,11 @@ function CoachPage() {
                   {msg.referencedSkills.map((sk, skIdx) => {
                     const skLabel = typeof sk === "string" ? humanizeCode(sk) : (sk as any)?.name || (sk as any)?.code || "Skill";
                     return (
-                      <Badge key={skIdx} variant="outline" className="text-[9px] bg-secondary">
+                      <Badge
+                        key={skIdx}
+                        variant="secondary"
+                        className="text-[10px] py-0 px-2 font-mono"
+                      >
                         {skLabel}
                       </Badge>
                     );
@@ -227,100 +283,75 @@ function CoachPage() {
                 </div>
               )}
 
-              {/* Structured Recommendation Action Card */}
+              {/* Recommended Action CTA */}
               {msg.recommendedAction && (
-                <div className="mt-3 rounded-xl border border-primary/40 bg-primary/10 p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
-                      <Sparkles className="size-3.5" />
-                      {msg.recommendedAction.title || "Recommended Next Step"}
+                <div className="mt-3 pt-3 border-t border-border/40">
+                  <div className="rounded-xl border border-primary/30 bg-primary/[0.05] p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <span className="font-bold text-foreground text-xs block">
+                        {msg.recommendedAction.title || "Recommended Next Action"}
+                      </span>
+                      <span className="text-[11px] text-muted-foreground">
+                        {msg.recommendedAction.description}
+                      </span>
                     </div>
-                    {msg.recommendedAction.reason && (
-                      <p className="text-[11px] text-muted-foreground">
-                        {msg.recommendedAction.reason}
-                      </p>
-                    )}
-                  </div>
 
-                  <Button
-                    size="sm"
-                    variant="hero"
-                    onClick={() => handleActionClick(msg.recommendedAction!)}
-                    className="shrink-0 rounded-xl text-xs gap-1.5 shadow-sm"
-                  >
-                    {msg.recommendedAction.cta_text || msg.recommendedAction.title || "Take Action"}
-                    <ArrowRight className="size-3.5" />
-                  </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => handleActionClick(msg.recommendedAction!)}
+                      className="text-xs font-semibold gap-1 shrink-0"
+                    >
+                      Take Action <ArrowRight className="size-3" />
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
-
-            {msg.role === "user" && (
-              <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-secondary text-foreground mt-1">
-                <User className="size-4" />
-              </span>
-            )}
           </div>
         ))}
 
         {loading && (
-          <div className="flex gap-3 justify-start items-center text-muted-foreground text-xs">
+          <div className="flex gap-3 justify-start items-center text-xs text-muted-foreground">
             <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary/20 text-primary">
-              <Bot className="size-4 animate-pulse" />
+              <Loader2 className="size-4 animate-spin" />
             </span>
-            <span className="flex items-center gap-1.5 bg-surface border border-border/60 rounded-2xl px-4 py-2.5">
-              <Loader2 className="size-3.5 animate-spin text-primary" />
-              SPAR is formulating your tailored guidance...
-            </span>
+            <div className="p-3 rounded-2xl border bg-surface flex items-center gap-2">
+              <Sparkles className="size-3.5 text-primary animate-pulse" />
+              <span>SPAR Coach is synthesizing personalized career intelligence…</span>
+            </div>
           </div>
         )}
 
         <div ref={bottomRef} />
       </div>
 
-      {/* Quick Prompts Strip */}
-      <div className="flex items-center gap-2 overflow-x-auto py-1 text-xs">
-        <span className="text-[10px] text-muted-foreground font-medium shrink-0">Suggestions:</span>
-        {QUICK_PROMPTS.map((qp, i) => (
-          <button
-            key={i}
-            type="button"
-            onClick={() => void handleSend(qp)}
-            disabled={loading}
-            className="shrink-0 rounded-full border border-border/70 bg-surface px-3 py-1 text-[11px] text-muted-foreground transition-colors hover:border-primary hover:bg-primary/10 hover:text-foreground"
-          >
-            {qp}
-          </button>
-        ))}
-      </div>
-
-      {/* Input Composer */}
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              void handleSend();
-            }
+      {/* Message Input Box */}
+      <div className="surface-panel rounded-3xl border border-border/80 p-3 bg-card shadow-sm space-y-2">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            void handleSend();
           }}
-          placeholder="Ask SPAR about your career roadmap, skill gaps, or learning concepts..."
-          disabled={loading}
-          className="flex-1 rounded-2xl border border-border/80 bg-surface px-4 py-3 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-60"
-        />
-
-        <Button
-          onClick={() => void handleSend()}
-          disabled={loading || !input.trim()}
-          size="lg"
-          variant="hero"
-          className="rounded-2xl px-5 gap-2 font-semibold shadow-md"
+          className="flex gap-2"
         >
-          <Send className="size-4" />
-          <span className="hidden sm:inline">Ask Coach</span>
-        </Button>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask SPAR about your curriculum, project rubric, or interview preparation..."
+            disabled={loading}
+            className="flex-1 rounded-xl border bg-background px-4 py-2.5 text-xs sm:text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+          />
+
+          <Button
+            type="submit"
+            disabled={loading || !input.trim()}
+            className="rounded-xl px-4 text-xs font-semibold gap-1.5"
+          >
+            <Send className="size-3.5" />
+            <span className="hidden sm:inline">Send</span>
+          </Button>
+        </form>
       </div>
     </div>
   );

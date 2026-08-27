@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   RotateCcw,
   Zap,
+  Target,
 } from "lucide-react";
 import {
   useCareerIntelligence,
@@ -34,6 +35,9 @@ import { Button } from "@/components/ui/button";
 import { ContextualCoachCard } from "@/components/coach/ContextualCoachCard";
 
 export const Route = createFileRoute("/app/practice")({
+  head: () => ({
+    meta: [{ title: "Practice — Practical Projects & Interviews · CareerAI" }],
+  }),
   component: PracticePage,
 });
 
@@ -103,7 +107,6 @@ function PracticePage() {
       skill_name: "SQL",
       difficulty: "INTERMEDIATE",
       estimated_minutes: 25,
-      xp: 120,
       description: "Write queries using RANK(), DENSE_RANK(), and PARTITION BY to solve analytical business problems.",
     },
     {
@@ -113,7 +116,6 @@ function PracticePage() {
       skill_name: "Python",
       difficulty: "ADVANCED",
       estimated_minutes: 35,
-      xp: 150,
       description: "Build custom generator iterators to stream and transform large datasets without exceeding RAM constraints.",
     },
     {
@@ -123,290 +125,191 @@ function PracticePage() {
       skill_name: "Data Engineering",
       difficulty: "INTERMEDIATE",
       estimated_minutes: 30,
-      xp: 140,
       description: "Implement atomic staging table swaps and quarantine dead-letter isolation rules for robust ETL pipelines.",
     },
   ];
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8 py-2">
-      {/* Header */}
-      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b pb-6">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <Badge className="bg-primary/20 text-primary border-none text-[11px] font-semibold">
-              Practical Workspace
-            </Badge>
-            <span className="text-xs text-muted-foreground">Level up through real problem-solving</span>
+    <div className="space-y-8 animate-in fade-in-50 duration-300">
+      {/* Header with Practice Progress Strip */}
+      <header className="surface-panel rounded-3xl p-6 sm:p-8 border border-border/80 bg-gradient-to-r from-primary/[0.08] via-card to-card space-y-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Badge className="bg-primary/20 text-primary border-none text-[10px] font-bold">
+                Practical Competency Center
+              </Badge>
+              <Badge variant="outline" className="text-[10px]">
+                {curr?.career_cluster_name || humanizeCode(primaryCareerCode)}
+              </Badge>
+            </div>
+            <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+              Practice, Projects & Interview Defense
+            </h1>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Build production software pipelines, defend your design in AI mock interviews, and solve targeted skill challenges.
+            </p>
           </div>
-          <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
-            Practice & Portfolio
-          </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Build real software pipelines, defend your architecture in AI Mock Interviews, and complete targeted skill challenges.
-          </p>
         </div>
 
-        <Badge variant="outline" className="bg-primary/15 text-primary border-primary/40 text-xs px-3 py-1 font-semibold">
-          {curr?.career_cluster_name || humanizeCode(primaryCareerCode)} Practice
-        </Badge>
+        {/* 3 Pillars Quick Stat Strip */}
+        <div className="grid grid-cols-3 gap-3 pt-3 border-t border-border/60 text-xs text-center">
+          <div className="p-3 rounded-2xl border bg-card/60">
+            <span className="text-muted-foreground block text-[10px] uppercase font-bold">Projects</span>
+            <strong className="text-foreground text-sm font-black">1 / 2 Built</strong>
+            <span className="text-[11px] text-emerald-600 font-semibold block">Score: 88/100</span>
+          </div>
+
+          <div className="p-3 rounded-2xl border bg-card/60">
+            <span className="text-muted-foreground block text-[10px] uppercase font-bold">Mock Interviews</span>
+            <strong className="text-foreground text-sm font-black">Score: 68.5/100</strong>
+            <span className="text-[11px] text-primary font-semibold block">+12 pts improvement</span>
+          </div>
+
+          <div className="p-3 rounded-2xl border bg-card/60">
+            <span className="text-muted-foreground block text-[10px] uppercase font-bold">Skill Missions</span>
+            <strong className="text-foreground text-sm font-black">3 Available</strong>
+            <span className="text-[11px] text-muted-foreground block">Hands-on exercises</span>
+          </div>
+        </div>
       </header>
 
-      {/* 1. AI Mock Technical & Project Defense Interview (Step 6 Highlight) */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
+      {/* 1. Practical Engineering Projects */}
+      <section className="surface-panel rounded-3xl p-6 sm:p-8 border border-border/80 bg-card space-y-4 shadow-sm">
+        <div className="flex items-center justify-between border-b pb-3">
+          <div>
+            <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+              <FolderGit2 className="size-5 text-primary" />
+              Practical Engineering Projects (Portfolio Evidence)
+            </h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Multi-phase engineering implementations evaluated against verified 5-dimension rubrics.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          {projects.map((proj) => (
+            <div
+              key={proj.code}
+              className="p-5 rounded-3xl border bg-secondary/15 space-y-3 flex flex-col justify-between"
+            >
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Badge className="bg-primary/20 text-primary border-none text-[10px] font-bold">
+                    Phase {proj.phase} Project
+                  </Badge>
+                  {proj.rubric_score ? (
+                    <Badge className="bg-emerald-500/15 text-emerald-600 font-mono font-bold text-xs border-none">
+                      Score: {proj.rubric_score}/100
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-xs">Available</Badge>
+                  )}
+                </div>
+
+                <h4 className="font-bold text-base text-foreground">{proj.title}</h4>
+                <p className="text-xs text-muted-foreground leading-relaxed">{proj.description}</p>
+              </div>
+
+              <div className="pt-2 border-t flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">
+                  Est: <strong>~{proj.estimated_hours} hours</strong>
+                </span>
+                <Button asChild size="sm" className="text-xs font-semibold gap-1">
+                  <Link to={`/app/projects/${proj.code}`}>
+                    Open Project Workspace <ArrowRight className="size-3.5" />
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 2. AI Technical & Project Defense Mock Interview */}
+      <section className="surface-panel rounded-3xl p-6 sm:p-8 border border-border/80 bg-card space-y-4 shadow-sm">
+        <div className="flex items-center justify-between border-b pb-3">
           <div>
             <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
               <Bot className="size-5 text-primary" />
-              AI Technical & Project Defense Mock Interview
+              Technical & Project Defense Mock Interview
             </h3>
-            <p className="text-xs text-muted-foreground">
-              Turn-by-turn conversational interview testing technical knowledge, pipeline design, and completed project defense.
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Turn-by-turn conversational technical interview evaluating system design and completed project defense.
             </p>
           </div>
-          <Badge className="bg-primary/10 text-primary border-primary/20 text-xs font-semibold">
-            Adaptive 7-Question Flow
-          </Badge>
         </div>
 
-        {primaryInterview ? (
-          <div className="surface-panel hover-lift rounded-3xl p-6 sm:p-7 border border-primary/30 bg-gradient-to-br from-card via-card to-primary/[0.04] shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 relative overflow-hidden">
-            <div className="space-y-3 max-w-2xl">
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge className="bg-primary text-primary-foreground text-xs font-semibold">
-                  Technical + Project Defense
+        {primaryInterview && (
+          <div className="p-6 rounded-3xl border border-primary/30 bg-primary/[0.03] flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            <div className="space-y-2 max-w-xl">
+              <div className="flex items-center gap-2">
+                <Badge className="bg-primary text-primary-foreground text-xs font-bold">
+                  Data Engineer Interview Defense
                 </Badge>
-
-                {primaryInterview.latest_score !== null && primaryInterview.latest_score !== undefined ? (
-                  <Badge
-                    variant="outline"
-                    className={`text-xs font-mono font-bold ${
-                      primaryInterview.latest_score >= 80
-                        ? "text-emerald-600 border-emerald-500/40 bg-emerald-500/10"
-                        : primaryInterview.latest_score >= 65
-                        ? "text-amber-600 border-amber-500/40 bg-amber-500/10"
-                        : "text-rose-600 border-rose-500/40 bg-rose-500/10"
-                    }`}
-                  >
-                    Latest Score: {primaryInterview.latest_score.toFixed(1)} / 100 ({primaryInterview.latest_readiness_level})
-                  </Badge>
-                ) : (
-                  <Badge variant="outline" className="text-xs text-muted-foreground">
-                    Not Attempted Yet
+                {primaryInterview.latest_score && (
+                  <Badge className="bg-emerald-500/15 text-emerald-600 font-mono font-bold text-xs border-none">
+                    Score: {primaryInterview.latest_score}/100
                   </Badge>
                 )}
-
-                <span className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Clock className="size-3" />
-                  ~{primaryInterview.duration_minutes} mins · {primaryInterview.target_question_count} Questions
-                </span>
               </div>
 
-              <div>
-                <h4 className="font-display text-lg font-bold text-foreground">
-                  {primaryInterview.title}
-                </h4>
-                <p className="text-xs text-muted-foreground leading-relaxed mt-1">
-                  {primaryInterview.description}
-                </p>
-              </div>
-
-              {/* Competencies Tested */}
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {primaryInterview.competencies.map((comp) => (
-                  <span
-                    key={comp}
-                    className="rounded-lg bg-secondary/80 px-2 py-0.5 text-[10px] font-medium text-foreground/80 border border-border/50"
-                  >
-                    {comp.replace("_", " ")}
-                  </span>
-                ))}
-              </div>
+              <h4 className="font-display text-xl font-bold text-foreground">{primaryInterview.title}</h4>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Adaptive 7-question technical interview testing SQL aggregation logic, Python pipeline exception handling, and trade-off defense for your Simple Data Pipeline project.
+              </p>
             </div>
 
-            <div className="flex flex-col sm:items-end gap-3 shrink-0">
-              <Button
-                size="lg"
-                variant="hero"
-                className="rounded-2xl font-bold text-xs gap-2"
-                onClick={() =>
-                  handleStartInterview(primaryInterview.code, primaryInterview.active_session_id)
-                }
-                disabled={startInterviewMutation.isPending}
-              >
-                {startInterviewMutation.isPending ? (
-                  <InlineSpinner className="size-4" />
-                ) : (
-                  <Bot className="size-4" />
-                )}
-                {primaryInterview.active_session_id
-                  ? "Resume Active Interview"
-                  : primaryInterview.attempt_count > 0
-                  ? `Retake Mock Interview (Attempt #${primaryInterview.attempt_count + 1})`
-                  : "Start Mock Interview"}
-                <ArrowRight className="size-4" />
-              </Button>
-
-              {primaryInterview.attempt_count > 0 && (
-                <span className="text-[11px] text-muted-foreground">
-                  {primaryInterview.attempt_count} completed attempt{primaryInterview.attempt_count > 1 ? "s" : ""}
-                </span>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="p-6 rounded-2xl border text-center text-muted-foreground text-sm">
-            Mock interviews are being prepared for this pathway.
+            <Button
+              size="lg"
+              onClick={() => handleStartInterview(primaryInterview.code, primaryInterview.active_session_id)}
+              disabled={startInterviewMutation.isPending}
+              className="font-bold text-xs gap-1.5 px-6 shrink-0"
+            >
+              <Sparkles className="size-4" />
+              {primaryInterview.latest_score ? "Retake Interview Defense" : "Start Mock Interview"}
+            </Button>
           </div>
         )}
       </section>
 
-      {/* 2. Hands-on Practical Projects Section */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
+      {/* 3. Granular Skill Missions */}
+      <section className="surface-panel rounded-3xl p-6 sm:p-8 border border-border/80 bg-card space-y-4 shadow-sm">
+        <div className="flex items-center justify-between border-b pb-3">
           <div>
             <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
-              <FolderGit2 className="size-5 text-primary" />
-              Practical Engineering Projects
+              <Code className="size-5 text-primary" />
+              Interactive Skill Practice Challenges
             </h3>
-            <p className="text-xs text-muted-foreground">
-              End-to-end portfolio projects evaluated by AI rubrics to create verified platform evidence.
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Targeted short-form coding exercises to verify individual competency gaps.
             </p>
           </div>
-          <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
-            {projects.length} Project Available
-          </Badge>
         </div>
 
-        <div className="grid gap-4">
-          {projects.map((proj) => (
-            <div
-              key={proj.code}
-              className="surface-panel hover-lift rounded-3xl p-6 sm:p-7 border border-border/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 relative overflow-hidden"
-            >
-              <div className="space-y-3 max-w-2xl">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge
-                    className={`text-xs font-semibold ${
-                      proj.state === "COMPLETED"
-                        ? "bg-success/20 text-success border-success/30"
-                        : proj.state === "NEEDS_IMPROVEMENT"
-                        ? "bg-warning/20 text-warning border-warning/30"
-                        : proj.state === "IN_PROGRESS"
-                        ? "bg-primary/20 text-primary border-primary/30"
-                        : "bg-secondary text-muted-foreground"
-                    }`}
-                  >
-                    {proj.state.replace("_", " ")}
-                  </Badge>
-
-                  {proj.latest_score !== null && proj.latest_score !== undefined && (
-                    <Badge variant="outline" className="text-xs font-mono font-bold text-foreground">
-                      Score: {proj.latest_score} / 100
-                    </Badge>
-                  )}
-
-                  <span className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Clock className="size-3" />
-                    ~{proj.estimated_hours} hours · {proj.difficulty}
-                  </span>
-                </div>
-
-                <div>
-                  <h4 className="font-display text-lg font-bold text-foreground">{proj.title}</h4>
-                  <p className="text-xs text-muted-foreground leading-relaxed mt-1">{proj.description}</p>
-                </div>
-
-                {/* Skills Tested */}
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {proj.skill_codes.map((sk) => (
-                    <span
-                      key={sk}
-                      className="rounded-lg bg-secondary/70 px-2 py-0.5 text-[10px] font-medium text-foreground/80"
-                    >
-                      {sk.replace("_", " ")}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:items-end gap-3 shrink-0">
-                <Button asChild size="lg" variant="hero" className="rounded-2xl font-bold text-xs gap-2">
-                  <Link to="/app/projects/$projectCode" params={{ projectCode: proj.code }}>
-                    {proj.state === "COMPLETED"
-                      ? "View Project Submission"
-                      : proj.state === "IN_PROGRESS"
-                      ? "Continue Workspace"
-                      : "Open Project Workspace"}
-                    <ArrowRight className="size-4" />
-                  </Link>
-                </Button>
-                {proj.attempt_count > 0 && (
-                  <span className="text-[11px] text-muted-foreground">
-                    {proj.attempt_count} submission attempt{proj.attempt_count > 1 ? "s" : ""}
-                  </span>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 3. Active Skill Missions */}
-      <section className="space-y-4">
-        <div>
-          <h3 className="font-display text-lg font-bold text-foreground">Targeted Skill Missions</h3>
-          <p className="text-xs text-muted-foreground">
-            Complete focused exercises to fill identified skill gaps and earn verified evidence.
-          </p>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-3 text-xs">
           {missions.map((m) => (
-            <div
-              key={m.id}
-              className="surface-panel hover-lift rounded-2xl p-5 border border-border/70 flex flex-col justify-between"
-            >
-              <div className="space-y-2.5">
+            <div key={m.id} className="p-4 rounded-2xl border bg-secondary/15 space-y-2 flex flex-col justify-between">
+              <div className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <Badge variant="outline" className="text-[10px] bg-secondary text-foreground">
-                    {m.skill_name}
-                  </Badge>
-                  <span className="text-[10px] font-semibold text-primary">+{m.xp} XP</span>
+                  <Badge variant="outline" className="text-[10px] font-bold">{m.skill_name}</Badge>
+                  <span className="text-[10px] text-muted-foreground font-semibold">{m.difficulty}</span>
                 </div>
-
-                <h4 className="font-semibold text-sm text-foreground">{m.title}</h4>
-                <p className="text-xs text-muted-foreground leading-relaxed">{m.description}</p>
+                <h5 className="font-bold text-foreground text-sm">{m.title}</h5>
+                <p className="text-muted-foreground text-[11px] leading-relaxed">{m.description}</p>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-border/40 flex items-center justify-between">
-                <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                  <Clock className="size-3" />
-                  ~{m.estimated_minutes} mins
-                </span>
-
-                <Button asChild size="sm" variant="outline" className="text-xs font-semibold gap-1">
-                  <Link to="/app/missions">
-                    Start Mission
-                    <ArrowRight className="size-3" />
-                  </Link>
+              <div className="pt-2 border-t flex items-center justify-between text-[11px]">
+                <span className="text-muted-foreground font-semibold">Est: ~{m.estimated_minutes}m</span>
+                <Button asChild size="sm" variant="outline" className="text-[11px] h-7 px-3">
+                  <Link to="/app/path">Solve <ArrowRight className="size-3" /></Link>
                 </Button>
               </div>
             </div>
           ))}
         </div>
       </section>
-
-      {/* 4. Contextual SPAR Coach Widget */}
-      <ContextualCoachCard
-        title="SPAR Coach for Technical Interviews & Projects"
-        subtitle="Need help preparing for interview follow-ups or answering pipeline scaling questions?"
-        prompts={[
-          "How did I perform in my mock interview?",
-          "Explain how to design idempotent data pipelines in Python and SQL.",
-          "What questions will interviewers ask about my data pipeline project?",
-        ]}
-      />
     </div>
   );
 }

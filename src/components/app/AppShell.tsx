@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { cn } from "@/lib/utils";
 
@@ -103,6 +104,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </span>
               </div>
             ) : null}
+
+            <ThemeToggle />
 
             <Button
               variant="outline"
