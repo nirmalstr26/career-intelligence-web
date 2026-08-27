@@ -999,3 +999,182 @@ export interface PlacementActivitySummary {
   recent_applications: JobApplicationItem[];
   active_interview_prep?: InterviewPrepPlan | null;
 }
+
+// ---------------------------------------------------------------------------
+// Domain 23 — College & Placement Coordinator Pilot
+// ---------------------------------------------------------------------------
+
+export interface PlacementCoordinatorProfile {
+  id: string;
+  institution_id: string;
+  name: string;
+  email: string;
+  designation: string;
+  department?: string | null;
+  institution_name: string;
+}
+
+export interface CollegeCohortSummary {
+  id: string;
+  institution_id: string;
+  name: string;
+  department: string;
+  graduation_year: number;
+  academic_year: string;
+  invite_code: string;
+  total_students: number;
+  active_students: number;
+}
+
+export interface CohortReadinessSummary {
+  cohort_id: string;
+  cohort_name: string;
+  department: string;
+  graduation_year: number;
+  total_students: number;
+  active_students: number;
+  overall_readiness_score: number;
+  dimension_scores: {
+    technical_foundation: number;
+    career_specific_skills: number;
+    projects: number;
+    communication: number;
+    interview_readiness: number;
+    profile_readiness: number;
+  };
+  readiness_distribution: {
+    placement_ready: number;
+    nearly_ready: number;
+    developing: number;
+    needs_attention: number;
+  };
+  placement_pipeline_summary: {
+    applying_students: number;
+    total_applications: number;
+    online_assessments: number;
+    interviews: number;
+    offers: number;
+  };
+}
+
+export interface PriorityGapItem {
+  domain_or_skill: string;
+  students_needing_improvement: number;
+  percentage_of_cohort: number;
+  impact_explanation: string;
+  suggested_action_type: string;
+  suggested_action_reference: string;
+}
+
+export interface CohortGapAnalysis {
+  cohort_id: string;
+  cohort_name: string;
+  total_students_evaluated: number;
+  priority_gaps: PriorityGapItem[];
+}
+
+export interface CohortStudentListItem {
+  student_id: string;
+  first_name: string;
+  last_name: string;
+  email_masked: string;
+  department: string;
+  graduation_year: number;
+  career_path: string;
+  career_readiness_score: number;
+  curriculum_progress_pct: number;
+  project_status: string;
+  project_score?: number | null;
+  mock_interview_score?: number | null;
+  profile_readiness_score: number;
+  placement_status: string;
+  technical_score: number;
+  communication_score: number;
+}
+
+export interface CoordinatorStudentDetail {
+  student_id: string;
+  name: string;
+  department: string;
+  graduation_year: number;
+  career_goal: string;
+  career_readiness_score: number;
+  verified_strengths: string[];
+  current_gaps: string[];
+  modules_completed_text: string;
+  project_name: string;
+  project_score?: number | null;
+  project_status: string;
+  mock_interview_score?: number | null;
+  profile_readiness_score: number;
+  total_applications: number;
+  active_interviews: number;
+  recommended_support: string;
+}
+
+export interface CohortAssignmentItem {
+  id: string;
+  cohort_id: string;
+  title: string;
+  description: string;
+  activity_type: string;
+  target_reference: string;
+  due_date?: string | null;
+  is_mandatory: boolean;
+  assigned_count: number;
+  started_count: number;
+  completed_count: number;
+  overdue_count: number;
+  average_score?: number | null;
+  readiness_before_avg?: number | null;
+  readiness_after_avg?: number | null;
+  created_at: string;
+}
+
+export interface StudentAssignmentStatusItem {
+  assignment_id: string;
+  title: string;
+  activity_type: string;
+  target_reference: string;
+  due_date?: string | null;
+  is_mandatory: boolean;
+  status: string;
+  score_achieved?: number | null;
+  readiness_before?: number | null;
+  readiness_after?: number | null;
+  college_name: string;
+  cohort_name: string;
+}
+
+export interface CollegeSessionItem {
+  id: string;
+  institution_id: string;
+  cohort_id?: string | null;
+  cohort_name?: string | null;
+  title: string;
+  description: string;
+  session_type: string;
+  scheduled_at: string;
+  duration_minutes: number;
+  meeting_link?: string | null;
+  capacity: number;
+  related_career_cluster: string;
+  registered_count: number;
+  is_registered: boolean;
+}
+
+export interface StudentCollegeMembership {
+  is_member: boolean;
+  college_name?: string | null;
+  cohort_name?: string | null;
+  department?: string | null;
+  graduation_year?: number | null;
+  active_assignments: StudentAssignmentStatusItem[];
+  upcoming_sessions: CollegeSessionItem[];
+}
+
+export interface CollegeAgentQueryResult {
+  query: string;
+  answer: string;
+  data_snapshot: Record<string, any>;
+}

@@ -19,7 +19,8 @@ import { Badge } from "@/components/ui/badge";
 import { InlineSpinner } from "@/components/common/Loader";
 import { JourneyStrip } from "@/components/common/JourneyStrip";
 import { ContextualCoachCard } from "@/components/coach/ContextualCoachCard";
-import { useCareerIntelligence, useCurriculum } from "@/lib/careerai/hooks";
+import { useCareerIntelligence, useCurriculum, useStudentCollegeContext } from "@/lib/careerai/hooks";
+import { GraduationCap, Building2, Calendar, Video, ShieldCheck } from "lucide-react";
 import { resolveStudentJourney } from "@/lib/careerai/journeyResolver";
 import type { CareerIntelligence } from "@/lib/careerai/types";
 import { cn } from "@/lib/utils";
@@ -68,6 +69,8 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
   const primaryCareerCode = ci.career_direction.primary_career ?? "DATA_ENGINEER";
   const curriculumQuery = useCurriculum(primaryCareerCode);
   const curr = curriculumQuery.data;
+  const collegeQuery = useStudentCollegeContext();
+  const collegeData = collegeQuery.data;
 
   // Resolve full guided journey
   const journey = resolveStudentJourney(ci, curr);

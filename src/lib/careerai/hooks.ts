@@ -543,3 +543,158 @@ export function usePlacementActivity() {
     staleTime: 5_000,
   });
 }
+
+// ---------------------------------------------------------------------------
+// Domain 23 — College & Placement Coordinator Hooks
+// ---------------------------------------------------------------------------
+
+export const PILOT_COORDINATOR_ID = "c62ec244-2f8e-4a75-9ca9-99e18b4db0ca";
+export const PILOT_INSTITUTION_ID = "d23fd1dc-18e2-4d02-9323-0cf9ae6b503c";
+export const PILOT_COHORT_ID = "02d01bbf-49ba-452d-876c-341121226e4e";
+
+export function useCoordinatorProfile(coordinatorId = PILOT_COORDINATOR_ID) {
+  return useQuery({
+    queryKey: ["coordinator-profile", coordinatorId],
+    queryFn: () => careerai.getCoordinatorProfile(coordinatorId),
+    staleTime: 60_000,
+  });
+}
+
+export function useCohortReadinessSummary(
+  coordinatorId = PILOT_COORDINATOR_ID,
+  cohortId = PILOT_COHORT_ID
+) {
+  return useQuery({
+    queryKey: ["cohort-summary", coordinatorId, cohortId],
+    queryFn: () => careerai.getCohortReadinessSummary(coordinatorId, cohortId),
+    staleTime: 10_000,
+  });
+}
+
+export function useCohortGapAnalysis(
+  coordinatorId = PILOT_COORDINATOR_ID,
+  cohortId = PILOT_COHORT_ID
+) {
+  return useQuery({
+    queryKey: ["cohort-gaps", coordinatorId, cohortId],
+    queryFn: () => careerai.getCohortGapAnalysis(coordinatorId, cohortId),
+    staleTime: 10_000,
+  });
+}
+
+export function useCohortStudents(
+  coordinatorId = PILOT_COORDINATOR_ID,
+  cohortId = PILOT_COHORT_ID,
+  search?: string,
+  readinessTier?: string
+) {
+  return useQuery({
+    queryKey: ["cohort-students", coordinatorId, cohortId, search, readinessTier],
+    queryFn: () => careerai.listCohortStudents(coordinatorId, cohortId, search, readinessTier),
+    staleTime: 5_000,
+  });
+}
+
+export function useCoordinatorStudentDetail(
+  coordinatorId = PILOT_COORDINATOR_ID,
+  studentId?: string | null
+) {
+  return useQuery({
+    queryKey: ["coordinator-student-detail", coordinatorId, studentId],
+    queryFn: () => careerai.getCoordinatorStudentDetail(coordinatorId, studentId!),
+    enabled: Boolean(studentId),
+    staleTime: 5_000,
+  });
+}
+
+export function useCohortAssignments(
+  coordinatorId = PILOT_COORDINATOR_ID,
+  cohortId = PILOT_COHORT_ID
+) {
+  return useQuery({
+    queryKey: ["cohort-assignments", coordinatorId, cohortId],
+    queryFn: () => careerai.listCohortAssignments(coordinatorId, cohortId),
+    staleTime: 5_000,
+  });
+}
+
+export function useCreateCohortAssignment(
+  coordinatorId = PILOT_COORDINATOR_ID,
+  cohortId = PILOT_COHORT_ID
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: {
+      title: string;
+      description: string;
+      activity_type: string;
+      target_reference: string;
+      due_date?: string | null;
+      is_mandatory?: boolean;
+    }) => careerai.createCohortAssignment(coordinatorId, cohortId, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cohort-assignments", coordinatorId, cohortId] });
+      queryClient.invalidateQueries({ queryKey: ["student-college-context"] });
+    },
+  });
+}
+
+export function useCollegeSessions(institutionId = PILOT_INSTITUTION_ID) {
+  return useQuery({
+    queryKey: ["college-sessions", institutionId],
+    queryFn: () => careerai.listCollegeSessions(institutionId),
+    staleTime: 10_000,
+  });
+}
+
+export function useCreateCollegeSession(coordinatorId = PILOT_COORDINATOR_ID) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: {
+      cohort_id?: string | null;
+      title: string;
+      description: string;
+      session_type: string;
+      scheduled_at: string;
+      duration_minutes?: number;
+      meeting_link?: string | null;
+      capacity?: number;
+      related_career_cluster?: string;
+    }) => careerai.createCollegeSession(coordinatorId, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["college-sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["student-college-context"] });
+    },
+  });
+}
+
+export function useQueryCollegeIntelligence(
+  coordinatorId = PILOT_COORDINATOR_ID,
+  cohortId = PILOT_COHORT_ID
+) {
+  return useMutation({
+    mutationFn: (query: string) =>
+      careerai.queryCollegeIntelligence(coordinatorId, cohortId, query),
+  });
+}
+
+export function useStudentCollegeContext() {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["student-college-context", studentId],
+    queryFn: () => careerai.getStudentCollegeContext(studentId),
+    enabled: studentId !== "",
+    staleTime: 5_000,
+  });
+}
+
+export function useJoinCollegeCohort() {
+  const studentId = useStudentId();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (invite_code: string) => careerai.joinCollegeCohort(studentId, invite_code),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["student-college-context", studentId] });
+    },
+  });
+}

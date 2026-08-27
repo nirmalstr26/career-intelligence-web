@@ -275,4 +275,85 @@ export const careerai = {
     ),
   getPlacementActivity: (studentId: string) =>
     api.get<PlacementActivitySummary>(`/students/${studentId}/opportunities/placement-activity`),
+  // College & Placement Coordinator Pilot (Domain 23)
+  getCoordinatorProfile: (coordinatorId: string) =>
+    api.get<PlacementCoordinatorProfile>(`/college/coordinators/${coordinatorId}`),
+  getInstitutionCohorts: (institutionId: string) =>
+    api.get<CollegeCohortSummary[]>(`/college/institutions/${institutionId}/cohorts`),
+  getCohortReadinessSummary: (coordinatorId: string, cohortId: string) =>
+    api.get<CohortReadinessSummary>(
+      `/college/coordinators/${coordinatorId}/cohorts/${cohortId}/summary`
+    ),
+  getCohortGapAnalysis: (coordinatorId: string, cohortId: string) =>
+    api.get<CohortGapAnalysis>(
+      `/college/coordinators/${coordinatorId}/cohorts/${cohortId}/gaps`
+    ),
+  listCohortStudents: (
+    coordinatorId: string,
+    cohortId: string,
+    search?: string,
+    readinessTier?: string
+  ) => {
+    let url = `/college/coordinators/${coordinatorId}/cohorts/${cohortId}/students`;
+    const params = new URLSearchParams();
+    if (search) params.append("search", search);
+    if (readinessTier) params.append("readiness_tier", readinessTier);
+    const qs = params.toString();
+    if (qs) url += `?${qs}`;
+    return api.get<CohortStudentListItem[]>(url);
+  },
+  getCoordinatorStudentDetail: (coordinatorId: string, studentId: string) =>
+    api.get<CoordinatorStudentDetail>(
+      `/college/coordinators/${coordinatorId}/students/${studentId}`
+    ),
+  listCohortAssignments: (coordinatorId: string, cohortId: string) =>
+    api.get<CohortAssignmentItem[]>(
+      `/college/coordinators/${coordinatorId}/cohorts/${cohortId}/assignments`
+    ),
+  createCohortAssignment: (
+    coordinatorId: string,
+    cohortId: string,
+    body: {
+      title: string;
+      description: string;
+      activity_type: string;
+      target_reference: string;
+      due_date?: string | null;
+      is_mandatory?: boolean;
+    }
+  ) =>
+    api.post<CohortAssignmentItem>(
+      `/college/coordinators/${coordinatorId}/cohorts/${cohortId}/assignments`,
+      { body }
+    ),
+  listCollegeSessions: (institutionId: string) =>
+    api.get<CollegeSessionItem[]>(`/college/institutions/${institutionId}/sessions`),
+  createCollegeSession: (
+    coordinatorId: string,
+    body: {
+      cohort_id?: string | null;
+      title: string;
+      description: string;
+      session_type: string;
+      scheduled_at: string;
+      duration_minutes?: number;
+      meeting_link?: string | null;
+      capacity?: number;
+      related_career_cluster?: string;
+    }
+  ) =>
+    api.post<CollegeSessionItem>(`/college/coordinators/${coordinatorId}/sessions`, {
+      body,
+    }),
+  queryCollegeIntelligence: (coordinatorId: string, cohortId: string, query: string) =>
+    api.post<CollegeAgentQueryResult>(
+      `/college/coordinators/${coordinatorId}/cohorts/${cohortId}/agent-query`,
+      { body: { cohort_id: cohortId, query } }
+    ),
+  getStudentCollegeContext: (studentId: string) =>
+    api.get<StudentCollegeMembership>(`/students/${studentId}/college/context`),
+  joinCollegeCohort: (studentId: string, invite_code: string) =>
+    api.post<StudentCollegeMembership>(`/students/${studentId}/college/join`, {
+      body: { invite_code },
+    }),
 };

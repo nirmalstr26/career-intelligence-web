@@ -30,6 +30,7 @@ import { Route as AppProgressRouteImport } from './routes/app/progress'
 import { Route as AppReadinessRouteImport } from './routes/app/readiness'
 import { Route as AppSkillsRouteImport } from './routes/app/skills'
 import { Route as AppTodayRouteImport } from './routes/app/today'
+import { Route as CollegeDashboardRouteImport } from './routes/college/dashboard'
 import { Route as AppInterviewInterviewIdRouteImport } from './routes/app/interview.$interviewId'
 import { Route as AppLearnModuleCodeRouteImport } from './routes/app/learn.$moduleCode'
 import { Route as AppProjectsProjectCodeRouteImport } from './routes/app/projects.$projectCode'
@@ -139,6 +140,11 @@ const AppTodayRoute = AppTodayRouteImport.update({
   path: '/today',
   getParentRoute: () => AppRoute,
 } as any)
+const CollegeDashboardRoute = CollegeDashboardRouteImport.update({
+  id: '/college/dashboard',
+  path: '/college/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppInterviewInterviewIdRoute = AppInterviewInterviewIdRouteImport.update({
   id: '/interview/$interviewId',
   path: '/interview/$interviewId',
@@ -176,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/app/readiness': typeof AppReadinessRoute
   '/app/skills': typeof AppSkillsRoute
   '/app/today': typeof AppTodayRoute
+  '/college/dashboard': typeof CollegeDashboardRoute
   '/app/': typeof AppIndexRoute
   '/app/interview/$interviewId': typeof AppInterviewInterviewIdRoute
   '/app/learn/$moduleCode': typeof AppLearnModuleCodeRoute
@@ -201,6 +208,7 @@ export interface FileRoutesByTo {
   '/app/readiness': typeof AppReadinessRoute
   '/app/skills': typeof AppSkillsRoute
   '/app/today': typeof AppTodayRoute
+  '/college/dashboard': typeof CollegeDashboardRoute
   '/app': typeof AppIndexRoute
   '/app/interview/$interviewId': typeof AppInterviewInterviewIdRoute
   '/app/learn/$moduleCode': typeof AppLearnModuleCodeRoute
@@ -228,6 +236,7 @@ export interface FileRoutesById {
   '/app/readiness': typeof AppReadinessRoute
   '/app/skills': typeof AppSkillsRoute
   '/app/today': typeof AppTodayRoute
+  '/college/dashboard': typeof CollegeDashboardRoute
   '/app/': typeof AppIndexRoute
   '/app/interview/$interviewId': typeof AppInterviewInterviewIdRoute
   '/app/learn/$moduleCode': typeof AppLearnModuleCodeRoute
@@ -256,6 +265,7 @@ export interface FileRouteTypes {
     | '/app/readiness'
     | '/app/skills'
     | '/app/today'
+    | '/college/dashboard'
     | '/app/'
     | '/app/interview/$interviewId'
     | '/app/learn/$moduleCode'
@@ -281,6 +291,7 @@ export interface FileRouteTypes {
     | '/app/readiness'
     | '/app/skills'
     | '/app/today'
+    | '/college/dashboard'
     | '/app'
     | '/app/interview/$interviewId'
     | '/app/learn/$moduleCode'
@@ -307,6 +318,7 @@ export interface FileRouteTypes {
     | '/app/readiness'
     | '/app/skills'
     | '/app/today'
+    | '/college/dashboard'
     | '/app/'
     | '/app/interview/$interviewId'
     | '/app/learn/$moduleCode'
@@ -317,6 +329,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
+  CollegeDashboardRoute: typeof CollegeDashboardRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -468,6 +481,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTodayRouteImport
       parentRoute: typeof AppRoute
     }
+    '/college/dashboard': {
+      id: '/college/dashboard'
+      path: '/college/dashboard'
+      fullPath: '/college/dashboard'
+      preLoaderRoute: typeof CollegeDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/interview/$interviewId': {
       id: '/app/interview/$interviewId'
       path: '/interview/$interviewId'
@@ -546,6 +566,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
+  CollegeDashboardRoute: CollegeDashboardRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
