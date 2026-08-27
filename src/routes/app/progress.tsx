@@ -13,10 +13,7 @@ import {
 } from "lucide-react";
 import { useCareerIntelligence, useCurriculum, useProjects } from "@/lib/careerai/hooks";
 import { CareerIntelligence } from "@/lib/careerai/types";
-
-import { SectionCard, humanizeCode } from "@/components/app/ui";
-import { EmptyState } from "@/components/app/ui";
-import { InlineSpinner } from "@/components/app/ui";
+import { SectionCard, EmptyState, InlineSpinner, humanizeCode } from "@/components/app/ui";
 import { CareerReadinessRing } from "@/components/career/CareerReadinessRing";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -57,19 +54,24 @@ function ProgressPage() {
 }
 
 function ProgressContent({ ci }: { ci: CareerIntelligence }) {
-  const primaryCareerCode = ci.career_direction.primary_career ?? "DATA_ENGINEER";
+  const primaryCareerCode = ci?.career_direction?.primary_career ?? "DATA_ENGINEER";
   const currQuery = useCurriculum(primaryCareerCode);
   const projectsQuery = useProjects(primaryCareerCode);
 
   const curr = currQuery.data;
   const projects = projectsQuery.data ?? [];
 
-  const readinessScore = Math.round(ci.readiness.overall_readiness ?? 79);
-  const completedCount = curr?.completed_modules ?? 4;
-  const totalModules = curr?.total_modules ?? 15;
+  const readinessScore = Math.round(
+    ci?.placement_readiness?.score ??
+    ci?.primary_career_readiness?.score ??
+    (ci as any)?.readiness?.overall_readiness ??
+    79
+  );
+  const completedCount = (curr as any)?.completed_count ?? (curr as any)?.completed_modules ?? 4;
+  const totalModules = (curr as any)?.total_count ?? (curr as any)?.total_modules ?? 15;
 
-  const strengths = (ci.verified_evidence || (ci as any).strengths || []).slice(0, 3);
-  const gaps = (ci.skill_gaps || (ci as any).priority_gaps || []).slice(0, 3);
+  const strengths = (ci?.strengths || (ci as any)?.verified_evidence || []).slice(0, 3);
+  const gaps = (ci?.priority_gaps || (ci as any)?.skill_gaps || []).slice(0, 3);
 
   const evidenceList = [
     {
@@ -116,7 +118,7 @@ function ProgressContent({ ci }: { ci: CareerIntelligence }) {
 
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="bg-primary/15 text-primary border-primary/40 text-xs px-3 py-1 font-semibold">
-            {curr?.career_cluster_name || humanizeCode(primaryCareerCode)} Pathway
+            {(curr as any)?.career_cluster_name || humanizeCode(primaryCareerCode)} Pathway
           </Badge>
         </div>
       </header>
@@ -277,26 +279,34 @@ function ProgressContent({ ci }: { ci: CareerIntelligence }) {
               <ShieldCheck className="size-4 text-success" />
               Your Strengths
             </h3>
-            <span className="text-xs text-muted-foreground">Verified Skills</span>
+            <span className="text-xs text-muted-foreground">{strengths.length} Verified Skills</span>
           </div>
 
           <div className="space-y-3">
-            {strengths.map((s, i) => (
-              <div key={i} className="rounded-2xl border border-border/60 bg-surface/60 p-3.5 space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-foreground">{s.skill_name || humanizeCode(s.skill_code)}</span>
-                  <Badge variant="outline" className="bg-success/15 text-success border-success/30 text-[10px]">
-                    {s.score ?? 80}/100
-                  </Badge>
-                </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-                  <div
-                    className="h-full rounded-full bg-success transition-all"
-                    style={{ width: `${s.score ?? 80}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+            {strengths.length === 0 ? (
+              <p className="text-xs text-muted-foreground">No verified skills recorded yet.</p>
+            ) : (
+              strengths.map((s: any, i: number) => {
+                const sName = s.skill_name || humanizeCode(s.skill_code);
+                const sScore = s.score ?? 80;
+                return (
+                  <div key={i} className="rounded-2xl border border-border/60 bg-surface/60 p-3.5 space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-foreground">{sName}</span>
+                      <Badge variant="outline" className="bg-success/15 text-success border-success/30 text-[10px]">
+                        {sScore}/100
+                      </Badge>
+                    </div>
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+                      <div
+                        className="h-full rounded-full bg-success transition-all"
+                        style={{ width: `${Math.min(100, Math.max(0, sScore))}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </section>
 
@@ -311,31 +321,41 @@ function ProgressContent({ ci }: { ci: CareerIntelligence }) {
           </div>
 
           <div className="space-y-3">
-            {gaps.map((g, i) => (
-              <div key={i} className="rounded-2xl border border-border/60 bg-surface/60 p-3.5 space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <div>
-                    <span className="font-semibold text-foreground">{g.skill_name || humanizeCode(g.skill_code)}</span>
-                    <span className="ml-2 text-[10px] text-warning font-medium">Gap: -{g.gap ?? 15} pts</span>
+            {gaps.length === 0 ? (
+              <p className="text-xs text-muted-foreground">No active skill gaps identified for your target career.</p>
+            ) : (
+              gaps.map((g: any, i: number) => {
+                const gName = g.skill_name || humanizeCode(g.skill_code);
+                const curScore = g.current_score ?? 55;
+                const reqScore = g.required_score ?? 75;
+                const gapDiff = g.gap ?? (reqScore - curScore);
+                return (
+                  <div key={i} className="rounded-2xl border border-border/60 bg-surface/60 p-3.5 space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <div>
+                        <span className="font-semibold text-foreground">{gName}</span>
+                        <span className="ml-2 text-[10px] text-warning font-medium">Gap: -{gapDiff} pts</span>
+                      </div>
+                      <span className="text-muted-foreground text-[10px]">Required: {reqScore}</span>
+                    </div>
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+                      <div
+                        className="h-full rounded-full bg-warning transition-all"
+                        style={{ width: `${Math.min(100, Math.max(0, curScore))}%` }}
+                      />
+                    </div>
+                    <div className="pt-1 flex justify-end">
+                      <Button asChild size="sm" variant="outline" className="h-7 text-[11px] rounded-lg gap-1">
+                        <Link to="/app/practice">
+                          Practice Skill
+                          <ArrowRight className="size-3" />
+                        </Link>
+                      </Button>
+                    </div>
                   </div>
-                  <span className="text-muted-foreground text-[10px]">Required: {g.required_score ?? 75}</span>
-                </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-                  <div
-                    className="h-full rounded-full bg-warning transition-all"
-                    style={{ width: `${g.current_score ?? 55}%` }}
-                  />
-                </div>
-                <div className="pt-1 flex justify-end">
-                  <Button asChild size="sm" variant="outline" className="h-7 text-[11px] rounded-lg gap-1">
-                    <Link to="/app/practice">
-                      Practice Skill
-                      <ArrowRight className="size-3" />
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-            ))}
+                );
+              })
+            )}
           </div>
         </section>
       </div>
