@@ -18,6 +18,7 @@ import { AgentReply, RecommendedAction } from "@/lib/careerai/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { humanizeCode } from "@/lib/utils";
+import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 
 export const Route = createFileRoute("/app/coach")({
   validateSearch: (search: Record<string, unknown>) => ({
