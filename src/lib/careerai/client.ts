@@ -26,6 +26,11 @@ import type {
   StartedAttempt,
   StudentIdentity,
   StudentInterest,
+  CurriculumData,
+  CurriculumModule,
+  StartModuleResult,
+  CompleteModuleResult,
+  RecordAssessmentResult,
 } from "@/lib/careerai/types";
 
 export const careerai = {
@@ -108,4 +113,45 @@ export const careerai = {
     api.post<AgentReply>(`/students/${studentId}/career-agent/messages`, {
       body: { message, conversation_id: conversationId ?? null },
     }),
+
+  // Curriculum (Domain 18)
+  getCurriculum: (studentId: string, careerClusterCode: string) =>
+    api.get<CurriculumData>(`/students/${studentId}/curriculum/${careerClusterCode}`),
+  getNextModules: (studentId: string, careerClusterCode: string) =>
+    api.get<CurriculumModule[]>(`/students/${studentId}/curriculum/${careerClusterCode}/next`),
+  getModuleDetail: (studentId: string, moduleCode: string) =>
+    api.get<CurriculumModule>(`/students/${studentId}/curriculum/module/${moduleCode}`),
+  startModule: (studentId: string, moduleCode: string) =>
+    api.post<StartModuleResult>(`/students/${studentId}/curriculum/module/start`, {
+      body: { module_code: moduleCode },
+    }),
+  completeModule: (
+    studentId: string,
+    body: {
+      module_code: string;
+      assessment_score?: number;
+      time_spent_minutes?: number;
+      ai_feedback?: string;
+    },
+  ) =>
+    api.post<CompleteModuleResult>(`/students/${studentId}/curriculum/module/complete`, {
+      body,
+    }),
+  recordModuleAssessment: (
+    studentId: string,
+    body: { module_code: string; score: number },
+  ) =>
+    api.post<RecordAssessmentResult>(
+      `/students/${studentId}/curriculum/module/assessment`,
+      { body },
+    ),
+  recalculateCurriculumUnlocks: (studentId: string, careerClusterCode: string) =>
+    api.post<{ newly_available: CurriculumModule[]; count: number }>(
+      `/students/${studentId}/curriculum/${careerClusterCode}/recalculate`,
+      { body: {} },
+    ),
+  getCurriculumAgentContext: (studentId: string, careerClusterCode: string) =>
+    api.get<Record<string, unknown>>(
+      `/students/${studentId}/curriculum/${careerClusterCode}/agent-context`,
+    ),
 } as const;

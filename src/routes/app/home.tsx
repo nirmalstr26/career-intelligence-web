@@ -7,6 +7,12 @@ import {
   Sparkles,
   Target,
   TrendingUp,
+  BookOpen,
+  Play,
+  CheckCircle2,
+  Bot,
+  Layers,
+  GraduationCap,
 } from "lucide-react";
 
 import { CareerReadinessRing } from "@/components/career/CareerReadinessRing";
@@ -20,8 +26,13 @@ import {
 } from "@/components/app/ui";
 import { InlineSpinner } from "@/components/common/Loader";
 import { Button } from "@/components/ui/button";
-import { useCareerIntelligence, useRefreshIntelligence } from "@/lib/careerai/hooks";
-import type { CareerIntelligence } from "@/lib/careerai/types";
+import { Badge } from "@/components/ui/badge";
+import {
+  useCareerIntelligence,
+  useCurriculum,
+  useRefreshIntelligence,
+} from "@/lib/careerai/hooks";
+import type { CareerIntelligence, CurriculumData } from "@/lib/careerai/types";
 
 export const Route = createFileRoute("/app/home")({
   component: HomePage,
@@ -57,6 +68,10 @@ function HomePage() {
 
 function HomeContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: boolean }) {
   const { student } = ci;
+  const primaryCareerCode = ci.career_direction.primary_career ?? "DATA_ENGINEER";
+  const curriculumQuery = useCurriculum(primaryCareerCode);
+  const curr = curriculumQuery.data;
+
   const hasSignals =
     ci.career_landscape.length > 0 || ci.placement_readiness !== null || ci.strengths.length > 0;
 
@@ -65,15 +80,19 @@ function HomeContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: b
     student.current_year !== null ? `Year ${student.current_year}` : null,
   ].filter((p): p is string => p !== null && p !== "");
 
+  // Identify active / next module
+  const activeModule = curr?.current_module ?? curr?.next_available?.[0];
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Header */}
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-display text-2xl font-bold sm:text-3xl">
+          <h1 className="font-display text-2xl font-bold sm:text-3xl tracking-tight">
             Welcome back, {student.first_name}
           </h1>
           {subtitleParts.length > 0 ? (
-            <p className="mt-1 text-sm text-muted-foreground">{subtitleParts.join(" \u00b7 ")}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{subtitleParts.join(" · ")}</p>
           ) : null}
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -85,7 +104,83 @@ function HomeContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: b
         </div>
       </header>
 
-      {!hasSignals ? (
+      {/* 1. Your Career Plan & Continue Learning Hero */}
+      {curr ? (
+        <section
+          aria-label="Your Career Plan"
+          className="relative overflow-hidden rounded-3xl border border-primary/40 bg-gradient-to-r from-primary/[0.08] via-card/90 to-surface p-6 sm:p-8 backdrop-blur shadow-xl"
+        >
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="space-y-3 max-w-2xl">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="outline" className="bg-primary/20 text-primary border-primary/40 font-semibold text-xs">
+                  Your Career Plan
+                </Badge>
+                <span className="text-xs text-muted-foreground">
+                  {curr.career_cluster_name || humanizeCode(curr.career_cluster_code)}
+                </span>
+                <span className="text-xs text-muted-foreground font-mono">
+                  {curr.completed_count} of {curr.total_count} modules completed ({curr.progress_pct}%)
+                </span>
+              </div>
+
+              {activeModule ? (
+                <div>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                    {activeModule.state === "IN_PROGRESS" ? "Continue Learning" : "Next Recommended"}
+                  </p>
+                  <h2 className="mt-1 font-display text-xl font-bold text-foreground sm:text-2xl">
+                    {activeModule.title}
+                  </h2>
+                  <p className="mt-1 text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                    Phase: <strong className="text-foreground/80">{activeModule.phase_name}</strong> · ~{activeModule.estimated_minutes} mins · {activeModule.difficulty}
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <h2 className="font-display text-xl font-bold text-foreground">
+                    You're on track with your Career Plan!
+                  </h2>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Explore deeper modules or test your readiness with our career diagnostics.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 self-start lg:self-center shrink-0">
+              {activeModule ? (
+                <Button asChild size="lg" variant="hero" className="font-semibold gap-2 shadow-lg">
+                  <Link to="/app/learn/$moduleCode" params={{ moduleCode: activeModule.code }}>
+                    <Play className="size-4 fill-current" />
+                    {activeModule.state === "IN_PROGRESS" ? "Continue Module" : "Start Learning"}
+                  </Link>
+                </Button>
+              ) : null}
+              <Button asChild variant="outline" size="lg" className="text-xs font-semibold">
+                <Link to="/app/plan">
+                  <Layers className="mr-1.5 size-4" />
+                  View Full Roadmap
+                </Link>
+              </Button>
+            </div>
+          </div>
+
+          {/* Mini progress track bar */}
+          <div className="mt-6 pt-4 border-t border-border/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-muted-foreground">
+            <span>Overall Roadmap Completion</span>
+            <div className="flex items-center gap-3 flex-1 sm:max-w-xs">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+                <div
+                  className="h-full bg-primary transition-all duration-500"
+                  style={{ width: `${curr.progress_pct}%` }}
+                />
+              </div>
+              <span className="font-mono text-foreground font-bold">{curr.progress_pct}%</span>
+            </div>
+          </div>
+        </section>
+      ) : !hasSignals ? (
         <SectionCard className="border-primary/30">
           <EmptyState
             icon={<Sparkles className="size-6" />}
@@ -103,42 +198,103 @@ function HomeContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: b
         </SectionCard>
       ) : null}
 
-      {ci.next_best_action !== null ? (
-        <SectionCard
-          title="Your next best action"
-          description="The single most valuable thing to do next."
-        >
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-3">
-              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-secondary text-primary">
-                <Target className="size-5" />
-              </span>
-              <div>
-                <p className="font-medium">
-                  {ci.next_best_action.title ?? humanizeCode(ci.next_best_action.action_code)}
-                </p>
-                {ci.next_best_action.rationale !== null ? (
-                  <p className="mt-0.5 text-sm text-muted-foreground">
-                    {ci.next_best_action.rationale}
-                  </p>
-                ) : null}
-                {ci.next_best_action.estimated_minutes !== null ? (
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    ~{ci.next_best_action.estimated_minutes} min
-                  </p>
-                ) : null}
+      {/* 2. Top 3 Ranked Next Best Actions */}
+      <section aria-label="Next Best Actions" className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+              <Target className="size-5 text-primary" />
+              Ranked Next Best Actions
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Prioritized recommendations to maximize your career readiness.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          {/* Action 1: Curriculum module */}
+          <div className="flex flex-col justify-between rounded-2xl border border-primary/40 bg-card/60 p-5 shadow-sm">
+            <div>
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <Badge className="bg-primary/20 text-primary border-primary/30 text-[10px]">
+                  #1 Priority
+                </Badge>
+                <span className="text-[11px] text-muted-foreground">Learning Module</span>
               </div>
+              <h3 className="font-display text-sm font-bold text-foreground">
+                {activeModule ? activeModule.title : "Start Data Engineering Foundations"}
+              </h3>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                {activeModule?.description ?? "Advance your foundational skills in software, SQL, and data pipelines."}
+              </p>
             </div>
-            <Button asChild variant="outline">
+            <Button asChild size="sm" variant="hero" className="mt-4 w-full font-semibold">
+              {activeModule ? (
+                <Link to="/app/learn/$moduleCode" params={{ moduleCode: activeModule.code }}>
+                  {activeModule.state === "IN_PROGRESS" ? "Continue" : "Start Module"}
+                  <ArrowRight className="ml-1.5 size-3.5" />
+                </Link>
+              ) : (
+                <Link to="/app/plan">
+                  Open Plan
+                  <ArrowRight className="ml-1.5 size-3.5" />
+                </Link>
+              )}
+            </Button>
+          </div>
+
+          {/* Action 2: Diagnostic / NBA */}
+          <div className="flex flex-col justify-between rounded-2xl border border-border/70 bg-card/60 p-5 shadow-sm">
+            <div>
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <Badge variant="secondary" className="text-[10px]">
+                  #2 Priority
+                </Badge>
+                <span className="text-[11px] text-muted-foreground">Skill Validation</span>
+              </div>
+              <h3 className="font-display text-sm font-bold text-foreground">
+                {ci.next_best_action?.title ?? "Take Skill Diagnostic"}
+              </h3>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                {ci.next_best_action?.rationale ?? "Assess your core technical competencies to uncover verified strengths."}
+              </p>
+            </div>
+            <Button asChild size="sm" variant="outline" className="mt-4 w-full">
               <Link to="/app/diagnostic">
-                Take action
-                <ArrowRight />
+                Take Diagnostic
+                <ArrowRight className="ml-1.5 size-3.5" />
               </Link>
             </Button>
           </div>
-        </SectionCard>
-      ) : null}
 
+          {/* Action 3: AI Advisor Review */}
+          <div className="flex flex-col justify-between rounded-2xl border border-border/70 bg-card/60 p-5 shadow-sm">
+            <div>
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <Badge variant="secondary" className="text-[10px]">
+                  #3 Priority
+                </Badge>
+                <span className="text-[11px] text-muted-foreground">AI Coaching</span>
+              </div>
+              <h3 className="font-display text-sm font-bold text-foreground">
+                Review Career Strategy with SPAR AI
+              </h3>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                Ask your dedicated AI advisor about interview preparation and skill gap closure.
+              </p>
+            </div>
+            <Button asChild size="sm" variant="outline" className="mt-4 w-full">
+              <Link to="/app/agent">
+                <Bot className="mr-1.5 size-3.5 text-primary" />
+                Talk to Advisor
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Landscape & Readiness Grids */}
       {hasSignals ? (
         <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
           <div className="space-y-6">

@@ -431,3 +431,114 @@ export interface RefreshResult {
   duration_ms: number;
   intelligence: CareerIntelligence;
 }
+
+
+// --- Curriculum (Domain 18) ------------------------------------------------
+
+export type ModuleState =
+  | "LOCKED"
+  | "AVAILABLE"
+  | "RECOMMENDED"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "NEEDS_IMPROVEMENT"
+  | "SKIPPED_BY_ASSESSMENT";
+
+export interface KnowledgeQuestion {
+  id: string;
+  text: string;
+  choices: string[];
+  correct: string;
+}
+
+export interface ModuleContentSection {
+  type: "text" | "exercise" | "knowledge_check" | "code" | "callout" | string;
+  heading?: string;
+  body?: string;
+  code?: string;
+  language?: string;
+  prompt?: string;
+  solution?: string;
+  questions?: KnowledgeQuestion[];
+}
+
+export interface ModuleContent {
+  sections?: ModuleContentSection[];
+}
+
+export interface CurriculumModule {
+  id: string;
+  code: string;
+  title: string;
+  description: string | null;
+  learning_objective: string | null;
+  why_it_matters: string | null;
+  estimated_minutes: number;
+  difficulty: string;
+  display_order: number;
+  requires_assessment: boolean;
+  min_pass_score: number | null;
+  track_code: string;
+  track_name: string;
+  phase_code: string;
+  phase_name: string;
+  state: ModuleState;
+  started_at: string | null;
+  completed_at: string | null;
+  content_progress_pct: number;
+  assessment_score: number | null;
+  passed_assessment: boolean;
+  time_spent_minutes: number;
+  ai_feedback: string | null;
+  prerequisite_module_codes: string[];
+  content: ModuleContent | null;
+  skill_codes: string[];
+}
+
+export interface CurriculumPhase {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  display_order: number;
+  modules: CurriculumModule[];
+}
+
+export interface CurriculumTrack {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  display_order: number;
+  phases: CurriculumPhase[];
+}
+
+export interface CurriculumData {
+  career_cluster_code: string;
+  career_cluster_name: string;
+  tracks: CurriculumTrack[];
+  current_module: CurriculumModule | null;
+  next_available: CurriculumModule[];
+  completed_count: number;
+  total_count: number;
+  progress_pct: number;
+}
+
+export interface StartModuleResult {
+  module: CurriculumModule;
+  message: string;
+}
+
+export interface CompleteModuleResult {
+  module: CurriculumModule;
+  newly_unlocked: CurriculumModule[];
+  message: string;
+}
+
+export interface RecordAssessmentResult {
+  module_code: string;
+  score: number;
+  passed: boolean;
+  state: string;
+  message: string;
+}

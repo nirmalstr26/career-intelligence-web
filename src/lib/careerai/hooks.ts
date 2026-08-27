@@ -103,3 +103,85 @@ export function useMakePrimaryCareer() {
     },
   });
 }
+
+
+// --- Curriculum Hooks -------------------------------------------------------
+
+export function useCurriculum(careerClusterCode?: string) {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["curriculum", studentId, careerClusterCode],
+    queryFn: () => careerai.getCurriculum(studentId, careerClusterCode!),
+    enabled: studentId !== "" && Boolean(careerClusterCode),
+  });
+}
+
+export function useNextModules(careerClusterCode?: string) {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["curriculum-next", studentId, careerClusterCode],
+    queryFn: () => careerai.getNextModules(studentId, careerClusterCode!),
+    enabled: studentId !== "" && Boolean(careerClusterCode),
+  });
+}
+
+export function useModuleDetail(moduleCode?: string) {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["curriculum-module", studentId, moduleCode],
+    queryFn: () => careerai.getModuleDetail(studentId, moduleCode!),
+    enabled: studentId !== "" && Boolean(moduleCode),
+  });
+}
+
+export function useStartModule() {
+  const studentId = useStudentId();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (moduleCode: string) => careerai.startModule(studentId, moduleCode),
+    onSuccess: (data) => {
+      void queryClient.invalidateQueries({ queryKey: ["curriculum", studentId] });
+      void queryClient.invalidateQueries({ queryKey: ["curriculum-next", studentId] });
+      void queryClient.invalidateQueries({
+        queryKey: ["curriculum-module", studentId, data.module.code],
+      });
+      void queryClient.invalidateQueries({ queryKey: ["career-intelligence", studentId] });
+    },
+  });
+}
+
+export function useCompleteModule() {
+  const studentId = useStudentId();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: {
+      module_code: string;
+      assessment_score?: number;
+      time_spent_minutes?: number;
+      ai_feedback?: string;
+    }) => careerai.completeModule(studentId, body),
+    onSuccess: (data) => {
+      void queryClient.invalidateQueries({ queryKey: ["curriculum", studentId] });
+      void queryClient.invalidateQueries({ queryKey: ["curriculum-next", studentId] });
+      void queryClient.invalidateQueries({
+        queryKey: ["curriculum-module", studentId, data.module.code],
+      });
+      void queryClient.invalidateQueries({ queryKey: ["career-intelligence", studentId] });
+    },
+  });
+}
+
+export function useRecordModuleAssessment() {
+  const studentId = useStudentId();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { module_code: string; score: number }) =>
+      careerai.recordModuleAssessment(studentId, body),
+    onSuccess: (data) => {
+      void queryClient.invalidateQueries({ queryKey: ["curriculum", studentId] });
+      void queryClient.invalidateQueries({
+        queryKey: ["curriculum-module", studentId, data.module_code],
+      });
+    },
+  });
+}

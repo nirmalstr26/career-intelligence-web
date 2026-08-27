@@ -20,9 +20,11 @@ import { Route as AppEvidenceRouteImport } from './routes/app/evidence'
 import { Route as AppExploreRouteImport } from './routes/app/explore'
 import { Route as AppHomeRouteImport } from './routes/app/home'
 import { Route as AppMissionsRouteImport } from './routes/app/missions'
+import { Route as AppPlanRouteImport } from './routes/app/plan'
 import { Route as AppProfileRouteImport } from './routes/app/profile'
 import { Route as AppReadinessRouteImport } from './routes/app/readiness'
 import { Route as AppSkillsRouteImport } from './routes/app/skills'
+import { Route as AppLearnModuleCodeRouteImport } from './routes/app/learn.$moduleCode'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -79,6 +81,11 @@ const AppMissionsRoute = AppMissionsRouteImport.update({
   path: '/missions',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPlanRoute = AppPlanRouteImport.update({
+  id: '/plan',
+  path: '/plan',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProfileRoute = AppProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -94,6 +101,11 @@ const AppSkillsRoute = AppSkillsRouteImport.update({
   path: '/skills',
   getParentRoute: () => AppRoute,
 } as any)
+const AppLearnModuleCodeRoute = AppLearnModuleCodeRouteImport.update({
+  id: '/learn/$moduleCode',
+  path: '/learn/$moduleCode',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -106,10 +118,12 @@ export interface FileRoutesByFullPath {
   '/app/explore': typeof AppExploreRoute
   '/app/home': typeof AppHomeRoute
   '/app/missions': typeof AppMissionsRoute
+  '/app/plan': typeof AppPlanRoute
   '/app/profile': typeof AppProfileRoute
   '/app/readiness': typeof AppReadinessRoute
   '/app/skills': typeof AppSkillsRoute
   '/app/': typeof AppIndexRoute
+  '/app/learn/$moduleCode': typeof AppLearnModuleCodeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -121,10 +135,12 @@ export interface FileRoutesByTo {
   '/app/explore': typeof AppExploreRoute
   '/app/home': typeof AppHomeRoute
   '/app/missions': typeof AppMissionsRoute
+  '/app/plan': typeof AppPlanRoute
   '/app/profile': typeof AppProfileRoute
   '/app/readiness': typeof AppReadinessRoute
   '/app/skills': typeof AppSkillsRoute
   '/app': typeof AppIndexRoute
+  '/app/learn/$moduleCode': typeof AppLearnModuleCodeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -138,10 +154,12 @@ export interface FileRoutesById {
   '/app/explore': typeof AppExploreRoute
   '/app/home': typeof AppHomeRoute
   '/app/missions': typeof AppMissionsRoute
+  '/app/plan': typeof AppPlanRoute
   '/app/profile': typeof AppProfileRoute
   '/app/readiness': typeof AppReadinessRoute
   '/app/skills': typeof AppSkillsRoute
   '/app/': typeof AppIndexRoute
+  '/app/learn/$moduleCode': typeof AppLearnModuleCodeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -156,10 +174,12 @@ export interface FileRouteTypes {
     | '/app/explore'
     | '/app/home'
     | '/app/missions'
+    | '/app/plan'
     | '/app/profile'
     | '/app/readiness'
     | '/app/skills'
     | '/app/'
+    | '/app/learn/$moduleCode'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -171,10 +191,12 @@ export interface FileRouteTypes {
     | '/app/explore'
     | '/app/home'
     | '/app/missions'
+    | '/app/plan'
     | '/app/profile'
     | '/app/readiness'
     | '/app/skills'
     | '/app'
+    | '/app/learn/$moduleCode'
   id:
     | '__root__'
     | '/'
@@ -187,10 +209,12 @@ export interface FileRouteTypes {
     | '/app/explore'
     | '/app/home'
     | '/app/missions'
+    | '/app/plan'
     | '/app/profile'
     | '/app/readiness'
     | '/app/skills'
     | '/app/'
+    | '/app/learn/$moduleCode'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -278,6 +302,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMissionsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/plan': {
+      id: '/app/plan'
+      path: '/plan'
+      fullPath: '/app/plan'
+      preLoaderRoute: typeof AppPlanRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/profile': {
       id: '/app/profile'
       path: '/profile'
@@ -299,6 +330,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSkillsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/learn/$moduleCode': {
+      id: '/app/learn/$moduleCode'
+      path: '/learn/$moduleCode'
+      fullPath: '/app/learn/$moduleCode'
+      preLoaderRoute: typeof AppLearnModuleCodeRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -310,10 +348,12 @@ interface AppRouteChildren {
   AppExploreRoute: typeof AppExploreRoute
   AppHomeRoute: typeof AppHomeRoute
   AppMissionsRoute: typeof AppMissionsRoute
+  AppPlanRoute: typeof AppPlanRoute
   AppProfileRoute: typeof AppProfileRoute
   AppReadinessRoute: typeof AppReadinessRoute
   AppSkillsRoute: typeof AppSkillsRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppLearnModuleCodeRoute: typeof AppLearnModuleCodeRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -324,10 +364,12 @@ const AppRouteChildren: AppRouteChildren = {
   AppExploreRoute: AppExploreRoute,
   AppHomeRoute: AppHomeRoute,
   AppMissionsRoute: AppMissionsRoute,
+  AppPlanRoute: AppPlanRoute,
   AppProfileRoute: AppProfileRoute,
   AppReadinessRoute: AppReadinessRoute,
   AppSkillsRoute: AppSkillsRoute,
   AppIndexRoute: AppIndexRoute,
+  AppLearnModuleCodeRoute: AppLearnModuleCodeRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
