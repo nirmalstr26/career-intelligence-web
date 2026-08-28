@@ -50,6 +50,8 @@ export const careerai = {
     }),
   recordConsent: (studentId: string, body: ConsentInput) =>
     api.post<unknown>(`/students/${studentId}/consents`, { body }),
+  grantConsent: (studentId: string, body: ConsentInput) =>
+    api.post<unknown>(`/students/${studentId}/consents`, { body }),
   listInterestAreas: () => api.get<InterestArea[]>(`/interest-areas`),
 
   // Home
@@ -582,18 +584,17 @@ export const careerai = {
 // --- Step 16: Career Discovery & Onboarding Reference API Methods ----------
 
 export async function getOnboardingReference(): Promise<OnboardingReferenceData> {
-  return fetchJson<OnboardingReferenceData>("/reference/onboarding");
+  return api.get<OnboardingReferenceData>("/reference/onboarding");
 }
 
 export async function startCareerDiscovery(resetExisting = false): Promise<DiscoverySession> {
-  return fetchJson<DiscoverySession>("/career-discovery/sessions", {
-    method: "POST",
-    body: JSON.stringify({ reset_existing: resetExisting }),
+  return api.post<DiscoverySession>("/career-discovery/sessions", {
+    body: { reset_existing: resetExisting },
   });
 }
 
 export async function getCurrentCareerDiscovery(): Promise<DiscoverySession | null> {
-  return fetchJson<DiscoverySession | null>("/career-discovery/current");
+  return api.get<DiscoverySession | null>("/career-discovery/current");
 }
 
 export async function respondToCareerDiscovery(
@@ -601,9 +602,8 @@ export async function respondToCareerDiscovery(
   choiceCodes: string[] = [],
   message?: string
 ): Promise<DiscoverySession> {
-  return fetchJson<DiscoverySession>(`/career-discovery/${sessionId}/respond`, {
-    method: "POST",
-    body: JSON.stringify({ choice_codes: choiceCodes, message }),
+  return api.post<DiscoverySession>(`/career-discovery/${sessionId}/respond`, {
+    body: { choice_codes: choiceCodes, message },
   });
 }
 
@@ -612,9 +612,8 @@ export async function compareCareerPaths(
   careerA: string,
   careerB: string
 ): Promise<CareerComparisonResponse> {
-  return fetchJson<CareerComparisonResponse>(
-    `/career-discovery/${sessionId}/compare?career_a=${encodeURIComponent(careerA)}&career_b=${encodeURIComponent(careerB)}`,
-    { method: "POST" }
+  return api.post<CareerComparisonResponse>(
+    `/career-discovery/${sessionId}/compare?career_a=${encodeURIComponent(careerA)}&career_b=${encodeURIComponent(careerB)}`
   );
 }
 
@@ -622,8 +621,7 @@ export async function selectDiscoveryCareer(
   sessionId: string,
   careerCode: string
 ): Promise<DiscoverySession> {
-  return fetchJson<DiscoverySession>(`/career-discovery/${sessionId}/select`, {
-    method: "POST",
-    body: JSON.stringify({ career_code: careerCode }),
+  return api.post<DiscoverySession>(`/career-discovery/${sessionId}/select`, {
+    body: { career_code: careerCode },
   });
 }

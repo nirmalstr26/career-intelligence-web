@@ -32,13 +32,68 @@ const STEPS = [
   { key: "goals", title: "Goals & Interests", subtitle: "What you want to achieve" },
 ];
 
+const DEFAULT_COUNTRIES = [
+  { value: "IN", label: "India (IN)" },
+  { value: "US", label: "United States (US)" },
+  { value: "GB", label: "United Kingdom (UK)" },
+  { value: "CA", label: "Canada (CA)" },
+  { value: "AU", label: "Australia (AU)" },
+  { value: "SG", label: "Singapore (SG)" },
+  { value: "DE", label: "Germany (DE)" },
+  { value: "AE", label: "United Arab Emirates (AE)" },
+];
+
+const DEFAULT_DEGREES = [
+  { value: "B_TECH", label: "B.Tech / B.E. (Bachelor of Technology / Engineering)" },
+  { value: "BCA", label: "BCA (Bachelor of Computer Applications)" },
+  { value: "B_SC", label: "B.Sc (Bachelor of Science)" },
+  { value: "M_TECH", label: "M.Tech / M.E. (Master of Technology)" },
+  { value: "MCA", label: "MCA (Master of Computer Applications)" },
+  { value: "M_SC", label: "M.Sc (Master of Science)" },
+  { value: "OTHER", label: "Other Degree / Program" },
+];
+
+const DEFAULT_DEPARTMENTS = [
+  { value: "CSE", label: "Computer Science & Engineering" },
+  { value: "IT", label: "Information Technology" },
+  { value: "AI_DS", label: "Artificial Intelligence & Data Science" },
+  { value: "ECE", label: "Electronics & Communication" },
+  { value: "EEE", label: "Electrical & Electronics" },
+  { value: "MECH", label: "Mechanical Engineering" },
+  { value: "CIVIL", label: "Civil Engineering" },
+  { value: "OTHER", label: "Other Department" },
+];
+
+const DEFAULT_GOALS = [
+  { value: "JOB", label: "Land a Full-Time Job", description: "Targeting entry-level or junior role" },
+  { value: "INTERNSHIP", label: "Find an Internship", description: "Seeking practical industry exposure" },
+  { value: "SKILLS", label: "Build Verified Skills", description: "Closing domain and tech gaps" },
+  { value: "CAREER_SWITCH", label: "Switch Career Path", description: "Transitioning to a new field" },
+  { value: "HIGHER_ED", label: "Higher Studies / Research", description: "Preparing for Masters or PhD" },
+];
+
+const DEFAULT_CLARITY = [
+  { value: "EXPLORING", label: "Still Exploring", description: "Need guidance on best-fit paths" },
+  { value: "SOME_IDEA", label: "Have an Idea", description: "Know general area, deciding role" },
+  { value: "CONFIDENT", label: "Target Role Chosen", description: "Ready to focus and prepare" },
+];
+
+const DEFAULT_INTERESTS = [
+  { value: "DATA", label: "Data Engineering & Analytics" },
+  { value: "AI_ML", label: "AI & Machine Learning" },
+  { value: "CLOUD", label: "Cloud & DevOps" },
+  { value: "FULLSTACK", label: "Full-Stack Development" },
+  { value: "CYBER", label: "Cybersecurity & Networks" },
+  { value: "PRODUCT", label: "Product & System Design" },
+];
+
 export function OnboardingFlow() {
   const navigate = useNavigate();
   const { session, reloadUser } = useAuth();
   const student = session?.student ?? null;
   const user = session?.user ?? null;
 
-  const { data: refData, isLoading: isRefLoading } = useOnboardingReference();
+  const { data: refData } = useOnboardingReference();
 
   const [stepIdx, setStepIdx] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,7 +107,7 @@ export function OnboardingFlow() {
 
   // --- Step 2: Education State ---
   const [academicStatus, setAcademicStatus] = useState<string>("COLLEGE");
-  const [institutionName, setInstitutionName] = useState("");
+  const [institutionName, setInstitutionName] = useState("MIT College of Engineering");
   const [isCustomInstitution, setIsCustomInstitution] = useState(false);
   const [degreeType, setDegreeType] = useState("B_TECH");
   const [department, setDepartment] = useState("CSE");
@@ -168,7 +223,7 @@ export function OnboardingFlow() {
       });
 
       // 3. Grant Consent
-      await careerai.grantConsent(student.id, {
+      await careerai.recordConsent(student.id, {
         consent_type: "CAREER_PROFILE_PROCESSING",
         consent_version: CONSENT_VERSION,
       });
@@ -184,21 +239,12 @@ export function OnboardingFlow() {
     }
   };
 
-  if (isRefLoading) {
-    return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center space-y-4">
-        <InlineSpinner className="size-8 text-primary" />
-        <p className="text-sm text-muted-foreground animate-pulse">Loading setup options…</p>
-      </div>
-    );
-  }
-
-  const countries = refData?.countries || [];
-  const degrees = refData?.degrees || [];
-  const departments = refData?.departments || [];
-  const careerGoals = refData?.career_goals || [];
-  const clarityLevels = refData?.career_clarity_levels || [];
-  const interestAreas = refData?.interest_areas || [];
+  const countries = refData?.countries && refData.countries.length > 0 ? refData.countries : DEFAULT_COUNTRIES;
+  const degrees = refData?.degrees && refData.degrees.length > 0 ? refData.degrees : DEFAULT_DEGREES;
+  const departments = refData?.departments && refData.departments.length > 0 ? refData.departments : DEFAULT_DEPARTMENTS;
+  const careerGoals = refData?.career_goals && refData.career_goals.length > 0 ? refData.career_goals : DEFAULT_GOALS;
+  const clarityLevels = refData?.career_clarity_levels && refData.career_clarity_levels.length > 0 ? refData.career_clarity_levels : DEFAULT_CLARITY;
+  const interestAreas = refData?.interest_areas && refData.interest_areas.length > 0 ? refData.interest_areas : DEFAULT_INTERESTS;
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:py-12">
@@ -308,7 +354,7 @@ export function OnboardingFlow() {
                   type="text"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  placeholder="e.g. Mumbai, Bengaluru, Pune"
+                  placeholder="e.g. Bengaluru, Austin, London"
                   className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
                 />
               </div>
@@ -319,8 +365,20 @@ export function OnboardingFlow() {
         {/* --- STEP 2: EDUCATION --- */}
         {stepIdx === 1 && (
           <div className="space-y-6">
+            <div className="flex items-center gap-4 border-b border-border pb-6">
+              <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary font-bold text-xl border border-primary/20">
+                <GraduationCap className="size-6" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-foreground">Education & Degree</h2>
+                <p className="text-xs text-muted-foreground">
+                  Helps calibrate skill assessments and timeline.
+                </p>
+              </div>
+            </div>
+
             <div>
-              <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+              <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2.5">
                 What describes your current academic status? *
               </label>
               <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
@@ -353,180 +411,151 @@ export function OnboardingFlow() {
               </div>
             </div>
 
-            {academicStatus === "COLLEGE" && (
-              <div className="space-y-4 pt-2 border-t border-border">
+            <div className="space-y-4 pt-2 border-t border-border">
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
+                  Institution / College *
+                </label>
+                {!isCustomInstitution ? (
+                  <div className="space-y-2">
+                    <select
+                      value={institutionName}
+                      onChange={(e) => {
+                        if (e.target.value === "__OTHER__") {
+                          setIsCustomInstitution(true);
+                          setInstitutionName("");
+                        } else {
+                          setInstitutionName(e.target.value);
+                        }
+                      }}
+                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
+                    >
+                      <option value="">Select your institution…</option>
+                      <option value="MIT College of Engineering">MIT College of Engineering</option>
+                      <option value="National Institute of Technology">National Institute of Technology (NIT)</option>
+                      <option value="Indian Institute of Information Technology">IIIT</option>
+                      <option value="Delhi Technological University">DTU</option>
+                      <option value="Vellore Institute of Technology">VIT</option>
+                      <option value="SRM Institute of Science and Technology">SRM Institute</option>
+                      <option value="PES University">PES University</option>
+                      <option value="Anna University">Anna University</option>
+                      <option value="__OTHER__">+ Can't find my institution (Type manually)</option>
+                    </select>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={institutionName}
+                      onChange={(e) => setInstitutionName(e.target.value)}
+                      placeholder="Enter your college / university name"
+                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsCustomInstitution(false)}
+                    >
+                      List
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
-                    Institution / College *
+                    Degree *
                   </label>
-                  {!isCustomInstitution ? (
-                    <div className="space-y-2">
-                      <select
-                        value={institutionName}
-                        onChange={(e) => {
-                          if (e.target.value === "__OTHER__") {
-                            setIsCustomInstitution(true);
-                            setInstitutionName("");
-                          } else {
-                            setInstitutionName(e.target.value);
-                          }
-                        }}
-                        className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
-                      >
-                        <option value="">Select your institution…</option>
-                        <option value="MIT College of Engineering">MIT College of Engineering</option>
-                        <option value="National Institute of Technology">National Institute of Technology (NIT)</option>
-                        <option value="Indian Institute of Information Technology">IIIT</option>
-                        <option value="Delhi Technological University">DTU</option>
-                        <option value="Vellore Institute of Technology">VIT</option>
-                        <option value="SRM Institute of Science and Technology">SRM Institute</option>
-                        <option value="PES University">PES University</option>
-                        <option value="Anna University">Anna University</option>
-                        <option value="__OTHER__">+ Can't find my institution (Type manually)</option>
-                      </select>
-                    </div>
-                  ) : (
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={institutionName}
-                        onChange={(e) => setInstitutionName(e.target.value)}
-                        placeholder="Enter your college / university name"
-                        className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setIsCustomInstitution(false)}
-                      >
-                        List
-                      </Button>
-                    </div>
-                  )}
+                  <select
+                    value={degreeType}
+                    onChange={(e) => setDegreeType(e.target.value)}
+                    className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
+                  >
+                    {degrees.map((d) => (
+                      <option key={d.value} value={d.value}>
+                        {d.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
-                      Degree *
-                    </label>
-                    <select
-                      value={degreeType}
-                      onChange={(e) => setDegreeType(e.target.value)}
-                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
-                    >
-                      {degrees.map((d) => (
-                        <option key={d.value} value={d.value}>
-                          {d.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
-                      Department / Field *
-                    </label>
-                    <select
-                      value={department}
-                      onChange={(e) => setDepartment(e.target.value)}
-                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
-                    >
-                      {departments.map((dept) => (
-                        <option key={dept.value} value={dept.value}>
-                          {dept.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
-                      Current Year *
-                    </label>
-                    <select
-                      value={currentYear}
-                      onChange={(e) => setCurrentYear(Number(e.target.value))}
-                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
-                    >
-                      <option value={1}>Year 1 (Freshman)</option>
-                      <option value={2}>Year 2 (Sophomore)</option>
-                      <option value={3}>Year 3 (Junior)</option>
-                      <option value={4}>Year 4 (Senior)</option>
-                      <option value={5}>Year 5 (Extended / Dual)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
-                      Expected Graduation *
-                    </label>
-                    <select
-                      value={graduationYear}
-                      onChange={(e) => setGraduationYear(Number(e.target.value))}
-                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
-                    >
-                      {currentYearOptions.map((y) => (
-                        <option key={y} value={y}>
-                          {y}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
+                    Department / Field *
+                  </label>
+                  <select
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
+                  >
+                    {departments.map((dept) => (
+                      <option key={dept.value} value={dept.value}>
+                        {dept.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
-            )}
 
-            {academicStatus !== "COLLEGE" && (
-              <div className="space-y-4 pt-2 border-t border-border">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
-                      Background / Field
-                    </label>
-                    <select
-                      value={department}
-                      onChange={(e) => setDepartment(e.target.value)}
-                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
-                    >
-                      {departments.map((dept) => (
-                        <option key={dept.value} value={dept.value}>
-                          {dept.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
-                      Graduation / Target Year
-                    </label>
-                    <select
-                      value={graduationYear}
-                      onChange={(e) => setGraduationYear(Number(e.target.value))}
-                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
-                    >
-                      {currentYearOptions.map((y) => (
-                        <option key={y} value={y}>
-                          {y}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
+                    Current Year *
+                  </label>
+                  <select
+                    value={currentYear}
+                    onChange={(e) => setCurrentYear(Number(e.target.value))}
+                    className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
+                  >
+                    <option value={1}>Year 1 (Freshman)</option>
+                    <option value={2}>Year 2 (Sophomore)</option>
+                    <option value={3}>Year 3 (Junior)</option>
+                    <option value={4}>Year 4 (Senior)</option>
+                    <option value={5}>Year 5 (Extended / Dual)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
+                    Expected Graduation *
+                  </label>
+                  <select
+                    value={graduationYear}
+                    onChange={(e) => setGraduationYear(Number(e.target.value))}
+                    className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
+                  >
+                    {currentYearOptions.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         )}
 
-        {/* --- STEP 3: GOALS, INTERESTS & CONSENT --- */}
+        {/* --- STEP 3: GOALS & INTERESTS --- */}
         {stepIdx === 2 && (
           <div className="space-y-6">
+            <div className="flex items-center gap-4 border-b border-border pb-6">
+              <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary font-bold text-xl border border-primary/20">
+                <Compass className="size-6" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-foreground">Goals & Interests</h2>
+                <p className="text-xs text-muted-foreground">
+                  Personalizes AI career suggestions and milestone pathways.
+                </p>
+              </div>
+            </div>
+
             <div>
-              <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
-                What are you hoping SPAR helps you with? (Choose 1–3) *
+              <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+                Primary Career Goal (Select up to 3) *
               </label>
-              <div className="grid gap-2.5 sm:grid-cols-2 pt-2">
+              <div className="grid gap-2 sm:grid-cols-2">
                 {careerGoals.map((g) => {
                   const isSelected = selectedGoals.includes(g.value);
                   return (
@@ -535,26 +564,28 @@ export function OnboardingFlow() {
                       type="button"
                       onClick={() => toggleGoal(g.value)}
                       className={cn(
-                        "flex items-start gap-3 rounded-xl border p-3.5 text-left transition-all",
+                        "flex items-start gap-3 rounded-xl border p-3 text-left transition-all",
                         isSelected
-                          ? "border-primary bg-primary/10 text-primary shadow-sm"
-                          : "border-border bg-background hover:border-primary/30"
+                          ? "border-primary bg-primary/10 text-foreground shadow-sm"
+                          : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
                       )}
                     >
                       <div
                         className={cn(
                           "mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-md border text-[10px]",
                           isSelected
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : "border-muted-foreground/40"
+                            ? "border-primary bg-primary text-primary-foreground font-bold"
+                            : "border-border"
                         )}
                       >
                         {isSelected && <Check className="size-3 stroke-[3]" />}
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-foreground">{g.label}</p>
+                        <div className="text-xs font-semibold text-foreground">{g.label}</div>
                         {g.description && (
-                          <p className="text-[11px] text-muted-foreground mt-0.5">{g.description}</p>
+                          <div className="text-[11px] text-muted-foreground mt-0.5">
+                            {g.description}
+                          </div>
                         )}
                       </div>
                     </button>
@@ -564,25 +595,30 @@ export function OnboardingFlow() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
-                How clear are you about your career direction?
+              <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+                How clear is your target career direction? *
               </label>
-              <div className="grid grid-cols-2 gap-2 pt-1.5">
-                {clarityLevels.map((cl) => {
-                  const isSelected = clarityLevel === cl.value;
+              <div className="grid grid-cols-3 gap-2">
+                {clarityLevels.map((lvl) => {
+                  const isSelected = clarityLevel === lvl.value;
                   return (
                     <button
-                      key={cl.value}
+                      key={lvl.value}
                       type="button"
-                      onClick={() => setClarityLevel(cl.value)}
+                      onClick={() => setClarityLevel(lvl.value)}
                       className={cn(
-                        "rounded-xl border p-3 text-left transition-all",
+                        "rounded-xl border p-3 text-center transition-all",
                         isSelected
-                          ? "border-primary bg-primary/10 text-primary font-medium shadow-sm"
-                          : "border-border bg-background text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                          ? "border-primary bg-primary/10 text-primary font-semibold shadow-sm"
+                          : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
                       )}
                     >
-                      <p className="text-xs font-semibold text-foreground">{cl.label}</p>
+                      <div className="text-xs font-semibold">{lvl.label}</div>
+                      {lvl.description && (
+                        <div className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">
+                          {lvl.description}
+                        </div>
+                      )}
                     </button>
                   );
                 })}
@@ -590,10 +626,10 @@ export function OnboardingFlow() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
-                What sounds interesting to you? (Optional)
+              <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+                Areas of Interest *
               </label>
-              <div className="flex flex-wrap gap-2 pt-1.5">
+              <div className="flex flex-wrap gap-2">
                 {interestAreas.map((ia) => {
                   const isSelected = selectedInterests.includes(ia.value);
                   return (
@@ -604,7 +640,7 @@ export function OnboardingFlow() {
                       className={cn(
                         "rounded-full border px-3.5 py-1.5 text-xs font-medium transition-all",
                         isSelected
-                          ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                          ? "border-primary bg-primary text-primary-foreground font-semibold shadow-xs"
                           : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
                       )}
                     >
@@ -615,47 +651,40 @@ export function OnboardingFlow() {
               </div>
             </div>
 
-            {/* Compact Consent */}
-            <div className="rounded-xl border border-border bg-secondary/30 p-4">
-              <label className="flex items-start gap-3 cursor-pointer">
+            {/* Privacy & Consent Note */}
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-2">
+              <div className="flex items-center gap-2 text-xs font-semibold text-primary">
+                <ShieldCheck className="size-4" />
+                <span>SPAR Privacy & AI Career Guidance Consent</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                By clicking Complete Setup, you consent to SPAR processing your academic profile, skill assessments, and project artifacts to provide personalized career recommendations and readiness scoring.
+              </p>
+              <label className="flex items-center gap-2 cursor-pointer pt-1">
                 <input
                   type="checkbox"
                   checked={consentGranted}
                   onChange={(e) => setConsentGranted(e.target.checked)}
-                  className="mt-1 size-4 rounded border-border text-primary focus:ring-primary"
+                  className="rounded border-border size-4 text-primary"
                 />
-                <div className="text-xs text-muted-foreground">
-                  <span className="text-foreground font-medium">
-                    I agree to SPAR using my profile and learning activity to personalize my career guidance.
-                  </span>{" "}
-                  Read our{" "}
-                  <a href="#" className="text-primary underline">
-                    Privacy Notice
-                  </a>
-                  ,{" "}
-                  <a href="#" className="text-primary underline">
-                    Terms
-                  </a>
-                  , and{" "}
-                  <a href="#" className="text-primary underline">
-                    AI Usage Notice
-                  </a>
-                  .
-                </div>
+                <span className="text-xs font-medium text-foreground">
+                  I agree to SPAR Career Intelligence processing (v{CONSENT_VERSION})
+                </span>
               </label>
             </div>
           </div>
         )}
 
-        {/* Footer Navigation */}
+        {/* Footer Navigation Buttons */}
         <div className="mt-8 flex items-center justify-between border-t border-border pt-6">
           {stepIdx > 0 ? (
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
+              size="sm"
               onClick={handleBack}
               disabled={isSubmitting}
-              className="gap-2"
+              className="gap-1.5"
             >
               <ArrowLeft className="size-4" />
               Back
@@ -665,26 +694,32 @@ export function OnboardingFlow() {
           )}
 
           {stepIdx < STEPS.length - 1 ? (
-            <Button type="button" onClick={handleNext} className="gap-2 rounded-xl px-6">
-              Continue
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleNext}
+              className="gap-1.5"
+            >
+              Next Step
               <ArrowRight className="size-4" />
             </Button>
           ) : (
             <Button
               type="button"
+              size="sm"
               onClick={handleCompleteOnboarding}
-              disabled={isSubmitting}
-              className="gap-2 rounded-xl bg-primary px-8 font-semibold text-primary-foreground hover:bg-primary/90"
+              disabled={isSubmitting || !consentGranted}
+              className="gap-1.5"
             >
               {isSubmitting ? (
                 <>
                   <InlineSpinner className="size-4" />
-                  Saving Profile…
+                  Completing Setup…
                 </>
               ) : (
                 <>
-                  <Zap className="size-4 fill-current" />
-                  Meet SPAR & Discover Career
+                  Complete Setup & Discover Careers
+                  <Sparkles className="size-4" />
                 </>
               )}
             </Button>
