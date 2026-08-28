@@ -18,6 +18,7 @@ import { Route as AppAgentRouteImport } from './routes/app/agent'
 import { Route as AppCareerRouteImport } from './routes/app/career'
 import { Route as AppCoachRouteImport } from './routes/app/coach'
 import { Route as AppDiagnosticRouteImport } from './routes/app/diagnostic'
+import { Route as AppDiscoverRouteImport } from './routes/app/discover'
 import { Route as AppEvidenceRouteImport } from './routes/app/evidence'
 import { Route as AppExploreRouteImport } from './routes/app/explore'
 import { Route as AppHomeRouteImport } from './routes/app/home'
@@ -81,6 +82,11 @@ const AppCoachRoute = AppCoachRouteImport.update({
 const AppDiagnosticRoute = AppDiagnosticRouteImport.update({
   id: '/diagnostic',
   path: '/diagnostic',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDiscoverRoute = AppDiscoverRouteImport.update({
+  id: '/discover',
+  path: '/discover',
   getParentRoute: () => AppRoute,
 } as any)
 const AppEvidenceRoute = AppEvidenceRouteImport.update({
@@ -187,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/app/career': typeof AppCareerRoute
   '/app/coach': typeof AppCoachRoute
   '/app/diagnostic': typeof AppDiagnosticRoute
+  '/app/discover': typeof AppDiscoverRoute
   '/app/evidence': typeof AppEvidenceRoute
   '/app/explore': typeof AppExploreRoute
   '/app/home': typeof AppHomeRoute
@@ -216,6 +223,7 @@ export interface FileRoutesByTo {
   '/app/career': typeof AppCareerRoute
   '/app/coach': typeof AppCoachRoute
   '/app/diagnostic': typeof AppDiagnosticRoute
+  '/app/discover': typeof AppDiscoverRoute
   '/app/evidence': typeof AppEvidenceRoute
   '/app/explore': typeof AppExploreRoute
   '/app/home': typeof AppHomeRoute
@@ -247,6 +255,7 @@ export interface FileRoutesById {
   '/app/career': typeof AppCareerRoute
   '/app/coach': typeof AppCoachRoute
   '/app/diagnostic': typeof AppDiagnosticRoute
+  '/app/discover': typeof AppDiscoverRoute
   '/app/evidence': typeof AppEvidenceRoute
   '/app/explore': typeof AppExploreRoute
   '/app/home': typeof AppHomeRoute
@@ -279,6 +288,7 @@ export interface FileRouteTypes {
     | '/app/career'
     | '/app/coach'
     | '/app/diagnostic'
+    | '/app/discover'
     | '/app/evidence'
     | '/app/explore'
     | '/app/home'
@@ -308,6 +318,7 @@ export interface FileRouteTypes {
     | '/app/career'
     | '/app/coach'
     | '/app/diagnostic'
+    | '/app/discover'
     | '/app/evidence'
     | '/app/explore'
     | '/app/home'
@@ -338,6 +349,7 @@ export interface FileRouteTypes {
     | '/app/career'
     | '/app/coach'
     | '/app/diagnostic'
+    | '/app/discover'
     | '/app/evidence'
     | '/app/explore'
     | '/app/home'
@@ -434,6 +446,13 @@ declare module '@tanstack/react-router' {
       path: '/diagnostic'
       fullPath: '/app/diagnostic'
       preLoaderRoute: typeof AppDiagnosticRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/discover': {
+      id: '/app/discover'
+      path: '/discover'
+      fullPath: '/app/discover'
+      preLoaderRoute: typeof AppDiscoverRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/evidence': {
@@ -577,6 +596,7 @@ interface AppRouteChildren {
   AppCareerRoute: typeof AppCareerRoute
   AppCoachRoute: typeof AppCoachRoute
   AppDiagnosticRoute: typeof AppDiagnosticRoute
+  AppDiscoverRoute: typeof AppDiscoverRoute
   AppEvidenceRoute: typeof AppEvidenceRoute
   AppExploreRoute: typeof AppExploreRoute
   AppHomeRoute: typeof AppHomeRoute
@@ -601,6 +621,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCareerRoute: AppCareerRoute,
   AppCoachRoute: AppCoachRoute,
   AppDiagnosticRoute: AppDiagnosticRoute,
+  AppDiscoverRoute: AppDiscoverRoute,
   AppEvidenceRoute: AppEvidenceRoute,
   AppExploreRoute: AppExploreRoute,
   AppHomeRoute: AppHomeRoute,

@@ -1000,3 +1000,63 @@ export function useSystemAuditLogs() {
     staleTime: 10_000,
   });
 }
+
+// --- Step 16: Career Discovery & Reference Hooks ---------------------------
+
+import {
+  getOnboardingReference,
+  startCareerDiscovery,
+  getCurrentCareerDiscovery,
+  respondToCareerDiscovery,
+  compareCareerPaths,
+  selectDiscoveryCareer,
+} from "./client";
+
+export function useOnboardingReference() {
+  return useQuery({
+    queryKey: ["onboarding-reference"],
+    queryFn: getOnboardingReference,
+    staleTime: 1000 * 60 * 60, // 1 hour
+  });
+}
+
+export function useCurrentCareerDiscovery() {
+  return useQuery({
+    queryKey: ["career-discovery-current"],
+    queryFn: getCurrentCareerDiscovery,
+  });
+}
+
+export function useStartCareerDiscovery() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (resetExisting?: boolean) => startCareerDiscovery(resetExisting),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["career-discovery-current"] });
+    },
+  });
+}
+
+export function useRespondCareerDiscovery() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ sessionId, choiceCodes, message }: { sessionId: string; choiceCodes?: string[]; message?: string }) =>
+      respondToCareerDiscovery(sessionId, choiceCodes, message),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["career-discovery-current"] });
+    },
+  });
+}
+
+export function useSelectDiscoveryCareer() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ sessionId, careerCode }: { sessionId: string; careerCode: string }) =>
+      selectDiscoveryCareer(sessionId, careerCode),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["career-discovery-current"] });
+      void queryClient.invalidateQueries({ queryKey: ["career-intelligence"] });
+      void queryClient.invalidateQueries({ queryKey: ["career-explorations"] });
+    },
+  });
+}

@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { to: "/app/today", label: "Today", icon: Sun },
+  { to: "/app/discover", label: "Discover", icon: Sparkles },
   { to: "/app/path", label: "My Path", icon: Compass },
   { to: "/app/practice", label: "Practice", icon: Wrench },
   { to: "/app/progress", label: "Progress", icon: TrendingUp },

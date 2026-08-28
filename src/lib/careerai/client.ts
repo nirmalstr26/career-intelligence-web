@@ -484,3 +484,52 @@ export const careerai = {
   runDataIntegrityCheck: () => api.get<DataIntegrityReportResponse>("/admin/integrity-check"),
   listSystemAuditLogs: () => api.get<SystemAuditLogItem[]>("/admin/audit-logs"),
 };
+
+// --- Step 16: Career Discovery & Onboarding Reference API Methods ----------
+
+export async function getOnboardingReference(): Promise<OnboardingReferenceData> {
+  return fetchJson<OnboardingReferenceData>("/reference/onboarding");
+}
+
+export async function startCareerDiscovery(resetExisting = false): Promise<DiscoverySession> {
+  return fetchJson<DiscoverySession>("/career-discovery/sessions", {
+    method: "POST",
+    body: JSON.stringify({ reset_existing: resetExisting }),
+  });
+}
+
+export async function getCurrentCareerDiscovery(): Promise<DiscoverySession | null> {
+  return fetchJson<DiscoverySession | null>("/career-discovery/current");
+}
+
+export async function respondToCareerDiscovery(
+  sessionId: string,
+  choiceCodes: string[] = [],
+  message?: string
+): Promise<DiscoverySession> {
+  return fetchJson<DiscoverySession>(`/career-discovery/${sessionId}/respond`, {
+    method: "POST",
+    body: JSON.stringify({ choice_codes: choiceCodes, message }),
+  });
+}
+
+export async function compareCareerPaths(
+  sessionId: string,
+  careerA: string,
+  careerB: string
+): Promise<CareerComparisonResponse> {
+  return fetchJson<CareerComparisonResponse>(
+    `/career-discovery/${sessionId}/compare?career_a=${encodeURIComponent(careerA)}&career_b=${encodeURIComponent(careerB)}`,
+    { method: "POST" }
+  );
+}
+
+export async function selectDiscoveryCareer(
+  sessionId: string,
+  careerCode: string
+): Promise<DiscoverySession> {
+  return fetchJson<DiscoverySession>(`/career-discovery/${sessionId}/select`, {
+    method: "POST",
+    body: JSON.stringify({ career_code: careerCode }),
+  });
+}

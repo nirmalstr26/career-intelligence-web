@@ -1436,3 +1436,89 @@ export interface SystemAuditLogItem {
   details?: string | null;
   created_at: string;
 }
+
+// --- Step 16: Career Discovery & Reference Types ---------------------------
+
+export interface ReferenceOption {
+  value: string;
+  label: string;
+  description?: string | null;
+  category?: string | null;
+}
+
+export interface OnboardingReferenceData {
+  countries: ReferenceOption[];
+  academic_statuses: ReferenceOption[];
+  degrees: ReferenceOption[];
+  departments: ReferenceOption[];
+  academic_years: ReferenceOption[];
+  career_goals: ReferenceOption[];
+  career_clarity_levels: ReferenceOption[];
+  interest_areas: ReferenceOption[];
+  career_clusters: ReferenceOption[];
+}
+
+export interface DiscoveryOption {
+  code: string;
+  label: string;
+  description?: string | null;
+  icon?: string | null;
+}
+
+export interface DiscoveryTurn {
+  id: string;
+  turn_number: number;
+  role: "assistant" | "user" | "system";
+  content: string;
+  turn_type: "CHOICE" | "MULTI_CHOICE" | "FREE_TEXT" | "RECOMMENDATION" | "ANSWER";
+  options?: DiscoveryOption[] | null;
+  selected_options?: string[] | null;
+  created_at: string;
+}
+
+export interface CareerRecommendation {
+  id: string;
+  career_code: string;
+  career_title: string;
+  rank: number;
+  fit_label: "Strong match" | "Worth exploring" | "Alternative path" | string;
+  match_score: number;
+  summary: string;
+  why: string[];
+  potential_challenges: string[];
+  explored: boolean;
+  selected: boolean;
+}
+
+export interface DiscoverySession {
+  id: string;
+  student_id: string;
+  status: "IN_PROGRESS" | "COMPLETED" | "ABANDONED";
+  current_step: number;
+  total_steps: number;
+  started_at: string;
+  completed_at?: string | null;
+  selected_career_code?: string | null;
+  turns: DiscoveryTurn[];
+  recommendations: CareerRecommendation[];
+}
+
+export interface CareerComparisonDetail {
+  career_code: string;
+  title: string;
+  category: string;
+  what_you_build: string;
+  typical_day: string;
+  coding_intensity: "High" | "Medium" | "Low" | string;
+  math_intensity: "High" | "Medium" | "Low" | string;
+  data_focus: "Core" | "Moderate" | "Minimal" | string;
+  entry_difficulty: "Moderate" | "Steep" | "Accessible" | string;
+  common_tools: string[];
+  where_it_leads: string[];
+}
+
+export interface CareerComparisonResponse {
+  career_a: CareerComparisonDetail;
+  career_b: CareerComparisonDetail;
+  spar_takeaway: string;
+}
