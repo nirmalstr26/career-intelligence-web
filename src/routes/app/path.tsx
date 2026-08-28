@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Compass,
+  Map,
   Sparkles,
   ArrowRight,
   TrendingUp,
@@ -46,7 +47,10 @@ const ALL_CAREER_OPTIONS = [
 
 export const Route = createFileRoute("/app/path")({
   head: () => ({
-    meta: [{ title: "My Path — Guided Career Roadmap · CareerAI" }],
+    meta: [{ title: "My Path — Guided Career Roadmap & Journey Map · CareerAI" }],
+  }),
+  validateSearch: (search: Record<string, unknown>) => ({
+    view: (typeof search.view === "string" ? search.view : undefined) as "guided" | "graph" | "full" | undefined,
   }),
   component: PathRoute,
 });
@@ -97,7 +101,10 @@ function PathContent({
   const journey = resolveStudentJourney(ci, curr);
   const student = ci.student;
 
-  const [viewMode, setViewMode] = useState<"guided" | "graph" | "full">("guided");
+  const search = Route.useSearch();
+  const [viewMode, setViewMode] = useState<"guided" | "graph" | "full">(
+    search?.view === "graph" || search?.view === "full" ? search.view : "guided"
+  );
   const navigate = useNavigate();
 
   // Career Switch Dialog State
@@ -163,6 +170,15 @@ function PathContent({
                 className="text-xs h-7 rounded-full font-semibold px-3"
               >
                 Guided View
+              </Button>
+              <Button
+                size="sm"
+                variant={viewMode === "graph" ? "default" : "ghost"}
+                onClick={() => setViewMode("graph")}
+                className="text-xs h-7 rounded-full font-semibold px-3 flex items-center gap-1.5"
+              >
+                <Map className="size-3.5 text-primary" />
+                Journey Map (Graph)
               </Button>
               <Button
                 size="sm"
