@@ -1016,16 +1016,16 @@ function ProfilePage() {
           </SectionCard>
 
           <SectionCard title="Academic Profile">
-            {academic_profile !== null ? (
+            {academic_profile ? (
               <>
-                <Row label="Institution" value={academic_profile.institution.name} />
-                <Row label="Program" value={academic_profile.program.program_name} />
-                <Row label="Degree" value={academic_profile.program.degree_type} />
-                <Row label="Department" value={academic_profile.program.department} />
-                <Row label="Year" value={academic_profile.current_year} />
-                <Row label="Semester" value={academic_profile.current_semester} />
-                <Row label="Graduation" value={academic_profile.expected_graduation_year} />
-                <Row label="Status" value={humanizeCode(academic_profile.academic_status)} />
+                <Row label="Institution" value={academic_profile.institution?.name ?? fallback} />
+                <Row label="Program" value={academic_profile.program?.program_name ?? fallback} />
+                <Row label="Degree" value={academic_profile.program?.degree_type ?? fallback} />
+                <Row label="Department" value={academic_profile.program?.department ?? fallback} />
+                <Row label="Year" value={academic_profile.current_year ?? fallback} />
+                <Row label="Semester" value={academic_profile.current_semester ?? fallback} />
+                <Row label="Graduation" value={academic_profile.expected_graduation_year ?? fallback} />
+                <Row label="Status" value={academic_profile.academic_status ? humanizeCode(academic_profile.academic_status) : fallback} />
               </>
             ) : (
               <p className="text-sm text-muted-foreground">No academic details yet.</p>
@@ -1033,10 +1033,10 @@ function ProfilePage() {
           </SectionCard>
 
           <SectionCard title="Career Intent">
-            {career_preferences !== null ? (
+            {career_preferences ? (
               <>
-                <Row label="Intent" value={humanizeCode(career_preferences.post_graduation_intent)} />
-                <Row label="Clarity" value={humanizeCode(career_preferences.career_clarity)} />
+                <Row label="Intent" value={career_preferences.post_graduation_intent ? humanizeCode(career_preferences.post_graduation_intent) : fallback} />
+                <Row label="Clarity" value={career_preferences.career_clarity ? humanizeCode(career_preferences.career_clarity) : fallback} />
                 <Row
                   label="Preferred location"
                   value={career_preferences.preferred_location ?? fallback}
@@ -1048,7 +1048,7 @@ function ProfilePage() {
           </SectionCard>
 
           <SectionCard title="Interests">
-            {interests.length > 0 ? (
+            {(interests || []).length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {interests.map((interest) => (
                   <Chip key={interest.interest_area_code}>

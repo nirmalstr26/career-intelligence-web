@@ -79,7 +79,7 @@ function ModuleLearningPage() {
   }
 
   const module = moduleQuery.data;
-  const activeCareer = ciQuery.data?.career_direction.primary_career ?? "DATA_ENGINEER";
+  const activeCareer = ciQuery.data?.career_direction?.primary_career ?? "DATA_ENGINEER";
   const stateBadge = getModuleStateBadge(module.state);
   const StateIcon = stateBadge.icon;
 
