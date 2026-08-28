@@ -11,15 +11,13 @@ function clean(value: string | undefined): string {
 }
 
 function resolveApiBaseUrl(): string {
+  // In the browser, always use same-origin relative /api/v1 (or window.location.origin/api/v1)
+  // so all session cookies are strictly same-origin and never dropped by browser cross-site policies.
+  if (typeof window !== "undefined") {
+    return `${window.location.origin}/api/v1`;
+  }
   const envUrl = clean(import.meta.env.VITE_API_BASE_URL);
   if (!envUrl) {
-    if (typeof window !== "undefined") {
-      // In browser, if hosted on custom domain or Amplify, use relative /api/v1 or HTTPS backend
-      if (window.location.hostname.includes("amplifyapp.com")) {
-        return "https://13-234-153-165.sslip.io/api/v1";
-      }
-      return `${window.location.origin}/api/v1`;
-    }
     return "https://13-234-153-165.sslip.io/api/v1";
   }
   const trimmed = envUrl.replace(/\/$/, "");
