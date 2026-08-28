@@ -169,7 +169,7 @@ export function OnboardingFlow() {
 
       // 3. Grant Consent
       await careerai.grantConsent(student.id, {
-        consent_type: "DATA_PROCESSING",
+        consent_type: "CAREER_PROFILE_PROCESSING",
         consent_version: CONSENT_VERSION,
       });
 
