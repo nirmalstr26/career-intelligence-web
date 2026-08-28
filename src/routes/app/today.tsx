@@ -245,10 +245,17 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
           {/* Action CTAs */}
           <div className="flex flex-col gap-3 shrink-0 lg:w-72">
             <Button asChild size="lg" data-primary-action="true" className="w-full gap-2 text-sm font-bold shadow-lg py-6">
-              <Link to={primary?.ctaLink || '/app/path'}>
-                {primary?.ctaText || 'Continue'}
-                <ArrowRight className="size-4" />
-              </Link>
+              {primary?.moduleCode ? (
+                <Link to="/app/learn/$moduleCode" params={{ moduleCode: primary.moduleCode }}>
+                  {primary?.ctaText || 'Continue'}
+                  <ArrowRight className="size-4" />
+                </Link>
+              ) : (
+                <Link to={primary?.ctaLink || '/app/path'}>
+                  {primary?.ctaText || 'Continue'}
+                  <ArrowRight className="size-4" />
+                </Link>
+              )}
             </Button>
 
             <Button asChild variant="outline" size="sm" className="w-full text-xs">

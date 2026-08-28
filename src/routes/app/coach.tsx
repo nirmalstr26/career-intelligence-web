@@ -139,7 +139,7 @@ function CoachPage() {
 
   function handleActionClick(action: RecommendedAction) {
     if (action.type === "MODULE" && action.target) {
-      void navigate({ to: `/app/learn/${action.target}` });
+      void navigate({ to: "/app/learn/$moduleCode", params: { moduleCode: action.target } });
     } else if (action.type === "DIAGNOSTIC") {
       void navigate({ to: "/app/diagnostic" });
     } else if (action.type === "PRACTICE") {

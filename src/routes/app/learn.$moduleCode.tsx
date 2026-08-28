@@ -64,15 +64,15 @@ function ModuleLearningPage() {
     }
   }, [moduleQuery.data?.state, moduleCode]);
 
-  if (moduleQuery.isLoading) {
-    return <PageLoading label={`Loading ${moduleCode}...`} />;
+  if (!moduleQuery.data && !moduleQuery.isError) {
+    return <PageLoading label={`Loading ${humanizeCode(moduleCode)}...`} />;
   }
 
   if (moduleQuery.isError || !moduleQuery.data) {
     return (
       <PageError
         title="Module not found"
-        message={`We couldn't load the content for '${moduleCode}'.`}
+        message={`We couldn't load the content for '${humanizeCode(moduleCode)}'.`}
         onRetry={() => void moduleQuery.refetch()}
       />
     );

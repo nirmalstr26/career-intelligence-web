@@ -230,7 +230,7 @@ function PathContent({
               </span>
 
               <Button asChild size="sm" data-primary-action="true" className="font-bold text-xs gap-1.5 px-5">
-                <Link to="/app/learn/MOD-DE-SQL-01">
+                <Link to="/app/learn/$moduleCode" params={{ moduleCode: curr?.tracks?.[0]?.phases?.[0]?.modules?.[0]?.code || "SW_IT_FUNDAMENTALS" }}>
                   Continue Module <ArrowRight className="size-3.5" />
                 </Link>
               </Button>

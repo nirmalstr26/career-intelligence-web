@@ -79,7 +79,7 @@ function ProfilePage() {
   const [linkedInHeadline, setLinkedInHeadline] = useState("");
   const [linkedInAbout, setLinkedInAbout] = useState("");
 
-  if (baseProfileQuery.isLoading) {
+  if (!baseProfileQuery.data && !baseProfileQuery.isError) {
     return <PageLoading label="Loading your profile…" />;
   }
 
