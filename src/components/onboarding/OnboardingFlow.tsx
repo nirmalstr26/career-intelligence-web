@@ -89,9 +89,7 @@ const DEFAULT_INTERESTS = [
 
 export function OnboardingFlow() {
   const navigate = useNavigate();
-  const { session, reloadUser } = useAuth();
-  const student = session?.student ?? null;
-  const user = session?.user ?? null;
+  const { student, user, refreshSession } = useAuth();
 
   const { data: refData } = useOnboardingReference();
 
@@ -100,10 +98,22 @@ export function OnboardingFlow() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // --- Step 1: About You State ---
-  const [firstName, setFirstName] = useState(student?.first_name || user?.email?.split("@")[0] || "");
-  const [lastName, setLastName] = useState(student?.last_name || "");
-  const [countryCode, setCountryCode] = useState(student?.country_code || "IN");
-  const [city, setCity] = useState(student?.city || "");
+  const [firstName, setFirstName] = useState(() => {
+    if (user?.name) {
+      const parts = user.name.trim().split(/\s+/);
+      return parts[0] || "";
+    }
+    return user?.email?.split("@")[0] || "";
+  });
+  const [lastName, setLastName] = useState(() => {
+    if (user?.name) {
+      const parts = user.name.trim().split(/\s+/);
+      return parts.slice(1).join(" ") || "";
+    }
+    return "";
+  });
+  const [countryCode, setCountryCode] = useState("IN");
+  const [city, setCity] = useState("Bengaluru");
 
   // --- Step 2: Education State ---
   const [academicStatus, setAcademicStatus] = useState<string>("COLLEGE");
@@ -120,15 +130,14 @@ export function OnboardingFlow() {
   const [selectedInterests, setSelectedInterests] = useState<string[]>(["DATA", "AI_ML"]);
   const [consentGranted, setConsentGranted] = useState(true);
 
-  // Sync profile when student loads
+  // Update initial names if user loads asynchronously
   useEffect(() => {
-    if (student) {
-      if (student.first_name) setFirstName(student.first_name);
-      if (student.last_name) setLastName(student.last_name);
-      if (student.country_code) setCountryCode(student.country_code);
-      if (student.city) setCity(student.city);
+    if (user?.name && !firstName) {
+      const parts = user.name.trim().split(/\s+/);
+      setFirstName(parts[0] || "");
+      setLastName(parts.slice(1).join(" ") || "");
     }
-  }, [student]);
+  }, [user, firstName]);
 
   const currentYearOptions = useMemo(() => {
     const current = new Date().getFullYear();
@@ -183,7 +192,11 @@ export function OnboardingFlow() {
   };
 
   const handleCompleteOnboarding = async () => {
-    if (!student?.id) return;
+    const studentId = student?.id;
+    if (!studentId) {
+      setErrorMsg("No active student identity found. Please reload or sign in again.");
+      return;
+    }
     if (!consentGranted) {
       setErrorMsg("Please agree to the SPAR personalized guidance consent to continue.");
       return;
@@ -194,17 +207,17 @@ export function OnboardingFlow() {
 
     try {
       // 1. Update Identity
-      await careerai.updateIdentity(student.id, {
-        first_name: firstName.trim(),
-        last_name: lastName.trim(),
+      await careerai.updateIdentity(studentId, {
+        first_name: firstName.trim() || "Student",
+        last_name: lastName.trim() || "",
         country_code: countryCode,
         city: city.trim() || undefined,
       });
 
       // 2. Update Academics
-      await careerai.updateAcademics(student.id, {
+      await careerai.updateAcademics(studentId, {
         institution: {
-          name: institutionName.trim() || "National University",
+          name: institutionName.trim() || "MIT College of Engineering",
           country_code: countryCode,
           institution_type: academicStatus === "SCHOOL" ? "SCHOOL" : "COLLEGE",
           city: city.trim() || undefined,
@@ -222,14 +235,38 @@ export function OnboardingFlow() {
         academic_status: "ACTIVE",
       });
 
-      // 3. Grant Consent
-      await careerai.recordConsent(student.id, {
+      // 3. Update Career Preferences (Non-blocking)
+      try {
+        await careerai.updateCareerPreferences(studentId, {
+          primary_career_goal: selectedGoals[0] || "JOB",
+          secondary_career_goals: selectedGoals.slice(1),
+          career_clarity_level: clarityLevel,
+        });
+      } catch {
+        // Continue
+      }
+
+      // 4. Update Interests (Non-blocking)
+      try {
+        if (selectedInterests.length > 0) {
+          await careerai.updateInterests(studentId, {
+            interest_area_codes: selectedInterests,
+          });
+        }
+      } catch {
+        // Continue
+      }
+
+      // 5. Grant Consent
+      await careerai.recordConsent(studentId, {
         consent_type: "CAREER_PROFILE_PROCESSING",
         consent_version: CONSENT_VERSION,
       });
 
-      // 4. Reload user & navigate to discovery
-      await reloadUser();
+      // 6. Refresh Auth Session & Transition to Career Discovery
+      if (refreshSession) {
+        await refreshSession();
+      }
       void navigate({ to: "/app/discover" });
     } catch (err: any) {
       console.error("Onboarding submission error:", err);
@@ -709,7 +746,7 @@ export function OnboardingFlow() {
               size="sm"
               onClick={handleCompleteOnboarding}
               disabled={isSubmitting || !consentGranted}
-              className="gap-1.5"
+              className="gap-1.5 font-bold"
             >
               {isSubmitting ? (
                 <>
