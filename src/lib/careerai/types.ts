@@ -1944,3 +1944,126 @@ export interface LinkedInCapabilityMatrixResponse {
   scraping_policy: string;
   compliant_import_available: boolean;
 }
+
+
+// ============================================================================
+// Job-Specific Career Gap Optimizer & Application Readiness (Step 22)
+// ============================================================================
+
+export interface JobRequirementRow {
+  skill_code: string;
+  requirement_name: string;
+  priority: "MANDATORY" | "HIGH_PRIORITY" | "PREFERRED" | "OPTIONAL" | string;
+  evidence_status: "VERIFIED_STRONG" | "VERIFIED_SUFFICIENT" | "SUPPORTED" | "LEARNING" | "SELF_DECLARED" | "MISSING" | string;
+  student_score: number | null;
+  target_score: number;
+  action_label: string;
+  proof_details: string;
+  benchmark_status?: string | null;
+  is_mandatory: boolean;
+}
+
+export interface JobPriorityGap {
+  gap_id: string;
+  skill_code: string;
+  skill_name: string;
+  severity: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | string;
+  is_application_blocker: boolean;
+  current_score: number | null;
+  target_score: number;
+  downstream_unlocks: number;
+  recommended_action: string;
+  estimated_minutes: number;
+  learning_module_code?: string | null;
+  rationale: string;
+}
+
+export interface PrepActionItem {
+  action_code: string;
+  title: string;
+  description: string;
+  impact_level: "HIGH_IMPACT" | "MEDIUM_IMPACT" | "LOW_IMPACT" | string;
+  category: "LEARNING" | "POSITIONING" | "INTERVIEW" | "PROJECT" | string;
+  estimated_minutes: number;
+  leverage_score: number;
+  is_completed?: boolean;
+  cta_label: string;
+  cta_link?: string | null;
+}
+
+export interface TimeAwarePlan {
+  mode: "TODAY" | "THREE_DAYS" | "ONE_WEEK" | "DEEPER_PREP" | string;
+  mode_label: string;
+  total_allocated_minutes: number;
+  headline: string;
+  actions: PrepActionItem[];
+}
+
+export interface JobInterviewQuestion {
+  question_id: string;
+  category: "TECHNICAL" | "PROJECT_DEFENSE" | "GAP_RISK" | "BEHAVIORAL" | string;
+  question_text: string;
+  expected_proof_points: string[];
+  student_defensibility: "HIGH" | "MEDIUM" | "LOW" | string;
+  coaching_tip: string;
+}
+
+export interface JobGraphOverlayNode {
+  id: string;
+  label: string;
+  node_type: string;
+  overlay_status: "MET" | "TRANSFERABLE" | "GAP_PRIORITY" | "MISSING_MANDATORY" | "JOB_SPECIFIC_EXTERNAL" | string;
+  score: number | null;
+  is_mandatory: boolean;
+}
+
+export interface JobGraphOverlayEdge {
+  source: string;
+  target: string;
+  relationship: string;
+  is_critical_path: boolean;
+}
+
+export interface JobPrepSimulationResponse {
+  simulated_actions: string[];
+  original_match_pct: number;
+  projected_match_pct: number;
+  original_recommendation: string;
+  projected_recommendation: string;
+  gaps_resolved: string[];
+  simulation_note: string;
+}
+
+export interface JobPreparationPlanResponse {
+  plan_id: string;
+  student_id: string;
+  opportunity_id: string;
+  job_title: string;
+  company_name: string;
+  location: string;
+  work_mode: string;
+
+  opportunity_match_pct: number;
+  career_readiness_pct: number;
+  profile_alignment_pct: number;
+  application_status: string;
+
+  recommendation: "READY_TO_APPLY" | "APPLY_WHILE_IMPROVING" | "PREPARE_FIRST" | string;
+  recommendation_rationale: string;
+  primary_cta_label: string;
+  primary_cta_action: string;
+
+  requirement_matrix: JobRequirementRow[];
+  priority_gaps: JobPriorityGap[];
+  two_hour_sprint: PrepActionItem[];
+  time_aware_plans: TimeAwarePlan[];
+  interview_intelligence: JobInterviewQuestion[];
+  interview_risk_summary: string;
+  graph_overlay_nodes: JobGraphOverlayNode[];
+  graph_overlay_edges: JobGraphOverlayEdge[];
+
+  tailored_resume_bullets: string[];
+  linkedin_positioning_advice: string;
+  created_at: string;
+  updated_at: string;
+}

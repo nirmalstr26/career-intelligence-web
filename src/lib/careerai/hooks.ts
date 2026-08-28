@@ -1228,3 +1228,36 @@ export function useLinkedInCapabilities() {
     staleTime: 1000 * 60 * 10,
   });
 }
+
+
+// ============================================================================
+// Job-Specific Career Gap Optimizer Hooks (Step 22)
+// ============================================================================
+
+export function useJobPrepPlan(opportunityId: string = "opp-de-intern-acme") {
+  return useQuery({
+    queryKey: ["job-prep-plan", opportunityId],
+    queryFn: () => careerai.getJobPrepPlan(opportunityId),
+    enabled: Boolean(opportunityId),
+    staleTime: 1000 * 60 * 2,
+  });
+}
+
+export function useSimulateJobPrep(opportunityId: string = "opp-de-intern-acme") {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (completedActions: string[]) => careerai.simulateJobPrep(opportunityId, completedActions),
+  });
+}
+
+export function useUpdateJobPrepStatus(opportunityId: string = "opp-de-intern-acme") {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { status: string; notes?: string }) =>
+      careerai.updateJobPrepStatus(opportunityId, data.status, data.notes),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["job-prep-plan", opportunityId] });
+      void queryClient.invalidateQueries({ queryKey: ["applications"] });
+    },
+  });
+}

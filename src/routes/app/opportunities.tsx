@@ -1,3 +1,4 @@
+import { JobPreparationWorkspace } from '@/components/opportunities/JobPreparationWorkspace';
 import React, { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
@@ -65,7 +66,7 @@ function OpportunitiesPage() {
   const createApplicationMutation = useCreateJobApplication();
   const updateStatusMutation = useUpdateJobApplicationStatus();
 
-  const [activeTab, setActiveTab] = useState<"matched" | "parser" | "tracker">("matched");
+  const [activeTab, setActiveTab] = useState<"matched" | "prepare" | "parser" | "tracker">("matched");
   const [selectedOpportunityId, setSelectedOpportunityId] = useState<string | null>(null);
 
   // JD Parser state
@@ -199,6 +200,22 @@ function OpportunitiesPage() {
 
         <button
           type="button"
+          onClick={() => setActiveTab("prepare")}
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-all shrink-0 ${
+            activeTab === "prepare"
+              ? "border-primary text-primary"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Zap className="size-3.5" />
+          <span>Gap Optimizer & Prep</span>
+          <Badge className="bg-primary/20 text-primary border-none text-[9px] px-1.5 py-0 font-bold">
+            NEW
+          </Badge>
+        </button>
+
+        <button
+          type="button"
           onClick={() => setActiveTab("parser")}
           className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-all shrink-0 ${
             activeTab === "parser"
@@ -306,15 +323,26 @@ function OpportunitiesPage() {
                   </div>
                 </div>
 
-                <div className="pt-2 border-t flex items-center justify-between gap-2">
+                <div className="pt-2 border-t flex flex-col sm:flex-row items-center justify-between gap-2">
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => setSelectedOpportunityId(opp.id)}
-                    className="w-full text-xs font-semibold"
+                    className="w-full sm:w-1/2 text-xs font-semibold"
                   >
                     <Eye className="size-3.5 mr-1" />
-                    View My Fit & Gaps
+                    Fit & Gaps
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setSelectedOpportunityId(opp.id);
+                      setActiveTab("prepare");
+                    }}
+                    className="w-full sm:w-1/2 text-xs font-bold gap-1 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground"
+                  >
+                    <Zap className="size-3.5" />
+                    Prepare
                   </Button>
                 </div>
               </div>

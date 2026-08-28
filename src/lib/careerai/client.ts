@@ -550,6 +550,19 @@ export const careerai = {
 
   getLinkedInCapabilities: (studentId: string) =>
     api.get<LinkedInCapabilityMatrixResponse>(`/students/${studentId}/professional-profile/capabilities`),
+
+  // Job-Specific Career Gap Optimizer (Step 22)
+  getJobPrepPlan: (opportunityId: string) =>
+    api.get<JobPreparationPlanResponse>(`/job-prep/${opportunityId}`),
+
+  createJobPrepPlan: (data: { opportunity_id?: string; role_title?: string; company_name?: string; raw_jd_text?: string }) =>
+    api.post<JobPreparationPlanResponse>(`/job-prep`, data),
+
+  simulateJobPrep: (opportunityId: string, completedActions: string[]) =>
+    api.post<JobPrepSimulationResponse>(`/job-prep/${opportunityId}/simulate`, { completed_actions: completedActions }),
+
+  updateJobPrepStatus: (opportunityId: string, status: string, notes?: string) =>
+    api.post<{ opportunity_id: string; status: string }>(`/job-prep/${opportunityId}/status`, { status, notes }),
 };
 
 // --- Step 16: Career Discovery & Onboarding Reference API Methods ----------
