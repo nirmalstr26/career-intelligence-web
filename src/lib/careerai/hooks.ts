@@ -1060,3 +1060,28 @@ export function useSelectDiscoveryCareer() {
     },
   });
 }
+
+
+// ============================================================================
+// Benchmark Intelligence & Transferability (Domain 25 - Step 17)
+// ============================================================================
+
+export function useStudentBenchmark() {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["benchmark", studentId],
+    queryFn: () => careerai.getBenchmark(studentId!),
+    enabled: Boolean(studentId),
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useTransferabilityAnalysis(targetCareer: string) {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["transferability", studentId, targetCareer],
+    queryFn: () => careerai.getTransferability(studentId!, targetCareer),
+    enabled: Boolean(studentId && targetCareer),
+    staleTime: 1000 * 60 * 5,
+  });
+}

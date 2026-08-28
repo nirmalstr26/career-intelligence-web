@@ -1522,3 +1522,68 @@ export interface CareerComparisonResponse {
   career_b: CareerComparisonDetail;
   spar_takeaway: string;
 }
+
+
+// ============================================================================
+// Domain 25: Benchmark Intelligence & Knowledge Graph Extensions (Step 17)
+// ============================================================================
+
+export interface BenchmarkThresholds {
+  p50_threshold: number;
+  p75_threshold: number;
+  p80_threshold: number;
+  p90_threshold: number;
+  p95_threshold: number;
+  distance_to_top_20: number;
+}
+
+export interface CompetencyBenchmarkRow {
+  skill_name: string;
+  student_score: number | null;
+  cohort_median: number;
+  top_20_benchmark: number;
+  career_target: number;
+  status: "STRONG" | "ON_TRACK" | "GAP" | "UNKNOWN";
+}
+
+export interface BenchmarkHistoryPoint {
+  milestone_event: string;
+  percentile: number;
+  readiness_score: number;
+  captured_at: string;
+}
+
+export interface StudentBenchmarkResponse {
+  student_id: string;
+  career_code: string;
+  career_title: string;
+  readiness_score: number;
+  percentile: number;
+  cohort_code: string;
+  cohort_title: string;
+  cohort_size: number;
+  academic_stage: string;
+  graduation_window: string;
+  insufficient_sample: boolean;
+  status_message: string | null;
+  thresholds: BenchmarkThresholds;
+  competencies: CompetencyBenchmarkRow[];
+  trajectory: BenchmarkHistoryPoint[];
+  spar_explanation: string;
+  benchmark_date: string;
+}
+
+export interface TransferabilityAnalysis {
+  current_career_code: string;
+  current_career_title: string;
+  target_career_code: string;
+  target_career_title: string;
+  transferability_percent: number;
+  reusable_foundation_skills: string[];
+  new_required_skills: string[];
+  reusable_modules_count: number;
+  new_modules_count: number;
+  spar_takeaway: string;
+}
+
+export type CareerGraphViewMode = "journey" | "skills" | "evidence" | "opportunity";

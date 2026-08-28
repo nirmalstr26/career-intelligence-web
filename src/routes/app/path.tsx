@@ -1,3 +1,5 @@
+import { CareerKnowledgeGraph } from "@/components/graph/CareerKnowledgeGraph";
+import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
@@ -95,7 +97,8 @@ function PathContent({
   const journey = resolveStudentJourney(ci, curr);
   const student = ci.student;
 
-  const [viewMode, setViewMode] = useState<"guided" | "full">("guided");
+  const [viewMode, setViewMode] = useState<"guided" | "graph" | "full">("guided");
+  const navigate = useNavigate();
 
   // Career Switch Dialog State
   const [switchModalOpen, setSwitchModalOpen] = useState(false);
@@ -265,6 +268,16 @@ function PathContent({
       )}
 
       {/* FULL ROADMAP VIEW */}
+            {viewMode === "graph" && (
+        <CareerKnowledgeGraph
+          careerTitle={humanizeCode(journey.selectedCareerCode || "DATA_ENGINEER")}
+          careerCode={journey.selectedCareerCode || "DATA_ENGINEER"}
+          onAskSpar={(prompt) => {
+            navigate({ to: "/app/coach", search: { query: prompt } as any });
+          }}
+        />
+      )}
+
       {viewMode === "full" && curr?.tracks && (
         <RoadmapTimeline tracks={curr.tracks} />
       )}
