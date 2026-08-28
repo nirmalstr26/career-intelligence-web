@@ -109,6 +109,18 @@ export const careerai = {
     api.post<unknown>(`/students/${studentId}/actions/${actionId}/complete`, { body: {} }),
 
   // Agent
+  chat: ({
+    student_id,
+    message,
+    conversation_id,
+  }: {
+    student_id: string;
+    message: string;
+    conversation_id?: string;
+  }) =>
+    api.post<AgentReply>(`/students/${student_id}/career-agent/messages`, {
+      body: { message, conversation_id: conversation_id ?? null },
+    }),
   sendAgentMessage: (studentId: string, message: string, conversationId?: string) =>
     api.post<AgentReply>(`/students/${studentId}/career-agent/messages`, {
       body: { message, conversation_id: conversationId ?? null },

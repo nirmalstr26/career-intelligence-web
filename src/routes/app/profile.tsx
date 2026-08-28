@@ -79,11 +79,11 @@ function ProfilePage() {
   const [linkedInHeadline, setLinkedInHeadline] = useState("");
   const [linkedInAbout, setLinkedInAbout] = useState("");
 
-  if (baseProfileQuery.isLoading || proProfileQuery.isLoading) {
-    return <PageLoading label="Loading your professional profile…" />;
+  if (baseProfileQuery.isLoading) {
+    return <PageLoading label="Loading your profile…" />;
   }
 
-  if (baseProfileQuery.isError || !baseProfileQuery.data || proProfileQuery.isError || !proProfileQuery.data) {
+  if (baseProfileQuery.isError || !baseProfileQuery.data) {
     return (
       <PageError
         onRetry={() => {
