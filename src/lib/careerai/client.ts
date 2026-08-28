@@ -526,6 +526,13 @@ export const careerai = {
     role_title?: string | null;
     company_name?: string | null;
   }) => api.post<JobOptimizationResult>(`/students/${studentId}/professional-profile/optimize-for-job`, { body }),
+
+  // Career Graph V2 & Node Impact (Step 19)
+  getCareerGraph: (studentId: string, view = "JOURNEY", careerCode = "DATA_ENGINEER") =>
+    api.get<CareerGraphResponse>(`/students/${studentId}/career-graph?view=${view}&career_code=${careerCode}`),
+
+  getNodeImpact: (studentId: string, nodeId: string) =>
+    api.get<NodeImpactResponse>(`/students/${studentId}/career-graph/nodes/${encodeURIComponent(nodeId)}/impact`),
 };
 
 // --- Step 16: Career Discovery & Onboarding Reference API Methods ----------

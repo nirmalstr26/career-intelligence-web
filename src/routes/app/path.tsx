@@ -1,4 +1,4 @@
-import { CareerKnowledgeGraph } from "@/components/graph/CareerKnowledgeGraph";
+import { CareerKnowledgeGraphV2 } from "@/components/graph/CareerKnowledgeGraphV2";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -285,11 +285,10 @@ function PathContent({
 
       {/* FULL ROADMAP VIEW */}
             {viewMode === "graph" && (
-        <CareerKnowledgeGraph
-          careerTitle={humanizeCode(journey.selectedCareerCode || "DATA_ENGINEER")}
+        <CareerKnowledgeGraphV2
           careerCode={journey.selectedCareerCode || "DATA_ENGINEER"}
           onAskSpar={(prompt) => {
-            navigate({ to: "/app/coach", search: { query: prompt } as any });
+            void navigate({ to: "/app/coach", search: { query: prompt } as any });
           }}
         />
       )}

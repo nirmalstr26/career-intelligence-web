@@ -1719,3 +1719,76 @@ export interface JobOptimizationResult {
   job_skills_to_feature: string[];
   action_plan: string[];
 }
+
+
+// ============================================================================
+// Career Graph V2 & Node Impact (Step 19)
+// ============================================================================
+
+export interface CareerGraphNode {
+  id: string;
+  type: "CAREER" | "PHASE" | "MODULE" | "SKILL" | "PROJECT" | "INTERVIEW" | "EVIDENCE";
+  code?: string | null;
+  label: string;
+  display_name: string;
+  status?: "COMPLETED" | "CURRENT_FOCUS" | "ACTIVE" | "AVAILABLE" | "LOCKED" | "GAP" | "FUTURE" | "TARGET_DESTINATION" | string | null;
+  score?: number | null;
+  target_score?: number | null;
+  confidence?: number | null;
+  is_primary_focus?: boolean;
+  phase_id?: string | null;
+  estimated_time?: string | null;
+  why_matters?: string | null;
+  why_locked?: string | null;
+  prerequisites?: Array<{ name: string; status: string; score?: number }>;
+  evidence_source?: string | null;
+  metadata?: Record<string, any>;
+}
+
+export interface CareerGraphEdge {
+  id: string;
+  source: string;
+  target: string;
+  type: "REQUIRES" | "UNLOCKS" | "DEVELOPS" | "VERIFIED_BY" | "PART_OF" | "BLOCKED_BY" | string;
+  label: string;
+  explanation?: string | null;
+  is_active_path?: boolean;
+  properties?: Record<string, any>;
+}
+
+export interface CareerGraphSummary {
+  scope: string;
+  view: string;
+  node_count: number;
+  edge_count: number;
+  current_focus_node_id?: string | null;
+  career_code: string;
+  career_name: string;
+  readiness_score: number;
+  truncated?: boolean;
+  truncation?: Record<string, any>;
+}
+
+export interface CareerGraphResponse {
+  student_id: string;
+  projection_status: string;
+  projection_version?: string | null;
+  projected_at?: string | null;
+  graph_used: boolean;
+  nodes: CareerGraphNode[];
+  edges: CareerGraphEdge[];
+  summary: CareerGraphSummary;
+}
+
+export interface NodeImpactResponse {
+  node_id: string;
+  title: string;
+  node_type: string;
+  current_status: string;
+  downstream_nodes: Array<{ node_id: string; title: string }>;
+  direct_unlocks: Array<{ node_id: string; title: string; type: string }>;
+  skills_developed: Array<{ skill_code: string; name: string; expected_gain: string }>;
+  career_importance: string;
+  why_matters: string;
+  reasoning: string;
+}

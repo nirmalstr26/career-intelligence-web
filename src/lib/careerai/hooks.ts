@@ -1158,3 +1158,28 @@ export function useOptimizeForJob() {
     }) => careerai.optimizeForJob(studentId!, body),
   });
 }
+
+
+// ============================================================================
+// Career Graph V2 Hooks (Step 19)
+// ============================================================================
+
+export function useCareerGraph(view = "JOURNEY", careerCode = "DATA_ENGINEER") {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["career-graph-v2", studentId, view, careerCode],
+    queryFn: () => careerai.getCareerGraph(studentId!, view, careerCode),
+    enabled: Boolean(studentId),
+    staleTime: 1000 * 60 * 2,
+  });
+}
+
+export function useNodeImpact(nodeId: string | null) {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["career-graph-node-impact", studentId, nodeId],
+    queryFn: () => careerai.getNodeImpact(studentId!, nodeId!),
+    enabled: Boolean(studentId && nodeId),
+    staleTime: 1000 * 60 * 5,
+  });
+}
