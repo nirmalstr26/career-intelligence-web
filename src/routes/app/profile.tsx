@@ -79,11 +79,11 @@ function ProfilePage() {
   const [linkedInHeadline, setLinkedInHeadline] = useState("");
   const [linkedInAbout, setLinkedInAbout] = useState("");
 
-  if (!baseProfileQuery.data && !baseProfileQuery.isError) {
+  if ((!baseProfileQuery.data && !baseProfileQuery.isError) || (!proProfileQuery.data && !proProfileQuery.isError)) {
     return <PageLoading label="Loading your profile…" />;
   }
 
-  if (baseProfileQuery.isError || !baseProfileQuery.data) {
+  if (baseProfileQuery.isError || proProfileQuery.isError || !baseProfileQuery.data || !proProfileQuery.data) {
     return (
       <PageError
         onRetry={() => {
@@ -139,8 +139,8 @@ function ProfilePage() {
   const handleSaveLinkedIn = async () => {
     try {
       await updateLinkedInMutation.mutateAsync({
-        headline: linkedInHeadline || pro.linkedin_headline || "",
-        about: linkedInAbout || pro.linkedin_about || "",
+        headline: linkedInHeadline || pro?.linkedin_headline || "",
+        about: linkedInAbout || pro?.linkedin_about || "",
       });
       setEditingLinkedIn(false);
     } catch (err) {
@@ -166,7 +166,7 @@ function ProfilePage() {
               Professional Assets & Resume
             </Badge>
             <Badge variant="outline" className="text-[10px]">
-              Version {pro.current_version_number}.0
+              Version {pro?.current_version_number ?? 1}.0
             </Badge>
           </div>
           <h1 className="font-display text-2xl font-bold sm:text-3xl text-foreground">
@@ -228,8 +228,8 @@ function ProfilePage() {
           type="button"
           onClick={() => {
             setActiveTab("linkedin");
-            setLinkedInHeadline(pro.linkedin_headline || "");
-            setLinkedInAbout(pro.linkedin_about || "");
+            setLinkedInHeadline(pro?.linkedin_headline || "");
+            setLinkedInAbout(pro?.linkedin_about || "");
           }}
           className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-all shrink-0 ${
             activeTab === "linkedin"
@@ -437,7 +437,7 @@ function ProfilePage() {
                   {student.first_name} {student.last_name}
                 </h2>
                 <p className="text-xs text-primary font-medium mt-0.5">
-                  {pro.headline || "Computer Science Student | Aspiring Data Engineer"}
+                  {pro?.headline || "Computer Science Student | Aspiring Data Engineer"}
                 </p>
                 <div className="flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground mt-1.5">
                   <span>{student.email}</span>
@@ -449,7 +449,7 @@ function ProfilePage() {
               </div>
 
               <Badge variant="outline" className="text-xs font-mono font-bold bg-secondary/50">
-                Resume Version #{pro.current_version_number}
+                Resume Version #{pro?.current_version_number ?? 1}
               </Badge>
             </div>
 
@@ -459,9 +459,9 @@ function ProfilePage() {
                 <FileText className="size-3.5 text-primary" />
                 Professional Summary
               </h3>
-              {pro.summary ? (
+              {pro?.summary ? (
                 <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed bg-secondary/20 p-3.5 rounded-xl border border-border/50">
-                  {pro.summary}
+                  {pro?.summary}
                 </p>
               ) : (
                 <div className="p-4 rounded-xl border border-dashed text-xs text-muted-foreground flex items-center justify-between">
@@ -654,7 +654,7 @@ function ProfilePage() {
                   </div>
 
                   <div>
-                    {ver.version_number === pro.current_version_number ? (
+                    {ver.version_number === pro?.current_version_number ? (
                       <Badge className="bg-primary/20 text-primary border-none text-[10px]">
                         Active Version
                       </Badge>
@@ -702,13 +702,13 @@ function ProfilePage() {
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-sm text-foreground">Suggested Headline</span>
                   <Badge variant="outline" className="text-[10px]">
-                    Character Count: {(pro.linkedin_headline || "").length} / 220
+                    Character Count: {(pro?.linkedin_headline || "").length} / 220
                   </Badge>
                 </div>
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => handleCopy(pro.linkedin_headline || "", "headline")}
+                  onClick={() => handleCopy(pro?.linkedin_headline || "", "headline")}
                   className="text-xs gap-1 h-8"
                 >
                   {copiedKey === "headline" ? (
@@ -732,7 +732,7 @@ function ProfilePage() {
                 />
               ) : (
                 <div className="p-3 rounded-xl bg-muted/40 text-xs font-mono text-foreground/90 border border-border/60">
-                  {pro.linkedin_headline || "Computer Science Student | Aspiring Data Engineer | Python | SQL | Data Pipelines"}
+                  {pro?.linkedin_headline || "Computer Science Student | Aspiring Data Engineer | Python | SQL | Data Pipelines"}
                 </div>
               )}
             </div>
@@ -749,7 +749,7 @@ function ProfilePage() {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => handleCopy(pro.linkedin_about || "", "about")}
+                  onClick={() => handleCopy(pro?.linkedin_about || "", "about")}
                   className="text-xs gap-1 h-8"
                 >
                   {copiedKey === "about" ? (
@@ -773,7 +773,7 @@ function ProfilePage() {
                 />
               ) : (
                 <div className="p-4 rounded-xl bg-muted/40 text-xs text-foreground/90 leading-relaxed border border-border/60 whitespace-pre-wrap">
-                  {pro.linkedin_about ||
+                  {pro?.linkedin_about ||
                     "Passionate Computer Science student preparing for Data Engineering internships. Experienced in building end-to-end data ingestion pipelines, writing optimized SQL aggregations, and ensuring data quality across raw and analytical layers."}
                 </div>
               )}
@@ -803,8 +803,8 @@ function ProfilePage() {
                     size="sm"
                     variant="outline"
                     onClick={() => {
-                      setLinkedInHeadline(pro.linkedin_headline || "");
-                      setLinkedInAbout(pro.linkedin_about || "");
+                      setLinkedInHeadline(pro?.linkedin_headline || "");
+                      setLinkedInAbout(pro?.linkedin_about || "");
                       setEditingLinkedIn(true);
                     }}
                     className="text-xs gap-1"
