@@ -1587,3 +1587,135 @@ export interface TransferabilityAnalysis {
 }
 
 export type CareerGraphViewMode = "journey" | "skills" | "evidence" | "opportunity";
+
+
+// ============================================================================
+// LinkedIn Intelligence V2 & Professional Profile Intelligence (Step 18)
+// ============================================================================
+
+export type EvidenceStatus = "VERIFIED" | "SUPPORTED" | "LEARNING" | "SELF_DECLARED" | "UNSUPPORTED";
+export type ProfileGapCategory = "HIGH_VALUE_GAP" | "LEARNING_GAP" | "CREDIBILITY_GAP" | "ALIGNED";
+export type ActionType = "ADD_NOW" | "REWRITE_IMPROVE" | "PROVE_BEFORE_ADDING" | "CONSIDER_LEARNING" | "REMOVE_DEEMPHASIZE";
+export type ActionPriority = "HIGH_IMPACT" | "HIGH" | "MEDIUM" | "LOW";
+
+export interface HeadlineVariant {
+  variant_type: "RECRUITER_SEARCH" | "PROJECT_LED" | "CONCISE";
+  title: string;
+  headline_text: string;
+  character_count: int;
+  rationale: string;
+  key_keywords: string[];
+}
+
+export interface ModularAboutPart {
+  part_id: string;
+  heading: string;
+  suggested_text: string;
+  evidence_backing: string;
+  evidence_status: EvidenceStatus;
+}
+
+export interface ModularAboutSection {
+  full_text: string;
+  parts: ModularAboutPart[];
+}
+
+export interface ProfileGapItem {
+  item_id: string;
+  name: string;
+  category: ProfileGapCategory;
+  action_type: ActionType;
+  priority: ActionPriority;
+  role_expectation: string;
+  spar_evidence: string;
+  linkedin_status: string;
+  recommendation: string;
+  provenance_source?: string | null;
+}
+
+export interface RoleSkillOrderingItem {
+  skill_code: string;
+  skill_name: string;
+  evidence_status: EvidenceStatus;
+  score?: number | null;
+  rank: number;
+  relevance_explanation: string;
+  is_top_pin_recommended: boolean;
+}
+
+export interface LinkedInProjectCard {
+  project_code: string;
+  title: string;
+  one_line_summary: string;
+  bullet_points: string[];
+  technologies: string[];
+  skills_demonstrated: string[];
+  score: number;
+  repo_url?: string | null;
+  featured_recommended: boolean;
+  no_fabrication_confirmed: boolean;
+}
+
+export interface CertificationHoldItem {
+  cert_id: string;
+  name: string;
+  authority: string;
+  issue_date?: string | null;
+  credential_url?: string | null;
+  verified_by_user: boolean;
+}
+
+export interface CertificationRecommendationItem {
+  cert_code: string;
+  name: string;
+  authority: string;
+  target_roles: string[];
+  why_it_matters: string;
+  skills_addressed: string[];
+  prerequisite_readiness_pct: number;
+  prerequisite_summary: string;
+  priority: "HIGH" | "MEDIUM" | "OPTIONAL";
+  estimated_cost?: string | null;
+  estimated_study_weeks: number;
+}
+
+export interface LinkedInConnectionState {
+  is_connected: boolean;
+  member_id?: string | null;
+  name?: string | null;
+  profile_picture?: string | null;
+  last_sync_at?: string | null;
+  scopes_granted: string[];
+  available_capabilities: string[];
+}
+
+export interface LinkedInIntelligenceV2 {
+  target_career_code: string;
+  target_career_name: string;
+  connection_state: LinkedInConnectionState;
+  readiness_score: number;
+  credibility_ratio_text: string;
+  high_impact_actions: ProfileGapItem[];
+  headline_variants: HeadlineVariant[];
+  modular_about: ModularAboutSection;
+  skill_ordering: RoleSkillOrderingItem[];
+  featured_projects: LinkedInProjectCard[];
+  held_certifications: CertificationHoldItem[];
+  recommended_certifications: CertificationRecommendationItem[];
+  all_gaps: ProfileGapItem[];
+  last_analyzed_at: string;
+}
+
+export interface JobOptimizationResult {
+  target_role: string;
+  company_name: string;
+  current_linkedin_fit_pct: number;
+  potential_evidence_fit_pct: number;
+  strong_signals: string[];
+  missing_or_learning_signals: string[];
+  three_way_gaps: ProfileGapItem[];
+  job_headline_variant: string;
+  job_about_diff: string;
+  job_skills_to_feature: string[];
+  action_plan: string[];
+}

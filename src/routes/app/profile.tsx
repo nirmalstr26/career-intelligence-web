@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { LinkedInIntelligenceV2View } from "@/components/profile/LinkedInIntelligenceV2View";
 import {
   LogOut,
   Sparkles,
@@ -64,6 +65,7 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
 
 function ProfilePage() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const baseProfileQuery = useProfile();
   const proProfileQuery = useProfessionalProfile();
   const resolveSuggestionMutation = useResolveProfileSuggestion();
@@ -679,143 +681,15 @@ function ProfilePage() {
       )}
 
       {/* ------------------------------------------------------------------- */}
-      {/* TAB 2: LINKEDIN INTELLIGENCE */}
+      {/* TAB 2: LINKEDIN & PROFESSIONAL PROFILE INTELLIGENCE V2             */}
       {/* ------------------------------------------------------------------- */}
       {activeTab === "linkedin" && (
-        <div className="space-y-6">
-          <div className="rounded-2xl border border-primary/20 bg-gradient-to-r from-blue-500/[0.04] via-card to-card p-6 space-y-2">
-            <div className="flex items-center gap-2">
-              <Linkedin className="size-5 text-[#0A66C2]" />
-              <h2 className="text-lg font-bold text-foreground">
-                Copy-Ready LinkedIn Optimization
-              </h2>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Formulated directly from your verified Data Engineer skills, curriculum milestones, and practical pipeline project.
-            </p>
-          </div>
-
-          <div className="grid gap-6">
-            {/* LinkedIn Headline */}
-            <div className="rounded-2xl border bg-card p-5 space-y-3 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm text-foreground">Suggested Headline</span>
-                  <Badge variant="outline" className="text-[10px]">
-                    Character Count: {(pro?.linkedin_headline || "").length} / 220
-                  </Badge>
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleCopy(pro?.linkedin_headline || "", "headline")}
-                  className="text-xs gap-1 h-8"
-                >
-                  {copiedKey === "headline" ? (
-                    <>
-                      <Check className="size-3 text-emerald-500" /> Copied
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="size-3" /> Copy Headline
-                    </>
-                  )}
-                </Button>
-              </div>
-
-              {editingLinkedIn ? (
-                <input
-                  type="text"
-                  value={linkedInHeadline}
-                  onChange={(e) => setLinkedInHeadline(e.target.value)}
-                  className="w-full text-xs rounded-lg border p-2.5 bg-background text-foreground"
-                />
-              ) : (
-                <div className="p-3 rounded-xl bg-muted/40 text-xs font-mono text-foreground/90 border border-border/60">
-                  {pro?.linkedin_headline || "Computer Science Student | Aspiring Data Engineer | Python | SQL | Data Pipelines"}
-                </div>
-              )}
-            </div>
-
-            {/* LinkedIn About Section */}
-            <div className="rounded-2xl border bg-card p-5 space-y-3 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm text-foreground">Suggested About Section</span>
-                  <Badge variant="outline" className="text-[10px]">
-                    Narrative Story
-                  </Badge>
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleCopy(pro?.linkedin_about || "", "about")}
-                  className="text-xs gap-1 h-8"
-                >
-                  {copiedKey === "about" ? (
-                    <>
-                      <Check className="size-3 text-emerald-500" /> Copied
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="size-3" /> Copy About
-                    </>
-                  )}
-                </Button>
-              </div>
-
-              {editingLinkedIn ? (
-                <textarea
-                  value={linkedInAbout}
-                  onChange={(e) => setLinkedInAbout(e.target.value)}
-                  rows={6}
-                  className="w-full text-xs rounded-lg border p-2.5 bg-background text-foreground leading-relaxed"
-                />
-              ) : (
-                <div className="p-4 rounded-xl bg-muted/40 text-xs text-foreground/90 leading-relaxed border border-border/60 whitespace-pre-wrap">
-                  {pro?.linkedin_about ||
-                    "Passionate Computer Science student preparing for Data Engineering internships. Experienced in building end-to-end data ingestion pipelines, writing optimized SQL aggregations, and ensuring data quality across raw and analytical layers."}
-                </div>
-              )}
-
-              <div className="flex justify-end gap-2 pt-2 border-t">
-                {editingLinkedIn ? (
-                  <>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setEditingLinkedIn(false)}
-                      className="text-xs"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={handleSaveLinkedIn}
-                      disabled={updateLinkedInMutation.isPending}
-                      className="text-xs font-semibold"
-                    >
-                      Save Changes
-                    </Button>
-                  </>
-                ) : (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setLinkedInHeadline(pro?.linkedin_headline || "");
-                      setLinkedInAbout(pro?.linkedin_about || "");
-                      setEditingLinkedIn(true);
-                    }}
-                    className="text-xs gap-1"
-                  >
-                    <Edit3 className="size-3" /> Edit LinkedIn Content
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+        <LinkedInIntelligenceV2View
+          activeCareerCode="DATA_ENGINEER"
+          onAskSpar={(prompt) => {
+            void navigate({ to: "/app/coach", search: { query: prompt } as any });
+          }}
+        />
       )}
 
       {/* ------------------------------------------------------------------- */}

@@ -495,6 +495,37 @@ export const careerai = {
     }),
   runDataIntegrityCheck: () => api.get<DataIntegrityReportResponse>("/admin/integrity-check"),
   listSystemAuditLogs: () => api.get<SystemAuditLogItem[]>("/admin/audit-logs"),
+
+  // LinkedIn Intelligence V2 & Professional Profile (Domain 21 / Step 18)
+  getLinkedInIntelligenceV2: (studentId: string, careerCode = "DATA_ENGINEER") =>
+    api.get<LinkedInIntelligenceV2>(`/students/${studentId}/professional-profile/linkedin-intelligence-v2?career_code=${careerCode}`),
+
+  connectLinkedIn: (studentId: string, body: { auth_code?: string; member_id?: string; name?: string; email?: string }) =>
+    api.post<LinkedInIntelligenceV2>(`/students/${studentId}/professional-profile/linkedin/connect`, { body }),
+
+  importProfile: (studentId: string, body: {
+    source_type: string;
+    headline?: string;
+    about?: string;
+    experiences?: any[];
+    education?: any[];
+    skills?: string[];
+    certifications?: string[];
+    raw_text?: string;
+  }) => api.post<LinkedInIntelligenceV2>(`/students/${studentId}/professional-profile/import`, { body }),
+
+  confirmCertification: (studentId: string, body: { name: string; authority: string; issue_date?: string; credential_url?: string }) =>
+    api.post<CertificationHoldItem[]>(`/students/${studentId}/professional-profile/certifications/confirm`, { body }),
+
+  getRecommendedCertifications: (studentId: string, careerCode = "DATA_ENGINEER") =>
+    api.get<CertificationRecommendationItem[]>(`/students/${studentId}/professional-profile/certifications/recommendations?career_code=${careerCode}`),
+
+  optimizeForJob: (studentId: string, body: {
+    opportunity_id?: string | null;
+    raw_jd_text?: string | null;
+    role_title?: string | null;
+    company_name?: string | null;
+  }) => api.post<JobOptimizationResult>(`/students/${studentId}/professional-profile/optimize-for-job`, { body }),
 };
 
 // --- Step 16: Career Discovery & Onboarding Reference API Methods ----------

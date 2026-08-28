@@ -1085,3 +1085,76 @@ export function useTransferabilityAnalysis(targetCareer: string) {
     staleTime: 1000 * 60 * 5,
   });
 }
+
+
+// ============================================================================
+// LinkedIn Intelligence V2 Hooks (Domain 21 / Step 18)
+// ============================================================================
+
+export function useLinkedInIntelligenceV2(careerCode = "DATA_ENGINEER") {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["linkedin-intelligence-v2", studentId, careerCode],
+    queryFn: () => careerai.getLinkedInIntelligenceV2(studentId!, careerCode),
+    enabled: Boolean(studentId),
+    staleTime: 1000 * 60 * 2,
+  });
+}
+
+export function useConnectLinkedIn() {
+  const studentId = useStudentId();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { auth_code?: string; member_id?: string; name?: string; email?: string }) =>
+      careerai.connectLinkedIn(studentId!, body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["linkedin-intelligence-v2", studentId] });
+      void queryClient.invalidateQueries({ queryKey: ["professional-profile", studentId] });
+    },
+  });
+}
+
+export function useImportProfile() {
+  const studentId = useStudentId();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: {
+      source_type: string;
+      headline?: string;
+      about?: string;
+      experiences?: any[];
+      education?: any[];
+      skills?: string[];
+      certifications?: string[];
+      raw_text?: string;
+    }) => careerai.importProfile(studentId!, body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["linkedin-intelligence-v2", studentId] });
+      void queryClient.invalidateQueries({ queryKey: ["professional-profile", studentId] });
+    },
+  });
+}
+
+export function useConfirmCertification() {
+  const studentId = useStudentId();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { name: string; authority: string; issue_date?: string; credential_url?: string }) =>
+      careerai.confirmCertification(studentId!, body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["linkedin-intelligence-v2", studentId] });
+    },
+  });
+}
+
+export function useOptimizeForJob() {
+  const studentId = useStudentId();
+  return useMutation({
+    mutationFn: (body: {
+      opportunity_id?: string | null;
+      raw_jd_text?: string | null;
+      role_title?: string | null;
+      company_name?: string | null;
+    }) => careerai.optimizeForJob(studentId!, body),
+  });
+}
