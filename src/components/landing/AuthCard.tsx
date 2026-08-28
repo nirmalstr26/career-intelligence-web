@@ -5,10 +5,8 @@ import {
   UserPlus,
   LogIn,
   ArrowRight,
-  Compass,
-  CheckCircle2,
-  Layers,
-  GraduationCap,
+  ShieldCheck,
+  Zap,
 } from "lucide-react";
 
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
@@ -94,26 +92,26 @@ export function AuthCard() {
   }
 
   return (
-    <div className="surface-panel w-full max-w-[540px] rounded-3xl p-6 shadow-[var(--shadow-elevated)] sm:p-8 backdrop-blur">
+    <div className="surface-panel w-full max-w-[540px] rounded-3xl p-6 shadow-[var(--shadow-elevated)] sm:p-8 backdrop-blur border border-border/80">
       <div className="flex flex-col items-center text-center">
         <span
-          className="grid size-12 place-items-center rounded-2xl"
-          style={{ backgroundImage: "var(--gradient-primary)" }}
-          aria-hidden="true"
+          className="grid size-12 place-items-center rounded-2xl bg-primary/15 text-primary border border-primary/30"
+          style={{ background: "var(--gradient-primary)" }}
         >
           <Sparkles className="size-6 text-primary-foreground" />
         </span>
-
         <h2 className="mt-4 font-display text-2xl font-bold tracking-tight">
-          Start Your Career Journey
+          {activeTab === "register" ? "Create Student Account" : "Welcome Back to CareerAI"}
         </h2>
-        <p className="mt-1 max-w-sm text-xs leading-relaxed text-muted-foreground">
-          Personalized curriculum, verified skill signals, and AI-guided career readiness.
+        <p className="mt-1.5 text-xs text-muted-foreground max-w-xs">
+          {activeTab === "register"
+            ? "Sign up with Google or enter details to build your AI career roadmap."
+            : "Sign in with Google or your pilot account to resume your journey."}
         </p>
       </div>
 
-      {/* Tabs: Register vs Sign In */}
-      <div className="mt-6 flex rounded-xl bg-secondary/60 p-1 border border-border/50">
+      {/* Tabs */}
+      <div className="mt-6 flex rounded-xl bg-surface/80 p-1 ring-1 ring-border/60">
         <button
           type="button"
           onClick={() => {
@@ -127,8 +125,8 @@ export function AuthCard() {
               : "text-muted-foreground hover:text-foreground",
           )}
         >
-          <UserPlus className="size-3.5 text-primary" />
-          Register New Student
+          <UserPlus className="size-3.5" />
+          Sign Up / Register
         </button>
         <button
           type="button"
@@ -150,94 +148,139 @@ export function AuthCard() {
 
       {/* Tab 1: Register New Student */}
       {activeTab === "register" ? (
-        <form onSubmit={handleRegister} className="mt-5 space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+        <div className="mt-5 space-y-4">
+          {/* Primary Option: Sign Up with Google */}
+          {isGoogleConfigured ? (
+            <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                  <Zap className="size-3.5 text-primary" />
+                  Recommended for Students:
+                </span>
+                <Badge className="bg-primary/20 text-primary border-primary/30 text-[10px]">
+                  Instant Setup
+                </Badge>
+              </div>
+
+              <div className="flex flex-col items-center gap-2 pt-1">
+                <GoogleSignInButton options={{ width: 320, text: "signup_with" }} />
+                <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-1">
+                  <ShieldCheck className="size-3 text-success" />
+                  Secure 1-click verification · Takes you directly to onboarding
+                </p>
+              </div>
+            </div>
+          ) : null}
+
+          {/* Divider */}
+          <div className="relative flex items-center justify-center">
+            <div className="w-full border-t border-border/70" />
+            <span className="bg-card px-3 text-[11px] font-medium text-muted-foreground shrink-0 uppercase tracking-wider">
+              {isGoogleConfigured ? "Or register with details" : "Register with details"}
+            </span>
+            <div className="w-full border-t border-border/70" />
+          </div>
+
+          {/* Fallback Manual Registration Form */}
+          <form onSubmit={handleRegister} className="space-y-3.5">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[11px] font-medium text-foreground block mb-1">
+                  First Name <span className="text-primary">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={regFirstName}
+                  onChange={(e) => setRegFirstName(e.target.value)}
+                  placeholder="e.g. Alex"
+                  className="w-full rounded-xl border border-border/80 bg-surface px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
+              <div>
+                <label className="text-[11px] font-medium text-foreground block mb-1">
+                  Last Name <span className="text-primary">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={regLastName}
+                  onChange={(e) => setRegLastName(e.target.value)}
+                  placeholder="e.g. Rivera"
+                  className="w-full rounded-xl border border-border/80 bg-surface px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
+            </div>
+
             <div>
               <label className="text-[11px] font-medium text-foreground block mb-1">
-                First Name <span className="text-primary">*</span>
+                Email Address <span className="text-primary">*</span>
               </label>
               <input
-                type="text"
+                type="email"
                 required
-                value={regFirstName}
-                onChange={(e) => setRegFirstName(e.target.value)}
-                placeholder="e.g. Alex"
+                value={regEmail}
+                onChange={(e) => setRegEmail(e.target.value)}
+                placeholder="e.g. alex.rivera@college.edu"
                 className="w-full rounded-xl border border-border/80 bg-surface px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
+
             <div>
               <label className="text-[11px] font-medium text-foreground block mb-1">
-                Last Name <span className="text-primary">*</span>
+                Target Career Direction <span className="text-primary">*</span>
               </label>
-              <input
-                type="text"
-                required
-                value={regLastName}
-                onChange={(e) => setRegLastName(e.target.value)}
-                placeholder="e.g. Rivera"
-                className="w-full rounded-xl border border-border/80 bg-surface px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              />
+              <select
+                value={regCareer}
+                onChange={(e) => setRegCareer(e.target.value)}
+                className="w-full rounded-xl border border-border/80 bg-surface px-3.5 py-2 text-xs text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              >
+                {CAREER_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value} className="bg-card text-foreground">
+                    {opt.label} — {opt.desc}
+                  </option>
+                ))}
+              </select>
             </div>
-          </div>
 
-          <div>
-            <label className="text-[11px] font-medium text-foreground block mb-1">
-              Email Address <span className="text-primary">*</span>
-            </label>
-            <input
-              type="email"
-              required
-              value={regEmail}
-              onChange={(e) => setRegEmail(e.target.value)}
-              placeholder="e.g. alex.rivera@college.edu"
-              className="w-full rounded-xl border border-border/80 bg-surface px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-            />
-          </div>
-
-          <div>
-            <label className="text-[11px] font-medium text-foreground block mb-1">
-              Target Career Direction <span className="text-primary">*</span>
-            </label>
-            <select
-              value={regCareer}
-              onChange={(e) => setRegCareer(e.target.value)}
-              className="w-full rounded-xl border border-border/80 bg-surface px-3.5 py-2 text-xs text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            <Button
+              type="submit"
+              size="lg"
+              variant="hero"
+              disabled={regLoading}
+              className="w-full font-semibold gap-2 shadow-lg mt-2"
             >
-              {CAREER_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value} className="bg-card text-foreground">
-                  {opt.label} — {opt.desc}
-                </option>
-              ))}
-            </select>
-          </div>
+              {regLoading ? (
+                "Creating Account & Preparing Onboarding…"
+              ) : (
+                <>
+                  Register & Begin Career Onboarding
+                  <ArrowRight className="size-4" />
+                </>
+              )}
+            </Button>
 
-          <Button
-            type="submit"
-            size="lg"
-            variant="hero"
-            disabled={regLoading}
-            className="w-full font-semibold gap-2 shadow-lg mt-2"
-          >
-            {regLoading ? (
-              "Creating Account & Preparing Onboarding…"
-            ) : (
-              <>
-                Register & Begin Career Onboarding
-                <ArrowRight className="size-4" />
-              </>
-            )}
-          </Button>
-
-          <p className="text-[11px] text-center text-muted-foreground">
-            You will complete your academic profile and baseline diagnostic in the next step.
-          </p>
-        </form>
+            <p className="text-[11px] text-center text-muted-foreground">
+              You will complete your academic profile and baseline diagnostic in the next step.
+            </p>
+          </form>
+        </div>
       ) : (
         /* Tab 2: Sign In */
         <div className="mt-5 space-y-4">
           {isGoogleConfigured ? (
-            <div className="flex flex-col items-center gap-3">
-              <GoogleSignInButton options={{ width: 320 }} />
+            <div className="flex flex-col items-center gap-3 py-1">
+              <GoogleSignInButton options={{ width: 320, text: "signin_with" }} />
+            </div>
+          ) : null}
+
+          {isGoogleConfigured ? (
+            <div className="relative flex items-center justify-center">
+              <div className="w-full border-t border-border/70" />
+              <span className="bg-card px-3 text-[11px] font-medium text-muted-foreground shrink-0 uppercase tracking-wider">
+                Or demo access
+              </span>
+              <div className="w-full border-t border-border/70" />
             </div>
           ) : null}
 

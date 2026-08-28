@@ -14,9 +14,13 @@ function resolveApiBaseUrl(): string {
   const envUrl = clean(import.meta.env.VITE_API_BASE_URL);
   if (!envUrl) {
     if (typeof window !== "undefined") {
+      // In browser, if hosted on custom domain or Amplify, use relative /api/v1 or HTTPS backend
+      if (window.location.hostname.includes("amplifyapp.com")) {
+        return "https://13-234-153-165.sslip.io/api/v1";
+      }
       return `${window.location.origin}/api/v1`;
     }
-    return "http://localhost:8000/api/v1";
+    return "https://13-234-153-165.sslip.io/api/v1";
   }
   const trimmed = envUrl.replace(/\/$/, "");
   if (trimmed.endsWith("/api/v1")) {
@@ -25,7 +29,9 @@ function resolveApiBaseUrl(): string {
   return `${trimmed}/api/v1`;
 }
 
-const googleClientId = clean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
+const googleClientId =
+  clean(import.meta.env.VITE_GOOGLE_CLIENT_ID) ||
+  "601182504704-513k286792um93ct1purvip7gshrjtr9.apps.googleusercontent.com";
 
 export const env = {
   /** CareerAI backend base URL, including the `/api/v1` prefix. */
