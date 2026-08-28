@@ -1874,3 +1874,73 @@ export interface BenchmarkActionsResponse {
   actions: BenchmarkActionItem[];
   spar_recommendation: string;
 }
+
+
+// ============================================================================
+// Professional Profile & LinkedIn Intelligence V2 (Step 21)
+// ============================================================================
+
+export interface ClaimAuditItem {
+  claim_id: string;
+  claim_text: string;
+  section: string;
+  evidence_status: "VERIFIED" | "SUPPORTED" | "LEARNING" | "SELF_DECLARED" | "UNSUPPORTED" | string;
+  interview_defensibility: "HIGH" | "MEDIUM" | "LOW" | string;
+  evidence_details: string;
+  recommended_action: string;
+  rationale: string;
+}
+
+export interface ClaimAuditResponse {
+  student_id: string;
+  total_claims: number;
+  verified_claims: number;
+  supported_claims: number;
+  self_declared_claims: number;
+  weakly_supported_claims: number;
+  credibility_score: number;
+  claims: ClaimAuditItem[];
+  spar_summary: string;
+}
+
+export interface MultiSourceHeatmapRow {
+  competency: string;
+  is_verified_spar: boolean;
+  is_present_linkedin: boolean;
+  is_present_resume: boolean;
+  is_present_github: boolean;
+  is_required_target_job: boolean;
+  visibility_status: "WELL_REPRESENTED" | "UNDERSELLING" | "OVERCLAIMED" | "LEARNING_GAP" | string;
+  recommendation: string;
+}
+
+export interface CrossPlatformHeatmapResponse {
+  student_id: string;
+  career_code: string;
+  rows: MultiSourceHeatmapRow[];
+  underselling_count: number;
+  credibility_gap_count: number;
+  spar_advice: string;
+}
+
+export interface OpportunityMatrixRow {
+  capability: string;
+  can_prove: "YES" | "LEARNING" | "NO" | string;
+  profile_shows: "YES" | "NO" | string;
+  job_needs: "YES" | "OPTIONAL" | string;
+  action: "STRONG_ALIGNMENT" | "ADD_NOW" | "SOFTEN_WORDING" | "LEARN_FIRST" | string;
+  guidance: string;
+}
+
+export interface LinkedInCapabilityItem {
+  capability: string;
+  available: boolean;
+  permission_required: string;
+  implementation_approach: string;
+}
+
+export interface LinkedInCapabilityMatrixResponse {
+  capabilities: LinkedInCapabilityItem[];
+  scraping_policy: string;
+  compliant_import_available: boolean;
+}

@@ -1193,3 +1193,38 @@ export function useBenchmarkActions() {
     staleTime: 1000 * 60 * 2,
   });
 }
+
+
+// ============================================================================
+// Professional Profile & Claim Audit Hooks (Step 21)
+// ============================================================================
+
+export function useClaimsAudit() {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["claims-audit", studentId],
+    queryFn: () => careerai.getClaimsAudit(studentId!),
+    enabled: Boolean(studentId),
+    staleTime: 1000 * 60 * 2,
+  });
+}
+
+export function useCrossPlatformHeatmap(careerCode: string = "DATA_ENGINEER") {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["cross-platform-heatmap", studentId, careerCode],
+    queryFn: () => careerai.getCrossPlatformHeatmap(studentId!, careerCode),
+    enabled: Boolean(studentId),
+    staleTime: 1000 * 60 * 2,
+  });
+}
+
+export function useLinkedInCapabilities() {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["linkedin-capabilities", studentId],
+    queryFn: () => careerai.getLinkedInCapabilities(studentId!),
+    enabled: Boolean(studentId),
+    staleTime: 1000 * 60 * 10,
+  });
+}

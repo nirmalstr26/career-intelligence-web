@@ -540,6 +540,16 @@ export const careerai = {
 
   getBenchmarkActions: (studentId: string) =>
     api.get<BenchmarkActionsResponse>(`/students/${studentId}/benchmarks/actions`),
+
+  // Professional Profile Intelligence V2 (Step 21)
+  getClaimsAudit: (studentId: string) =>
+    api.get<ClaimAuditResponse>(`/students/${studentId}/professional-profile/claims-audit`),
+
+  getCrossPlatformHeatmap: (studentId: string, careerCode: string = "DATA_ENGINEER") =>
+    api.get<CrossPlatformHeatmapResponse>(`/students/${studentId}/professional-profile/heatmap?career_code=${careerCode}`),
+
+  getLinkedInCapabilities: (studentId: string) =>
+    api.get<LinkedInCapabilityMatrixResponse>(`/students/${studentId}/professional-profile/capabilities`),
 };
 
 // --- Step 16: Career Discovery & Onboarding Reference API Methods ----------
