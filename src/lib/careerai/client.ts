@@ -533,6 +533,13 @@ export const careerai = {
 
   getNodeImpact: (studentId: string, nodeId: string) =>
     api.get<NodeImpactResponse>(`/students/${studentId}/career-graph/nodes/${encodeURIComponent(nodeId)}/impact`),
+
+  // Career Benchmark & Competitive Intelligence (Step 20)
+  getStudentBenchmark: (studentId: string) =>
+    api.get<StudentBenchmarkResponse>(`/students/${studentId}/benchmarks/current`),
+
+  getBenchmarkActions: (studentId: string) =>
+    api.get<BenchmarkActionsResponse>(`/students/${studentId}/benchmarks/actions`),
 };
 
 // --- Step 16: Career Discovery & Onboarding Reference API Methods ----------

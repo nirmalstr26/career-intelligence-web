@@ -1792,3 +1792,85 @@ export interface NodeImpactResponse {
   why_matters: string;
   reasoning: string;
 }
+
+
+// ============================================================================
+// Career Benchmark & Competitive Readiness Intelligence (Step 20)
+// ============================================================================
+
+export interface BenchmarkThresholds {
+  p50_threshold: number;
+  p75_threshold: number;
+  p80_threshold: number;
+  p90_threshold: number;
+  p95_threshold: number;
+  distance_to_top_20: number;
+}
+
+export interface CompetencyBenchmarkRow {
+  skill_name: string;
+  student_score: number | null;
+  cohort_median: number;
+  top_20_benchmark: number;
+  career_target: number;
+  status: "ABOVE_TOP_20" | "ON_TRACK" | "COMPETITIVE_GAP" | "UNKNOWN" | string;
+  difference_to_top_20: number;
+  why_matters?: string | null;
+}
+
+export interface BenchmarkHistoryPoint {
+  milestone_event: string;
+  percentile: number;
+  readiness_score: number;
+  captured_at: string;
+}
+
+export interface StudentBenchmarkResponse {
+  student_id: string;
+  career_code: string;
+  career_title: string;
+  readiness_score: number;
+  career_target_score: number;
+  percentile: number;
+  competitive_band: "BUILDING_FOUNDATION" | "DEVELOPING" | "COMPETITIVE" | "STRONG" | "HIGHLY_COMPETITIVE" | string;
+  cohort_code: string;
+  cohort_title: string;
+  cohort_size: number;
+  academic_stage: string;
+  graduation_window: string;
+  available: boolean;
+  insufficient_sample: boolean;
+  reason?: string | null;
+  status_message?: string | null;
+  thresholds: BenchmarkThresholds;
+  competencies: CompetencyBenchmarkRow[];
+  trajectory: BenchmarkHistoryPoint[];
+  strengths: string[];
+  competitive_gaps: string[];
+  spar_explanation: string;
+  benchmark_date: string;
+}
+
+export interface BenchmarkActionItem {
+  action_code: string;
+  title: string;
+  description: string;
+  impact_level: "HIGH_IMPACT" | "MEDIUM_IMPACT" | "LOW_IMPACT" | string;
+  gap_addressed: string;
+  downstream_unlocks: number;
+  estimated_effort_minutes: number;
+  leverage_score: number;
+  cta_label: string;
+  cta_link?: string | null;
+}
+
+export interface BenchmarkActionsResponse {
+  student_id: string;
+  career_code: string;
+  current_readiness: number;
+  current_percentile: number;
+  target_band: string;
+  points_to_target: number;
+  actions: BenchmarkActionItem[];
+  spar_recommendation: string;
+}

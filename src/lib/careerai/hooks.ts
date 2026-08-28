@@ -1070,7 +1070,7 @@ export function useStudentBenchmark() {
   const studentId = useStudentId();
   return useQuery({
     queryKey: ["benchmark", studentId],
-    queryFn: () => careerai.getBenchmark(studentId!),
+    queryFn: () => careerai.getStudentBenchmark(studentId!),
     enabled: Boolean(studentId),
     staleTime: 1000 * 60 * 5,
   });
@@ -1181,5 +1181,15 @@ export function useNodeImpact(nodeId: string | null) {
     queryFn: () => careerai.getNodeImpact(studentId!, nodeId!),
     enabled: Boolean(studentId && nodeId),
     staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useBenchmarkActions() {
+  const studentId = useStudentId();
+  return useQuery({
+    queryKey: ["student-benchmark-actions", studentId],
+    queryFn: () => careerai.getBenchmarkActions(studentId!),
+    enabled: Boolean(studentId),
+    staleTime: 1000 * 60 * 2,
   });
 }

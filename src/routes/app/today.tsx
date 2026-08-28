@@ -1,3 +1,4 @@
+import { TodayBenchmarkCard } from '@/components/today/TodayBenchmarkCard';
 import React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
@@ -505,6 +506,9 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
       {/* =================================================================== */}
       {/* LEVEL 6: ACHIEVEMENTS & CONTEXTUAL SPAR COACH                        */}
       {/* =================================================================== */}
+      {/* Competitive Position & Benchmark Snapshot */}
+      <TodayBenchmarkCard />
+
       <section className="grid gap-6 lg:grid-cols-2">
         <AchievementShowcase compact />
 
