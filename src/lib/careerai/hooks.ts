@@ -1261,3 +1261,95 @@ export function useUpdateJobPrepStatus(opportunityId: string = "opp-de-intern-ac
     },
   });
 }
+
+
+// ============================================================================
+// Pilot Analytics & Observability Hooks (Step 23)
+// ============================================================================
+
+export function usePilotHealth() {
+  return useQuery({
+    queryKey: ["admin-pilot-health"],
+    queryFn: () => careerai.getPilotHealth(),
+    staleTime: 1000 * 60,
+  });
+}
+
+export function useActivationFunnel() {
+  return useQuery({
+    queryKey: ["admin-activation-funnel"],
+    queryFn: () => careerai.getActivationFunnel(),
+    staleTime: 1000 * 60,
+  });
+}
+
+export function useTimeToValue() {
+  return useQuery({
+    queryKey: ["admin-time-to-value"],
+    queryFn: () => careerai.getTimeToValue(),
+    staleTime: 1000 * 60,
+  });
+}
+
+export function useMeaningfulRetention() {
+  return useQuery({
+    queryKey: ["admin-meaningful-retention"],
+    queryFn: () => careerai.getMeaningfulRetention(),
+    staleTime: 1000 * 60,
+  });
+}
+
+export function useRecommendationEffectiveness() {
+  return useQuery({
+    queryKey: ["admin-recommendations-effectiveness"],
+    queryFn: () => careerai.getRecommendationEffectiveness(),
+    staleTime: 1000 * 60,
+  });
+}
+
+export function useReadinessGrowthAnalytics() {
+  return useQuery({
+    queryKey: ["admin-readiness-growth-analytics"],
+    queryFn: () => careerai.getReadinessGrowthAnalytics(),
+    staleTime: 1000 * 60,
+  });
+}
+
+export function useCoachAnalytics() {
+  return useQuery({
+    queryKey: ["admin-coach-analytics"],
+    queryFn: () => careerai.getCoachAnalytics(),
+    staleTime: 1000 * 60,
+  });
+}
+
+export function useStudentSupportQueue() {
+  return useQuery({
+    queryKey: ["admin-student-support-queue"],
+    queryFn: () => careerai.getStudentSupportQueue(),
+    staleTime: 1000 * 60,
+  });
+}
+
+export function useProductFriction() {
+  return useQuery({
+    queryKey: ["admin-product-friction"],
+    queryFn: () => careerai.getProductFriction(),
+    staleTime: 1000 * 60,
+  });
+}
+
+export function useWeeklyPilotReport() {
+  return useQuery({
+    queryKey: ["admin-weekly-pilot-report"],
+    queryFn: () => careerai.getWeeklyPilotReport(),
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useTrackProductEvent() {
+  return useMutation({
+    mutationFn: (data: { event_name: string; student_id?: string; career_code?: string; entity_type?: string; entity_id?: string; properties_json?: Record<string, any> }) =>
+      careerai.trackProductEvent(data),
+  });
+}

@@ -2067,3 +2067,143 @@ export interface JobPreparationPlanResponse {
   created_at: string;
   updated_at: string;
 }
+
+
+// ============================================================================
+// Pilot Analytics, Funnel Intelligence & Product Observability (Step 23)
+// ============================================================================
+
+export interface PilotHealthSummaryResponse {
+  total_pilot_students: number;
+  activated_students: number;
+  activation_rate_pct: number;
+  d7_meaningful_retention_pct: number;
+  median_readiness_growth_pts: number;
+  critical_system_errors: number;
+  ai_success_rate_pct: number;
+  ai_p95_latency_sec: number;
+  active_applications_count: number;
+  support_queue_count: number;
+}
+
+export interface ActivationFunnelStage {
+  stage_name: string;
+  count: number;
+  conversion_pct: number;
+  drop_off_pct: number;
+  median_duration_mins: number;
+  description: string;
+}
+
+export interface ActivationFunnelResponse {
+  total_registered: number;
+  total_activated: number;
+  overall_activation_rate_pct: number;
+  stages: ActivationFunnelStage[];
+}
+
+export interface TimeToValueResponse {
+  median_hours_to_career_direction: number;
+  median_hours_to_first_recommendation: number;
+  median_hours_to_first_evidence: number;
+  median_hours_to_first_readiness_growth: number;
+}
+
+export interface CohortRetentionRow {
+  cohort_label: string;
+  total_students: number;
+  d1_retention_pct: number;
+  d7_retention_pct: number;
+  d14_retention_pct: number;
+  d30_retention_pct: number;
+}
+
+export interface MeaningfulRetentionResponse {
+  overall_d1_pct: number;
+  overall_d7_pct: number;
+  overall_d14_pct: number;
+  overall_d30_pct: number;
+  cohorts: CohortRetentionRow[];
+}
+
+export interface RecommendationActionRow {
+  action_type: string;
+  times_recommended: number;
+  times_started: number;
+  times_completed: number;
+  start_rate_pct: number;
+  completion_rate_pct: number;
+  avg_readiness_lift_pts: number;
+}
+
+export interface RecommendationEffectivenessResponse {
+  total_recommendations_served: number;
+  overall_start_rate_pct: number;
+  overall_completion_rate_pct: number;
+  alternative_actions_selected_count: number;
+  actions_breakdown: RecommendationActionRow[];
+}
+
+export interface ActivityReadinessGainRow {
+  activity_type: string;
+  students_completed: number;
+  median_readiness_delta: number;
+  correlation_note: string;
+}
+
+export interface ReadinessGrowthAnalyticsResponse {
+  baseline_median: number;
+  current_median: number;
+  median_delta_points: number;
+  percentile_25th_delta: number;
+  percentile_75th_delta: number;
+  activity_attribution: ActivityReadinessGainRow[];
+}
+
+export interface CoachAnalyticsResponse {
+  conversations_initiated: number;
+  starters_used: number;
+  structured_actions_generated: number;
+  actions_clicked: number;
+  actions_completed: number;
+  coach_to_action_conversion_pct: number;
+  action_completion_rate_pct: number;
+  context_breakdown: Record<string, number>;
+}
+
+export interface StudentSupportQueueItem {
+  student_id: string;
+  student_name: string;
+  email: string;
+  career_goal: string;
+  signal_type: "ONBOARDING_STALLED" | "DIAGNOSTIC_STALLED" | "REPEATED_FAILURE" | "PROJECT_STALLED" | "NO_ACTIVITY_7D" | string;
+  days_inactive: number;
+  current_readiness: number;
+  recommended_support_action: string;
+}
+
+export interface ProductFrictionItem {
+  issue_title: string;
+  affected_students_count: number;
+  severity: "HIGH" | "MEDIUM" | "LOW" | string;
+  journey_stage: string;
+  recommended_fix: string;
+}
+
+export interface ProductFrictionResponse {
+  highest_dropoff_stage: string;
+  highest_api_error_endpoint: string;
+  slowest_student_flow: string;
+  friction_priorities: ProductFrictionItem[];
+}
+
+export interface WeeklyPilotReportResponse {
+  report_title: string;
+  generated_at: string;
+  pilot_period_label: string;
+  executive_summary: string;
+  key_metrics: Record<string, any>;
+  top_strengths: string[];
+  top_friction_areas: string[];
+  recommended_product_actions: string[];
+}

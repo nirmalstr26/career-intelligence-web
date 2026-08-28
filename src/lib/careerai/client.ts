@@ -563,6 +563,20 @@ export const careerai = {
 
   updateJobPrepStatus: (opportunityId: string, status: string, notes?: string) =>
     api.post<{ opportunity_id: string; status: string }>(`/job-prep/${opportunityId}/status`, { status, notes }),
+
+  // Pilot Analytics & Observability (Step 23)
+  getPilotHealth: () => api.get<PilotHealthSummaryResponse>("/admin/analytics/pilot-health"),
+  getActivationFunnel: () => api.get<ActivationFunnelResponse>("/admin/analytics/activation-funnel"),
+  getTimeToValue: () => api.get<TimeToValueResponse>("/admin/analytics/time-to-value"),
+  getMeaningfulRetention: () => api.get<MeaningfulRetentionResponse>("/admin/analytics/retention"),
+  getRecommendationEffectiveness: () => api.get<RecommendationEffectivenessResponse>("/admin/analytics/recommendations"),
+  getReadinessGrowthAnalytics: () => api.get<ReadinessGrowthAnalyticsResponse>("/admin/analytics/readiness-growth"),
+  getCoachAnalytics: () => api.get<CoachAnalyticsResponse>("/admin/analytics/coach"),
+  getStudentSupportQueue: () => api.get<StudentSupportQueueItem[]>("/admin/analytics/support-queue"),
+  getProductFriction: () => api.get<ProductFrictionResponse>("/admin/analytics/friction"),
+  getWeeklyPilotReport: () => api.get<WeeklyPilotReportResponse>("/admin/analytics/weekly-report"),
+  trackProductEvent: (data: { event_name: string; student_id?: string; career_code?: string; entity_type?: string; entity_id?: string; properties_json?: Record<string, any> }) =>
+    api.post<{ status: string; event_name: string }>("/admin/analytics/events", data),
 };
 
 // --- Step 16: Career Discovery & Onboarding Reference API Methods ----------
