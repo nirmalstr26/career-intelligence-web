@@ -67,14 +67,48 @@ const FEATURE_TILES: FeatureTile[] = [
 
 export function Hero() {
   return (
-    <section className="relative pt-6 pb-8">
-      {/* 3-Column Desktop Grid Layout: Left Copy + Center Art + Right Auth Card */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr_400px] xl:grid-cols-[1.15fr_1.05fr_410px] items-start gap-8 lg:gap-6 xl:gap-8">
+    <section className="relative pt-6 pb-8 overflow-visible">
+      {/* 
+        CINEMATIC FULL-HERO BACKGROUND ARTWORK LAYER
+        - Spans across the hero background extending behind the left feature cards and right signup panel
+        - Strong 4-sided gradient mask (15% left/right, 8% top, 22% bottom)
+        - Bottom dark gradient to reduce brightness near metrics card
+        - Zero rectangular card borders or visible boundaries
+      */}
+      <div className="pointer-events-none absolute -inset-x-6 sm:-inset-x-12 -top-10 bottom-0 -z-10 flex items-center justify-center overflow-hidden">
+        <div
+          className="relative w-full h-full min-h-[640px] max-w-[1540px] opacity-95"
+          style={{
+            backgroundImage: "url('/brand/hero_background_home.png')",
+            backgroundPosition: "center 38%",
+            backgroundSize: "cover",
+            backgroundRepeat: "no-repeat",
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent 0%, black 16%, black 84%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 8%, black 76%, transparent 100%)",
+            maskImage:
+              "linear-gradient(to right, transparent 0%, black 16%, black 84%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 8%, black 76%, transparent 100%)",
+            WebkitMaskComposite: "destination-in",
+            maskComposite: "intersect",
+          }}
+        >
+          {/* Subtle bottom dark navy fade overlay to soften bottom road brightness */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to bottom, transparent 40%, rgba(3, 7, 18, 0.45) 65%, rgba(3, 7, 18, 0.9) 88%, #030712 100%)",
+            }}
+          />
+        </div>
+      </div>
+
+      {/* 3-Column Foreground Content Grid */}
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1.1fr_1fr_400px] xl:grid-cols-[1.15fr_1.05fr_410px] items-start gap-8 lg:gap-6 xl:gap-8">
         
         {/* LEFT COLUMN: Eyebrow + Headline + Description + 6 Feature Tiles */}
         <div className="space-y-6 pt-2">
           {/* Eyebrow Pill */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/40 bg-[#090e24]/90 px-3.5 py-1.5 text-xs text-cyan-300 shadow-[0_0_15px_rgba(6,215,247,0.2)] backdrop-blur">
+          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/40 bg-[#090e24]/90 px-3.5 py-1.5 text-xs text-cyan-300 shadow-[0_0_15px_rgba(6,215,247,0.2)] backdrop-blur-md">
             <Sparkles className="size-3.5 text-cyan-400" />
             <span className="font-semibold text-[10px] sm:text-[11px] tracking-wider uppercase">
               AI-Powered Career Intelligence for College Students
@@ -102,7 +136,7 @@ export function Hero() {
               return (
                 <div
                   key={tile.title}
-                  className="flex items-start gap-3 rounded-2xl border border-border/60 bg-[#090e24]/75 p-3 sm:p-3.5 backdrop-blur-md transition-all hover:border-cyan-500/40 hover:-translate-y-0.5"
+                  className="flex items-start gap-3 rounded-2xl border border-border/60 bg-[#090e24]/80 p-3 sm:p-3.5 backdrop-blur-md transition-all hover:border-cyan-500/40 hover:-translate-y-0.5"
                 >
                   <div className={`grid size-9 shrink-0 place-items-center rounded-xl border ${tile.glowColor}`}>
                     <Icon className={`size-4.5 ${tile.iconColor}`} />
@@ -121,18 +155,18 @@ export function Hero() {
           </div>
         </div>
 
-        {/* CENTER COLUMN: Serpentine Glowing Road Art + Floating Bottom Stats Card */}
+        {/* CENTER COLUMN: Interactive Pathway Milestone Chips + Floating Bottom Stats Card */}
         <div className="flex flex-col items-center justify-between h-full pt-1">
-          {/* Luminous Road Animation Art */}
+          {/* Floating Pathway Milestone Chips */}
           <CareerRoadArt />
 
           {/* Bottom Stats Card with Avatars & Stars */}
-          <div className="w-full flex justify-center -mt-8 sm:-mt-12 z-20">
+          <div className="w-full flex justify-center -mt-6 sm:-mt-10 z-20">
             <StatsFloatingCard />
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Pixel-Perfect Auth Panel */}
+        {/* RIGHT COLUMN: Pixel-Perfect 2-Tab Auth Panel */}
         <div className="flex justify-center lg:justify-end pt-1">
           <AuthCard />
         </div>
