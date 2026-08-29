@@ -10,8 +10,8 @@ export function AuthCard() {
   const router = useRouter();
   const { isGoogleConfigured, sendEmailOtp, verifyEmailOtp, refreshSession, error } = useAuth();
 
-  // Role Tab State: 'student' | 'graduate' | 'college'
-  const [roleTab, setRoleTab] = useState<"student" | "graduate" | "college">("student");
+  // 2 Clean Tabs: 'student' | 'college' (Student covers students & graduates, details collected during onboarding)
+  const [roleTab, setRoleTab] = useState<"student" | "college">("student");
 
   // Form Fields
   const [fullName, setFullName] = useState("");
@@ -95,15 +95,15 @@ export function AuthCard() {
       {/* Top Outer Edge Subtle Cyan Highlight */}
       <div className="pointer-events-none absolute -top-px left-12 right-12 h-px bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent" />
 
-      {/* Role Switcher Pills */}
-      <div className="flex rounded-full bg-[#0d1436] p-1 border border-border/60 mb-4">
+      {/* 2 Clean Role Switcher Pills */}
+      <div className="grid grid-cols-2 rounded-full bg-[#0d1436] p-1 border border-border/60 mb-4">
         <button
           type="button"
           onClick={() => {
             setRoleTab("student");
             setAuthError(null);
           }}
-          className={`flex-1 rounded-full py-1.5 text-xs font-semibold transition-all ${
+          className={`rounded-full py-1.5 text-xs font-semibold transition-all ${
             roleTab === "student"
               ? "bg-gradient-to-r from-purple-600/80 to-blue-600/80 text-white shadow-[0_0_12px_rgba(130,71,255,0.4)]"
               : "text-muted-foreground hover:text-foreground"
@@ -114,24 +114,10 @@ export function AuthCard() {
         <button
           type="button"
           onClick={() => {
-            setRoleTab("graduate");
-            setAuthError(null);
-          }}
-          className={`flex-1 rounded-full py-1.5 text-xs font-semibold transition-all ${
-            roleTab === "graduate"
-              ? "bg-gradient-to-r from-purple-600/80 to-blue-600/80 text-white shadow-[0_0_12px_rgba(130,71,255,0.4)]"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Graduate
-        </button>
-        <button
-          type="button"
-          onClick={() => {
             setRoleTab("college");
             setAuthError(null);
           }}
-          className={`flex-1 rounded-full py-1.5 text-xs font-semibold transition-all ${
+          className={`rounded-full py-1.5 text-xs font-semibold transition-all ${
             roleTab === "college"
               ? "bg-gradient-to-r from-purple-600/80 to-blue-600/80 text-white shadow-[0_0_12px_rgba(130,71,255,0.4)]"
               : "text-muted-foreground hover:text-foreground"
@@ -227,7 +213,7 @@ export function AuthCard() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder={roleTab === "college" ? "Official Institution Email" : "College Email Address"}
+                placeholder={roleTab === "college" ? "Official Institution Email" : "College or Personal Email"}
                 className="w-full rounded-xl border border-border/80 bg-[#0d1436]/90 pl-10 pr-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/50 transition-all"
               />
             </div>
