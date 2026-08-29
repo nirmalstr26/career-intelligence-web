@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Mail, KeyRound, CheckCircle2, Terminal, Sparkles, RefreshCw } from "lucide-react";
+import { ArrowRight, Mail, KeyRound, CheckCircle2, Terminal, Sparkles, RefreshCw, Building2 } from "lucide-react";
 import { devLogin } from "@/lib/careerai/client";
-import { useRouter } from "@tanstack/react-router";
+import { useRouter, Link } from "@tanstack/react-router";
+import { trackLandingEvent } from "@/lib/analytics/landingEvents";
 
 export function AuthCard() {
   const router = useRouter();
@@ -16,9 +17,8 @@ export function AuthCard() {
 
   // Email OTP state
   const [email, setEmail] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [otpCode, setOtpCode] = useState("");
+  const [otpCode, setOtpCode] = useState(["", "", "", "", "", ""]);
+  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [step, setStep] = useState<"enter_email" | "enter_otp">("enter_email");
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -42,10 +42,15 @@ export function AuthCard() {
 
     setLoading(true);
     setAuthError(null);
+    trackLandingEvent("EMAIL_AUTH_SELECTED");
+
     try {
       await sendEmailOtp(email.trim());
       setStep("enter_otp");
       setResendCooldown(30);
+      trackLandingEvent("EMAIL_OTP_REQUESTED");
+      // Focus first OTP input
+      setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
     } catch (err: any) {
       setAuthError(err?.message || "Failed to send verification code. Please check your email and try again.");
     } finally {
@@ -53,17 +58,51 @@ export function AuthCard() {
     }
   }
 
+  const handleOtpChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    const newCode = [...otpCode];
+    newCode[index] = value.slice(-1);
+    setOtpCode(newCode);
+
+    // Auto move to next input
+    if (value && index < 5) {
+      otpInputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !otpCode[index] && index > 0) {
+      otpInputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleOtpPaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").trim().replace(/\D/g, "").slice(0, 6);
+    if (!pasted) return;
+    const newCode = [...otpCode];
+    for (let i = 0; i < 6; i++) {
+      newCode[i] = pasted[i] || "";
+    }
+    setOtpCode(newCode);
+    if (pasted.length === 6) {
+      otpInputRefs.current[5]?.focus();
+    }
+  };
+
   async function handleVerifyOtp(e: React.FormEvent) {
     e.preventDefault();
-    if (otpCode.length < 6) {
-      setAuthError("Please enter the full 6-digit verification code.");
+    const fullCode = otpCode.join("");
+    if (fullCode.length < 6) {
+      setAuthError("Please enter all 6 digits of your verification code.");
       return;
     }
 
     setLoading(true);
     setAuthError(null);
     try {
-      const res = await verifyEmailOtp(email.trim(), otpCode.trim(), firstName.trim() || undefined, lastName.trim() || undefined);
+      const res = await verifyEmailOtp(email.trim(), fullCode);
+      trackLandingEvent("AUTH_COMPLETED", { method: "EMAIL_OTP" });
       if (res?.nextRoute) {
         await router.navigate({ to: res.nextRoute as any });
       }
@@ -78,10 +117,11 @@ export function AuthCard() {
     setDemoLoading(true);
     setAuthError(null);
     try {
-      const targetEmail = customEmail || "dev@careerai.dev";
+      const targetEmail = customEmail || "alex.rivera@spar.dev";
       const isAlex = targetEmail.includes("alex");
-      await devLogin(targetEmail, isAlex ? "Alex" : "Dev", isAlex ? "Rivera" : "User");
+      await devLogin(targetEmail, isAlex ? "Alex" : "Student", isAlex ? "Rivera" : "User");
       await refreshSession();
+      trackLandingEvent("AUTH_COMPLETED", { method: "DEMO" });
     } catch (err: any) {
       setAuthError(err?.message || "Demo sign in failed. Please try again.");
     } finally {
@@ -90,49 +130,55 @@ export function AuthCard() {
   }
 
   return (
-    <div className="surface-panel w-full max-w-[540px] rounded-3xl p-6 shadow-[var(--shadow-elevated)] sm:p-8 backdrop-blur border border-border/80">
+    <div
+      id="auth-card"
+      className="surface-panel relative w-full max-w-[420px] rounded-3xl p-6 sm:p-7 shadow-[0_20px_60px_rgba(0,0,0,0.6)] backdrop-blur-xl border border-border/80 transition-all duration-300"
+    >
+      {/* Subtle top card glow accent */}
+      <div className="pointer-events-none absolute -top-px left-10 right-10 h-px bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-primary flex items-center gap-1.5">
-            <Sparkles className="size-3.5" />
-            Get Started Free
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
+            <Sparkles className="size-3" />
+            {step === "enter_otp" ? "SECURITY CODE" : "START YOUR CAREER JOURNEY"}
           </span>
-          <h2 className="text-xl font-bold font-display text-foreground mt-1">
-            {step === "enter_otp" ? "Enter Verification Code" : "Start Your Career Journey"}
+          <h2 className="text-xl font-bold font-display text-foreground mt-0.5">
+            {step === "enter_otp" ? "Check your email" : "Start your career journey"}
           </h2>
         </div>
-        <Badge variant="outline" className="border-primary/30 text-primary bg-primary/10 text-[11px]">
-          Student Pilot
+        <Badge variant="outline" className="border-cyan-500/30 text-cyan-400 bg-cyan-950/40 text-[10px] px-2 py-0.5">
+          Pilot Access
         </Badge>
       </div>
 
-      <p className="mt-1 text-xs text-muted-foreground">
+      <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
         {step === "enter_otp"
-          ? `We sent a 6-digit code to ${email}`
-          : "Discover your AI Career Match, assess real skills, and build proven readiness."}
+          ? `We sent a 6-digit verification code to ${email}`
+          : "Sign in or create your account. SPAR will guide you from there."}
       </p>
 
-      {/* Google OAuth Section (if on email entry step) */}
+      {/* Step 1: Google + Email Form */}
       {step === "enter_email" ? (
         <div className="mt-5 space-y-4">
           {isGoogleConfigured ? (
             <>
-              <div className="flex flex-col items-center gap-2 py-1">
+              <div className="flex flex-col items-center gap-2">
                 <GoogleSignInButton options={{ width: 340, text: "continue_with" }} />
               </div>
 
-              <div className="relative flex items-center justify-center my-2">
+              <div className="relative flex items-center justify-center my-1">
                 <div className="w-full border-t border-border/70" />
-                <span className="bg-card px-3 text-[11px] font-medium text-muted-foreground shrink-0 uppercase tracking-wider">
-                  Or passwordless email
+                <span className="bg-card/90 px-3 text-[11px] font-medium text-muted-foreground shrink-0 uppercase tracking-wider">
+                  or
                 </span>
                 <div className="w-full border-t border-border/70" />
               </div>
             </>
           ) : null}
 
-          {/* Mode Switcher: Email vs Quick Demo */}
+          {/* Mode Tabs: Email vs Demo */}
           <div className="flex rounded-xl bg-surface/80 p-1 border border-border/60">
             <button
               type="button"
@@ -146,7 +192,7 @@ export function AuthCard() {
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Email Sign In / Register
+              Continue with Email
             </button>
             <button
               type="button"
@@ -160,42 +206,15 @@ export function AuthCard() {
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Demo Accounts
+              Quick Demo
             </button>
           </div>
 
           {authMode === "email" ? (
-            <form onSubmit={handleSendOtp} className="space-y-3.5 mt-2">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-[11px] font-medium text-foreground block mb-1">
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="e.g. Alex"
-                    className="w-full rounded-xl border border-border/80 bg-surface px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-medium text-foreground block mb-1">
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="e.g. Rivera"
-                    className="w-full rounded-xl border border-border/80 bg-surface px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
-                </div>
-              </div>
-
+            <form onSubmit={handleSendOtp} className="space-y-3 mt-2">
               <div>
                 <label className="text-[11px] font-medium text-foreground block mb-1">
-                  Email Address <span className="text-primary">*</span>
+                  Email Address
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
@@ -204,8 +223,8 @@ export function AuthCard() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="alex.rivera@college.edu"
-                    className="w-full rounded-xl border border-border/80 bg-surface pl-10 pr-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                    placeholder="College or personal email"
+                    className="w-full rounded-xl border border-border/80 bg-surface pl-10 pr-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/40 transition-all"
                   />
                 </div>
               </div>
@@ -228,15 +247,15 @@ export function AuthCard() {
               </Button>
 
               <p className="text-[11px] text-center text-muted-foreground">
-                No password required. We'll send a 6-digit code to your email.
+                No password required. We'll verify with a secure 6-digit code.
               </p>
             </form>
           ) : (
-            /* Demo Accounts Tab */
-            <div className="rounded-2xl border border-border/60 bg-card/40 p-4 space-y-3 mt-2">
-              <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                <Terminal className="size-3.5 text-primary" />
-                Quick One-Click Pilot Access:
+            /* Quick Demo Tab */
+            <div className="rounded-2xl border border-border/60 bg-card/40 p-3.5 space-y-2.5 mt-2">
+              <p className="text-[11px] font-semibold text-foreground flex items-center gap-1.5">
+                <Terminal className="size-3.5 text-cyan-400" />
+                Select a Test Profile:
               </p>
 
               <div className="grid gap-2">
@@ -244,14 +263,14 @@ export function AuthCard() {
                   type="button"
                   onClick={() => void handleDevLogin("alex.rivera@spar.dev")}
                   disabled={demoLoading}
-                  className="flex items-center justify-between rounded-xl border border-primary/40 bg-surface/80 px-3.5 py-2.5 text-left text-xs transition-colors hover:bg-primary/10 hover:border-primary"
+                  className="flex items-center justify-between rounded-xl border border-cyan-500/30 bg-surface/80 px-3 py-2 text-left text-xs transition-colors hover:bg-cyan-500/10 hover:border-cyan-400"
                 >
                   <div>
-                    <p className="font-semibold text-foreground">Alex Rivera (Data Engineer)</p>
-                    <p className="text-[10px] text-muted-foreground">Pre-configured roadmap & diagnostics</p>
+                    <p className="font-semibold text-foreground text-[11px]">Alex Rivera (Data Engineer)</p>
+                    <p className="text-[10px] text-muted-foreground">Active roadmap & diagnostic score: 78%</p>
                   </div>
-                  <Badge className="bg-primary/20 text-primary border-primary/30 text-[10px]">
-                    Ready
+                  <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 text-[9px]">
+                    Active
                   </Badge>
                 </button>
 
@@ -259,11 +278,11 @@ export function AuthCard() {
                   type="button"
                   onClick={() => void handleDevLogin("new.student@spar.dev")}
                   disabled={demoLoading}
-                  className="flex items-center justify-between rounded-xl border border-border/60 bg-surface/80 px-3.5 py-2.5 text-left text-xs transition-colors hover:bg-secondary hover:border-border-strong"
+                  className="flex items-center justify-between rounded-xl border border-border/60 bg-surface/80 px-3 py-2 text-left text-xs transition-colors hover:bg-secondary hover:border-border-strong"
                 >
                   <div>
-                    <p className="font-semibold text-foreground">New Student Account</p>
-                    <p className="text-[10px] text-muted-foreground">Starts fresh 3-step onboarding</p>
+                    <p className="font-semibold text-foreground text-[11px]">New Student Account</p>
+                    <p className="text-[10px] text-muted-foreground">Fresh onboarding state</p>
                   </div>
                   <span className="text-[10px] text-muted-foreground">Fresh</span>
                 </button>
@@ -272,43 +291,49 @@ export function AuthCard() {
           )}
         </div>
       ) : (
-        /* Step 2: Enter 6-digit OTP Code */
+        /* Step 2: 6-Box OTP Code View */
         <form onSubmit={handleVerifyOtp} className="space-y-4 mt-5">
-          <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 text-center space-y-2">
+          <div className="rounded-2xl border border-cyan-500/30 bg-cyan-950/20 p-3 text-center space-y-1.5">
             <div className="flex justify-center">
-              <div className="grid size-10 place-items-center rounded-xl bg-primary/20 text-primary">
-                <KeyRound className="size-5" />
+              <div className="grid size-8 place-items-center rounded-xl bg-cyan-500/20 text-cyan-300">
+                <KeyRound className="size-4" />
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Enter the 6-digit code sent to <strong className="text-foreground">{email}</strong>
+            <p className="text-[11px] text-muted-foreground">
+              Enter the code sent to <strong className="text-foreground">{email}</strong>
             </p>
           </div>
 
+          {/* 6 Individual Code Boxes */}
           <div>
-            <label className="text-[11px] font-medium text-foreground block mb-1 text-center">
-              6-Digit Code
+            <label className="text-[11px] font-medium text-foreground block mb-2 text-center">
+              Verification Code
             </label>
-            <input
-              type="text"
-              maxLength={6}
-              autoFocus
-              value={otpCode}
-              onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, "");
-                setOtpCode(val);
-              }}
-              placeholder="123456"
-              className="w-full rounded-xl border border-border/80 bg-surface px-4 py-3 text-center text-xl font-mono tracking-widest text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-            />
+            <div className="flex justify-between gap-1.5 sm:gap-2" onPaste={handleOtpPaste}>
+              {otpCode.map((digit, idx) => (
+                <input
+                  key={idx}
+                  ref={(el) => {
+                    otpInputRefs.current[idx] = el;
+                  }}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
+                  value={digit}
+                  onChange={(e) => handleOtpChange(idx, e.target.value)}
+                  onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+                  className="size-11 sm:size-12 rounded-xl border border-border/80 bg-surface text-center font-mono text-lg font-bold text-foreground focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/40 transition-all"
+                />
+              ))}
+            </div>
           </div>
 
           <Button
             type="submit"
             size="lg"
             variant="hero"
-            disabled={loading || otpCode.length < 6}
-            className="w-full font-semibold gap-2 shadow-lg"
+            disabled={loading || otpCode.join("").length < 6}
+            className="w-full font-semibold gap-2 shadow-lg mt-1"
           >
             {loading ? (
               "Verifying Code…"
@@ -325,44 +350,57 @@ export function AuthCard() {
               type="button"
               onClick={() => {
                 setStep("enter_email");
-                setOtpCode("");
+                setOtpCode(["", "", "", "", "", ""]);
                 setAuthError(null);
               }}
               className="text-muted-foreground hover:text-foreground underline transition-colors"
             >
-              ← Change Email
+              ← Change email
             </button>
 
             <button
               type="button"
               disabled={resendCooldown > 0 || loading}
               onClick={handleSendOtp}
-              className="text-primary hover:underline disabled:opacity-50 disabled:no-underline flex items-center gap-1 font-medium transition-colors"
+              className="text-cyan-400 hover:underline disabled:opacity-50 disabled:no-underline flex items-center gap-1 font-medium transition-colors"
             >
               <RefreshCw className={`size-3 ${loading ? "animate-spin" : ""}`} />
-              {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : "Resend code"}
+              {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend code"}
             </button>
           </div>
         </form>
       )}
 
+      {/* Error display */}
       {(error ?? authError) !== null ? (
         <p
           role="alert"
-          className="mt-4 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-2.5 text-center text-xs text-destructive"
+          className="mt-3 rounded-xl border border-destructive/40 bg-destructive/10 px-3.5 py-2 text-center text-xs text-destructive"
         >
           {error ?? authError}
         </p>
       ) : null}
 
-      <p className="mt-5 text-center text-[11px] leading-relaxed text-muted-foreground">
+      {/* College Workflow CTA */}
+      <div className="mt-4 pt-3.5 border-t border-border/60 text-center">
+        <Link
+          to="/colleges"
+          onClick={() => trackLandingEvent("COLLEGE_CTA_CLICKED")}
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-cyan-400 transition-colors"
+        >
+          <Building2 className="size-3.5" />
+          Representing a college? <span className="font-semibold underline">Explore SPAR for Colleges →</span>
+        </Link>
+      </div>
+
+      <p className="mt-3 text-center text-[10px] leading-relaxed text-muted-foreground">
         By continuing, you agree to SPAR's{" "}
-        <a href="#terms" className="text-primary hover:underline">
+        <a href="#terms" className="text-cyan-400 hover:underline">
           Terms
         </a>{" "}
         and{" "}
-        <a href="#privacy" className="text-primary hover:underline">
-          Privacy Policy
+        <a href="#privacy" className="text-cyan-400 hover:underline">
+          Privacy Notice
         </a>
         .
       </p>

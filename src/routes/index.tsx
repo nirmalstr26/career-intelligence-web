@@ -1,11 +1,19 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Lock, ShieldCheck } from "lucide-react";
 
-import { Hero } from "@/components/landing/Hero";
 import { Navbar } from "@/components/landing/Navbar";
-import { TrustStrip } from "@/components/landing/TrustStrip";
+import { Hero } from "@/components/landing/Hero";
+import { TruthfulProofBar } from "@/components/landing/TruthfulProofBar";
+import { PlatformCapabilities } from "@/components/landing/PlatformCapabilities";
+import { HowItWorks } from "@/components/landing/HowItWorks";
+import { CoachPreview } from "@/components/landing/CoachPreview";
+import { KnowledgeGraphPreview } from "@/components/landing/KnowledgeGraphPreview";
+import { ReadinessPreview } from "@/components/landing/ReadinessPreview";
+import { CareerPathsSection } from "@/components/landing/CareerPathsSection";
+import { CollegesSection } from "@/components/landing/CollegesSection";
+import { Footer } from "@/components/landing/Footer";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { trackLandingEvent } from "@/lib/analytics/landingEvents";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -14,13 +22,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "SPAR AI is an adaptive career operating system for students and universities: evidence-based career discovery, benchmark readiness scoring, and placement pipeline in one platform.",
+          "SPAR AI is an adaptive career operating system for students and universities: evidence-based career discovery, benchmark readiness scoring, practical projects, and university placement intelligence.",
       },
-      { property: "og:title", content: "SPAR AI — Build the career you're meant for" },
+      { property: "og:title", content: "SPAR AI — Turn ambition into a career roadmap" },
       {
         property: "og:description",
         content:
-          "AI-powered career discovery, verified capability evidence, and university placement intelligence.",
+          "AI-powered career discovery, verified capability evidence, practical projects, and university placement intelligence.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -32,6 +40,10 @@ export const Route = createFileRoute("/")({
 function Landing() {
   const { status, onboardingRequired, user } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    trackLandingEvent("LANDING_VIEWED");
+  }, []);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -48,44 +60,52 @@ function Landing() {
   }, [status, onboardingRequired, user, navigate]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden flex flex-col justify-between">
+    <div className="relative min-h-screen bg-background text-foreground flex flex-col justify-between selection:bg-cyan-500/30 selection:text-cyan-200">
+      {/* Top Ambient Glow Gradient */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-[700px] lg:hidden"
-        style={{ backgroundImage: "var(--gradient-hero-glow)" }}
+        className="pointer-events-none absolute inset-x-0 top-0 h-[800px] -z-20 opacity-60"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 50% at 50% -10%, rgba(6, 215, 247, 0.18), rgba(70, 87, 255, 0.08) 60%, transparent 80%)",
+        }}
         aria-hidden="true"
       />
 
       <div>
         <Navbar />
-        <main className="relative mx-auto w-full max-w-[1440px] px-6 pb-16 lg:px-10 lg:pb-20">
+
+        <main className="relative mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-10 space-y-4">
+          {/* 1. Hero Section with Animated Luminous Career Road & Auth Card */}
           <Hero />
-          <TrustStrip />
+
+          {/* 2. Truthful System Capabilities Proof Bar */}
+          <TruthfulProofBar />
+
+          {/* 3. 3x2 Platform Capability Cards */}
+          <PlatformCapabilities />
+
+          {/* 4. How It Works 5-Step Connected Visual Progression */}
+          <HowItWorks />
+
+          {/* 5. SPAR Coach Contextual AI Preview */}
+          <CoachPreview />
+
+          {/* 6. Career Knowledge Graph Architecture Preview */}
+          <KnowledgeGraphPreview />
+
+          {/* 7. Benchmark Readiness Intelligence Preview */}
+          <ReadinessPreview />
+
+          {/* 8. Supported Career Paths Showcase */}
+          <CareerPathsSection />
+
+          {/* 9. University / College Cohort Intelligence Section */}
+          <CollegesSection />
         </main>
       </div>
 
-      {/* Public Footer with Discreet Admin Link */}
-      <footer className="border-t border-border bg-card/40 py-8 text-xs text-muted-foreground">
-        <div className="mx-auto max-w-[1440px] px-6 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-display font-bold text-foreground">SPAR AI</span>
-            <span>· Adaptive Career Intelligence & University Placement Operating System</span>
-          </div>
-
-          <div className="flex items-center gap-6">
-            <a href="#product" className="hover:text-foreground transition-colors">Product</a>
-            <a href="#careers" className="hover:text-foreground transition-colors">Careers</a>
-            <Link to="/colleges" className="hover:text-foreground transition-colors">For Colleges</Link>
-            <a href="#about" className="hover:text-foreground transition-colors">About</a>
-            <Link
-              to="/admin"
-              className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/60 hover:text-foreground transition-colors border border-border/40 rounded-md px-2 py-0.5"
-            >
-              <Lock className="size-3" />
-              Admin
-            </Link>
-          </div>
-        </div>
-      </footer>
+      {/* 10. Comprehensive Public Footer */}
+      <Footer />
     </div>
   );
 }
