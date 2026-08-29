@@ -671,3 +671,12 @@ export async function registerCollege(data: CollegeRegistrationSubmitRequest): P
 export async function getMyCollegeRegistrations(): Promise<CollegeRegistrationResponse[]> {
   return api.get<CollegeRegistrationResponse[]>("/colleges/my-registration");
 }
+
+export async function devLogin(email: string, firstName?: string, lastName?: string): Promise<any> {
+  return apiPost<any>("/auth/dev-login", {
+    email,
+    first_name: firstName || "Dev",
+    last_name: lastName || "User",
+    is_new_registration: false,
+  });
+}
