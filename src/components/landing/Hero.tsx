@@ -8,7 +8,6 @@ import {
   Target,
   Sparkles,
 } from "lucide-react";
-import heroBgImage from "@/assets/hero_background_home.png";
 import { CareerRoadArt } from "@/components/landing/CareerRoadArt";
 import { StatsFloatingCard } from "@/components/landing/StatsFloatingCard";
 import { AuthCard } from "@/components/landing/AuthCard";
@@ -69,36 +68,8 @@ const FEATURE_TILES: FeatureTile[] = [
 export function Hero() {
   return (
     <section className="relative pt-6 pb-8 overflow-visible">
-      {/* 
-        EXPANSIVE SEAMLESS BACKGROUND ARTWORK LAYER
-        - Positioned behind the entire hero content
-        - Universal smooth radial mask fading softly on all 4 sides
-        - Directional edge gradient overlays to seamlessly blend into page background
-      */}
-      <div className="pointer-events-none absolute inset-0 -top-8 -bottom-10 -z-10 flex items-center justify-center overflow-hidden">
-        <div className="relative w-full h-full max-w-[1500px]">
-          <img
-            src={heroBgImage || "/brand/hero_background_home.png"}
-            alt=""
-            aria-hidden="true"
-            className="w-full h-full object-cover object-center scale-105 select-none opacity-90"
-            style={{
-              maskImage:
-                "radial-gradient(ellipse 72% 65% at 50% 42%, black 35%, rgba(0,0,0,0.8) 58%, rgba(0,0,0,0.2) 80%, transparent 100%)",
-              WebkitMaskImage:
-                "radial-gradient(ellipse 72% 65% at 50% 42%, black 35%, rgba(0,0,0,0.8) 58%, rgba(0,0,0,0.2) 80%, transparent 100%)",
-            }}
-          />
-
-          {/* Directional Soft Gradient Overlays for Zero Hard Edges */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#030712] via-transparent to-transparent opacity-80" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#030712] via-[#030712]/60 to-transparent opacity-95" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#030712] via-transparent to-[#030712] opacity-70" />
-        </div>
-      </div>
-
       {/* 3-Column Foreground Content Grid */}
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1.1fr_1fr_400px] xl:grid-cols-[1.15fr_1.05fr_410px] items-start gap-8 lg:gap-6 xl:gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1.05fr_400px] xl:grid-cols-[1.15fr_1.1fr_410px] items-start gap-8 lg:gap-6 xl:gap-8">
         
         {/* LEFT COLUMN: Eyebrow + Headline + Description + 6 Feature Tiles */}
         <div className="space-y-6 pt-2">
@@ -150,13 +121,13 @@ export function Hero() {
           </div>
         </div>
 
-        {/* CENTER COLUMN: Floating Pathway Milestone Chips + Floating Bottom Stats Card */}
+        {/* CENTER COLUMN: Integrated Artwork + Milestone Chips + Floating Bottom Stats Card */}
         <div className="flex flex-col items-center justify-between h-full pt-1">
-          {/* Floating Pathway Milestone Chips */}
+          {/* Luminous Career Pathway Artwork + Floating Milestone Chips */}
           <CareerRoadArt />
 
           {/* Bottom Stats Card with Avatars & Stars */}
-          <div className="w-full flex justify-center -mt-6 sm:-mt-10 z-20">
+          <div className="w-full flex justify-center -mt-8 sm:-mt-12 z-20">
             <StatsFloatingCard />
           </div>
         </div>
