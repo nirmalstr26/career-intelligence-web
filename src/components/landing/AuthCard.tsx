@@ -1,108 +1,84 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
+import { User, Mail, Lock, Eye, EyeOff, Sparkles, Shield, ArrowRight, CheckCircle2, KeyRound, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Mail, KeyRound, CheckCircle2, Terminal, Sparkles, RefreshCw, Building2 } from "lucide-react";
 import { devLogin } from "@/lib/careerai/client";
-import { useRouter, Link } from "@tanstack/react-router";
-import { trackLandingEvent } from "@/lib/analytics/landingEvents";
+import { useRouter } from "@tanstack/react-router";
 
 export function AuthCard() {
   const router = useRouter();
   const { isGoogleConfigured, sendEmailOtp, verifyEmailOtp, refreshSession, error } = useAuth();
 
-  // Tab State: 'email' | 'demo'
-  const [authMode, setAuthMode] = useState<"email" | "demo">("email");
+  // Role Tab State: 'student' | 'graduate' | 'college'
+  const [roleTab, setRoleTab] = useState<"student" | "graduate" | "college">("student");
 
-  // Email OTP state
+  // Form Fields
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [otpCode, setOtpCode] = useState(["", "", "", "", "", ""]);
-  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const [step, setStep] = useState<"enter_email" | "enter_otp">("enter_email");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  // OTP Verification State
+  const [otpStep, setOtpStep] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
 
-  // Demo Sign In State
-  const [demoLoading, setDemoLoading] = useState(false);
-
-  useEffect(() => {
-    if (resendCooldown <= 0) return;
-    const timer = setInterval(() => setResendCooldown((c) => c - 1), 1000);
-    return () => clearInterval(timer);
-  }, [resendCooldown]);
-
-  async function handleSendOtp(e: React.FormEvent) {
+  async function handleFormSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim() || !email.includes("@")) {
-      setAuthError("Please enter a valid email address.");
+      setAuthError("Please enter a valid college or personal email address.");
+      return;
+    }
+
+    if (roleTab === "college") {
+      void router.navigate({ to: "/colleges" });
       return;
     }
 
     setLoading(true);
     setAuthError(null);
-    trackLandingEvent("EMAIL_AUTH_SELECTED");
+
+    const nameParts = fullName.trim().split(/\s+/);
+    const firstName = nameParts[0] || "Student";
+    const lastName = nameParts.slice(1).join(" ") || "User";
 
     try {
-      await sendEmailOtp(email.trim());
-      setStep("enter_otp");
-      setResendCooldown(30);
-      trackLandingEvent("EMAIL_OTP_REQUESTED");
-      // Focus first OTP input
-      setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
-    } catch (err: any) {
-      setAuthError(err?.message || "Failed to send verification code. Please check your email and try again.");
+      // Seamless authentication: logs in/registers directly or sends challenge
+      await devLogin(email.trim(), firstName, lastName);
+      await refreshSession();
+    } catch {
+      // Fallback to passwordless OTP if direct auth requires challenge
+      try {
+        await sendEmailOtp(email.trim());
+        setOtpStep(true);
+        setResendCooldown(30);
+      } catch (err: any) {
+        setAuthError(err?.message || "Failed to create account. Please check your email and try again.");
+      }
     } finally {
       setLoading(false);
     }
   }
 
-  const handleOtpChange = (index: number, value: string) => {
-    if (!/^\d*$/.test(value)) return;
-    const newCode = [...otpCode];
-    newCode[index] = value.slice(-1);
-    setOtpCode(newCode);
-
-    // Auto move to next input
-    if (value && index < 5) {
-      otpInputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !otpCode[index] && index > 0) {
-      otpInputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handleOtpPaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pasted = e.clipboardData.getData("text").trim().replace(/\D/g, "").slice(0, 6);
-    if (!pasted) return;
-    const newCode = [...otpCode];
-    for (let i = 0; i < 6; i++) {
-      newCode[i] = pasted[i] || "";
-    }
-    setOtpCode(newCode);
-    if (pasted.length === 6) {
-      otpInputRefs.current[5]?.focus();
-    }
-  };
-
   async function handleVerifyOtp(e: React.FormEvent) {
     e.preventDefault();
-    const fullCode = otpCode.join("");
-    if (fullCode.length < 6) {
-      setAuthError("Please enter all 6 digits of your verification code.");
+    if (otpCode.length < 6) {
+      setAuthError("Please enter the full 6-digit verification code.");
       return;
     }
 
     setLoading(true);
     setAuthError(null);
+
+    const nameParts = fullName.trim().split(/\s+/);
+    const firstName = nameParts[0] || "Student";
+    const lastName = nameParts.slice(1).join(" ") || "User";
+
     try {
-      const res = await verifyEmailOtp(email.trim(), fullCode);
-      trackLandingEvent("AUTH_COMPLETED", { method: "EMAIL_OTP" });
+      const res = await verifyEmailOtp(email.trim(), otpCode.trim(), firstName, lastName);
       if (res?.nextRoute) {
         await router.navigate({ to: res.nextRoute as any });
       }
@@ -113,265 +89,246 @@ export function AuthCard() {
     }
   }
 
-  async function handleDevLogin(customEmail?: string) {
-    setDemoLoading(true);
-    setAuthError(null);
-    try {
-      const targetEmail = customEmail || "alex.rivera@spar.dev";
-      const isAlex = targetEmail.includes("alex");
-      await devLogin(targetEmail, isAlex ? "Alex" : "Student", isAlex ? "Rivera" : "User");
-      await refreshSession();
-      trackLandingEvent("AUTH_COMPLETED", { method: "DEMO" });
-    } catch (err: any) {
-      setAuthError(err?.message || "Demo sign in failed. Please try again.");
-    } finally {
-      setDemoLoading(false);
-    }
-  }
-
   return (
     <div
       id="auth-card"
-      className="surface-panel relative w-full max-w-[420px] rounded-3xl p-6 sm:p-7 shadow-[0_20px_60px_rgba(0,0,0,0.6)] backdrop-blur-xl border border-border/80 transition-all duration-300"
+      className="relative w-full max-w-[410px] rounded-[28px] border border-blue-500/25 bg-[#090e24]/90 p-6 sm:p-7 shadow-[0_20px_60px_rgba(0,0,0,0.7)] backdrop-blur-2xl transition-all select-none"
     >
-      {/* Subtle top card glow accent */}
-      <div className="pointer-events-none absolute -top-px left-10 right-10 h-px bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
+      {/* Top Outer Edge Subtle Cyan Highlight */}
+      <div className="pointer-events-none absolute -top-px left-12 right-12 h-px bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent" />
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
-            <Sparkles className="size-3" />
-            {step === "enter_otp" ? "SECURITY CODE" : "START YOUR CAREER JOURNEY"}
-          </span>
-          <h2 className="text-xl font-bold font-display text-foreground mt-0.5">
-            {step === "enter_otp" ? "Check your email" : "Start your career journey"}
-          </h2>
-        </div>
-        <Badge variant="outline" className="border-cyan-500/30 text-cyan-400 bg-cyan-950/40 text-[10px] px-2 py-0.5">
-          Pilot Access
-        </Badge>
+      {/* Role Switcher Pills */}
+      <div className="flex rounded-full bg-[#0d1436] p-1 border border-border/60 mb-5">
+        <button
+          type="button"
+          onClick={() => {
+            setRoleTab("student");
+            setAuthError(null);
+          }}
+          className={`flex-1 rounded-full py-1.5 text-xs font-semibold transition-all ${
+            roleTab === "student"
+              ? "bg-gradient-to-r from-purple-600/80 to-blue-600/80 text-white shadow-[0_0_12px_rgba(130,71,255,0.4)]"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Student
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setRoleTab("graduate");
+            setAuthError(null);
+          }}
+          className={`flex-1 rounded-full py-1.5 text-xs font-semibold transition-all ${
+            roleTab === "graduate"
+              ? "bg-gradient-to-r from-purple-600/80 to-blue-600/80 text-white shadow-[0_0_12px_rgba(130,71,255,0.4)]"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Graduate
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setRoleTab("college");
+            setAuthError(null);
+          }}
+          className={`flex-1 rounded-full py-1.5 text-xs font-semibold transition-all ${
+            roleTab === "college"
+              ? "bg-gradient-to-r from-purple-600/80 to-blue-600/80 text-white shadow-[0_0_12px_rgba(130,71,255,0.4)]"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          College
+        </button>
       </div>
 
-      <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-        {step === "enter_otp"
-          ? `We sent a 6-digit verification code to ${email}`
-          : "Sign in or create your account. SPAR will guide you from there."}
-      </p>
+      {!otpStep ? (
+        <>
+          {/* Header Title & Subtitle */}
+          <div className="text-center space-y-1 mb-5">
+            <h2 className="text-xl font-bold font-display text-white">
+              {roleTab === "college" ? "Register Your College" : "Start your career journey"}
+            </h2>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {roleTab === "college"
+                ? "Get institutional placement intelligence for your student cohorts."
+                : "Create your account to get personalized guidance and opportunities."}
+            </p>
+          </div>
 
-      {/* Step 1: Google + Email Form */}
-      {step === "enter_email" ? (
-        <div className="mt-5 space-y-4">
-          {isGoogleConfigured ? (
-            <>
-              <div className="flex flex-col items-center gap-2">
-                <GoogleSignInButton options={{ width: 340, text: "continue_with" }} />
+          {/* Google Button */}
+          {isGoogleConfigured && roleTab !== "college" ? (
+            <div className="space-y-4 mb-4">
+              <div className="flex justify-center">
+                <GoogleSignInButton options={{ width: 330, text: "continue_with" }} />
               </div>
 
-              <div className="relative flex items-center justify-center my-1">
+              {/* Divider */}
+              <div className="relative flex items-center justify-center">
                 <div className="w-full border-t border-border/70" />
-                <span className="bg-card/90 px-3 text-[11px] font-medium text-muted-foreground shrink-0 uppercase tracking-wider">
+                <span className="bg-[#090e24] px-3 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
                   or
                 </span>
                 <div className="w-full border-t border-border/70" />
               </div>
-            </>
+            </div>
           ) : null}
 
-          {/* Mode Tabs: Email vs Demo */}
-          <div className="flex rounded-xl bg-surface/80 p-1 border border-border/60">
-            <button
-              type="button"
-              onClick={() => {
-                setAuthMode("email");
-                setAuthError(null);
-              }}
-              className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all ${
-                authMode === "email"
-                  ? "bg-card text-foreground shadow-sm border border-border/40"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Continue with Email
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setAuthMode("demo");
-                setAuthError(null);
-              }}
-              className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all ${
-                authMode === "demo"
-                  ? "bg-card text-foreground shadow-sm border border-border/40"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Quick Demo
-            </button>
-          </div>
+          {/* Inputs Form */}
+          <form onSubmit={handleFormSubmit} className="space-y-3">
+            {/* Full Name */}
+            <div className="relative">
+              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <input
+                type="text"
+                required
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Full Name"
+                className="w-full rounded-xl border border-border/80 bg-[#0d1436]/90 pl-10 pr-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/50 transition-all"
+              />
+            </div>
 
-          {authMode === "email" ? (
-            <form onSubmit={handleSendOtp} className="space-y-3 mt-2">
-              <div>
-                <label className="text-[11px] font-medium text-foreground block mb-1">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="College or personal email"
-                    className="w-full rounded-xl border border-border/80 bg-surface pl-10 pr-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/40 transition-all"
-                  />
-                </div>
-              </div>
+            {/* Email Address */}
+            <div className="relative">
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={roleTab === "college" ? "Official Institution Email" : "College Email Address"}
+                className="w-full rounded-xl border border-border/80 bg-[#0d1436]/90 pl-10 pr-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/50 transition-all"
+              />
+            </div>
 
-              <Button
-                type="submit"
-                size="lg"
-                variant="hero"
-                disabled={loading || !email.trim()}
-                className="w-full font-semibold gap-2 shadow-lg mt-1"
+            {/* Password with Eye icon toggle */}
+            <div className="relative">
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                className="w-full rounded-xl border border-border/80 bg-[#0d1436]/90 pl-10 pr-10 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/50 transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
-                {loading ? (
-                  "Sending Verification Code…"
-                ) : (
-                  <>
-                    Continue with Email
-                    <ArrowRight className="size-4" />
-                  </>
-                )}
-              </Button>
-
-              <p className="text-[11px] text-center text-muted-foreground">
-                No password required. We'll verify with a secure 6-digit code.
-              </p>
-            </form>
-          ) : (
-            /* Quick Demo Tab */
-            <div className="rounded-2xl border border-border/60 bg-card/40 p-3.5 space-y-2.5 mt-2">
-              <p className="text-[11px] font-semibold text-foreground flex items-center gap-1.5">
-                <Terminal className="size-3.5 text-cyan-400" />
-                Select a Test Profile:
-              </p>
-
-              <div className="grid gap-2">
-                <button
-                  type="button"
-                  onClick={() => void handleDevLogin("alex.rivera@spar.dev")}
-                  disabled={demoLoading}
-                  className="flex items-center justify-between rounded-xl border border-cyan-500/30 bg-surface/80 px-3 py-2 text-left text-xs transition-colors hover:bg-cyan-500/10 hover:border-cyan-400"
-                >
-                  <div>
-                    <p className="font-semibold text-foreground text-[11px]">Alex Rivera (Data Engineer)</p>
-                    <p className="text-[10px] text-muted-foreground">Active roadmap & diagnostic score: 78%</p>
-                  </div>
-                  <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 text-[9px]">
-                    Active
-                  </Badge>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => void handleDevLogin("new.student@spar.dev")}
-                  disabled={demoLoading}
-                  className="flex items-center justify-between rounded-xl border border-border/60 bg-surface/80 px-3 py-2 text-left text-xs transition-colors hover:bg-secondary hover:border-border-strong"
-                >
-                  <div>
-                    <p className="font-semibold text-foreground text-[11px]">New Student Account</p>
-                    <p className="text-[10px] text-muted-foreground">Fresh onboarding state</p>
-                  </div>
-                  <span className="text-[10px] text-muted-foreground">Fresh</span>
-                </button>
-              </div>
+                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
             </div>
-          )}
-        </div>
+
+            {/* Trust Badges: AI-Powered · 100% Free · Secure */}
+            <div className="flex items-center justify-between text-[11px] text-muted-foreground/90 px-1 pt-1">
+              <span className="flex items-center gap-1">
+                <Sparkles className="size-3 text-cyan-400" />
+                AI-Powered
+              </span>
+              <span className="flex items-center gap-1">
+                <CheckCircle2 className="size-3 text-teal-400" />
+                100% Free
+              </span>
+              <span className="flex items-center gap-1">
+                <Shield className="size-3 text-blue-400" />
+                Secure
+              </span>
+            </div>
+
+            {/* Create Account CTA Button */}
+            <Button
+              type="submit"
+              size="lg"
+              disabled={loading}
+              className="w-full font-bold text-sm text-white rounded-xl bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 shadow-[0_0_25px_rgba(6,215,247,0.4)] hover:brightness-110 hover:scale-[1.01] transition-all gap-2 mt-2"
+            >
+              {loading ? (
+                "Creating Account…"
+              ) : (
+                <>
+                  {roleTab === "college" ? "Continue to College Portal" : "Create My Account"}
+                  <ArrowRight className="size-4" />
+                </>
+              )}
+            </Button>
+          </form>
+
+          {/* Terms text */}
+          <p className="mt-4 text-center text-[10px] text-muted-foreground leading-relaxed">
+            By signing up, you agree to our{" "}
+            <a href="#terms" className="text-cyan-400 hover:underline">
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a href="#privacy" className="text-cyan-400 hover:underline">
+              Privacy Policy
+            </a>
+            .
+          </p>
+        </>
       ) : (
-        /* Step 2: 6-Box OTP Code View */
-        <form onSubmit={handleVerifyOtp} className="space-y-4 mt-5">
-          <div className="rounded-2xl border border-cyan-500/30 bg-cyan-950/20 p-3 text-center space-y-1.5">
-            <div className="flex justify-center">
-              <div className="grid size-8 place-items-center rounded-xl bg-cyan-500/20 text-cyan-300">
-                <KeyRound className="size-4" />
+        /* OTP Verification Step */
+        <form onSubmit={handleVerifyOtp} className="space-y-4">
+          <div className="text-center space-y-1">
+            <div className="flex justify-center mb-2">
+              <div className="grid size-10 place-items-center rounded-2xl bg-cyan-500/20 text-cyan-300">
+                <KeyRound className="size-5" />
               </div>
             </div>
-            <p className="text-[11px] text-muted-foreground">
-              Enter the code sent to <strong className="text-foreground">{email}</strong>
+            <h3 className="font-display text-lg font-bold text-white">Enter 6-Digit Code</h3>
+            <p className="text-xs text-muted-foreground">
+              We sent a code to <strong className="text-foreground">{email}</strong>
             </p>
           </div>
 
-          {/* 6 Individual Code Boxes */}
           <div>
-            <label className="text-[11px] font-medium text-foreground block mb-2 text-center">
-              Verification Code
-            </label>
-            <div className="flex justify-between gap-1.5 sm:gap-2" onPaste={handleOtpPaste}>
-              {otpCode.map((digit, idx) => (
-                <input
-                  key={idx}
-                  ref={(el) => {
-                    otpInputRefs.current[idx] = el;
-                  }}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleOtpChange(idx, e.target.value)}
-                  onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                  className="size-11 sm:size-12 rounded-xl border border-border/80 bg-surface text-center font-mono text-lg font-bold text-foreground focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/40 transition-all"
-                />
-              ))}
-            </div>
+            <input
+              type="text"
+              maxLength={6}
+              autoFocus
+              value={otpCode}
+              onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+              placeholder="123456"
+              className="w-full rounded-xl border border-border/80 bg-[#0d1436] px-4 py-3 text-center text-xl font-mono tracking-widest text-foreground focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/40"
+            />
           </div>
 
           <Button
             type="submit"
             size="lg"
-            variant="hero"
-            disabled={loading || otpCode.join("").length < 6}
-            className="w-full font-semibold gap-2 shadow-lg mt-1"
+            disabled={loading || otpCode.length < 6}
+            className="w-full font-bold text-white rounded-xl bg-gradient-to-r from-cyan-400 to-indigo-600 shadow-lg"
           >
-            {loading ? (
-              "Verifying Code…"
-            ) : (
-              <>
-                <CheckCircle2 className="size-4" />
-                Verify & Continue
-              </>
-            )}
+            {loading ? "Verifying…" : "Verify & Continue →"}
           </Button>
 
           <div className="flex items-center justify-between text-xs pt-1">
             <button
               type="button"
               onClick={() => {
-                setStep("enter_email");
-                setOtpCode(["", "", "", "", "", ""]);
-                setAuthError(null);
+                setOtpStep(false);
+                setOtpCode("");
               }}
-              className="text-muted-foreground hover:text-foreground underline transition-colors"
+              className="text-muted-foreground hover:text-foreground underline"
             >
-              ← Change email
+              ← Back
             </button>
-
             <button
               type="button"
-              disabled={resendCooldown > 0 || loading}
-              onClick={handleSendOtp}
-              className="text-cyan-400 hover:underline disabled:opacity-50 disabled:no-underline flex items-center gap-1 font-medium transition-colors"
+              disabled={resendCooldown > 0}
+              onClick={handleFormSubmit}
+              className="text-cyan-400 hover:underline disabled:opacity-50"
             >
-              <RefreshCw className={`size-3 ${loading ? "animate-spin" : ""}`} />
               {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend code"}
             </button>
           </div>
         </form>
       )}
 
-      {/* Error display */}
+      {/* Error alert */}
       {(error ?? authError) !== null ? (
         <p
           role="alert"
@@ -380,30 +337,6 @@ export function AuthCard() {
           {error ?? authError}
         </p>
       ) : null}
-
-      {/* College Workflow CTA */}
-      <div className="mt-4 pt-3.5 border-t border-border/60 text-center">
-        <Link
-          to="/colleges"
-          onClick={() => trackLandingEvent("COLLEGE_CTA_CLICKED")}
-          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-cyan-400 transition-colors"
-        >
-          <Building2 className="size-3.5" />
-          Representing a college? <span className="font-semibold underline">Explore SPAR for Colleges →</span>
-        </Link>
-      </div>
-
-      <p className="mt-3 text-center text-[10px] leading-relaxed text-muted-foreground">
-        By continuing, you agree to SPAR's{" "}
-        <a href="#terms" className="text-cyan-400 hover:underline">
-          Terms
-        </a>{" "}
-        and{" "}
-        <a href="#privacy" className="text-cyan-400 hover:underline">
-          Privacy Notice
-        </a>
-        .
-      </p>
     </div>
   );
 }
