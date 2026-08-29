@@ -26,43 +26,43 @@ const FEATURE_TILES: FeatureTile[] = [
     title: "Career Discovery",
     desc: "Find paths that match your strengths & goals",
     icon: Compass,
-    iconColor: "text-purple-400",
-    glowColor: "border-purple-500/30 bg-purple-950/40 shadow-[0_0_12px_rgba(130,71,255,0.2)]",
+    iconColor: "text-purple-500 dark:text-purple-400",
+    glowColor: "border-purple-500/30 bg-purple-500/10 dark:bg-purple-950/40 shadow-sm",
   },
   {
     title: "Readiness Tracking",
     desc: "Real-time insights on skills, progress & improvement",
     icon: LineChart,
-    iconColor: "text-cyan-400",
-    glowColor: "border-cyan-500/30 bg-cyan-950/40 shadow-[0_0_12px_rgba(6,215,247,0.2)]",
+    iconColor: "text-cyan-600 dark:text-cyan-400",
+    glowColor: "border-cyan-500/30 bg-cyan-500/10 dark:bg-cyan-950/40 shadow-sm",
   },
   {
     title: "Resume & Profile Builder",
     desc: "Create a standout resume & portfolio that gets noticed",
     icon: FileText,
-    iconColor: "text-purple-400",
-    glowColor: "border-purple-500/30 bg-purple-950/40 shadow-[0_0_12px_rgba(130,71,255,0.2)]",
+    iconColor: "text-purple-500 dark:text-purple-400",
+    glowColor: "border-purple-500/30 bg-purple-500/10 dark:bg-purple-950/40 shadow-sm",
   },
   {
     title: "Mentor Guidance",
     desc: "Connect with mentors and get career advice",
     icon: UserCheck,
-    iconColor: "text-blue-400",
-    glowColor: "border-blue-500/30 bg-blue-950/40 shadow-[0_0_12px_rgba(0,140,255,0.2)]",
+    iconColor: "text-blue-500 dark:text-blue-400",
+    glowColor: "border-blue-500/30 bg-blue-500/10 dark:bg-blue-950/40 shadow-sm",
   },
   {
     title: "Internships & Projects",
     desc: "Discover verified opportunities to learn and grow",
     icon: Briefcase,
-    iconColor: "text-purple-400",
-    glowColor: "border-purple-500/30 bg-purple-950/40 shadow-[0_0_12px_rgba(130,71,255,0.2)]",
+    iconColor: "text-purple-500 dark:text-purple-400",
+    glowColor: "border-purple-500/30 bg-purple-500/10 dark:bg-purple-950/40 shadow-sm",
   },
   {
     title: "Placement Preparation",
     desc: "Aptitude, coding, mock interviews & company prep",
     icon: Target,
-    iconColor: "text-cyan-400",
-    glowColor: "border-cyan-500/30 bg-cyan-950/40 shadow-[0_0_12px_rgba(6,215,247,0.2)]",
+    iconColor: "text-cyan-600 dark:text-cyan-400",
+    glowColor: "border-cyan-500/30 bg-cyan-500/10 dark:bg-cyan-950/40 shadow-sm",
   },
 ];
 
@@ -72,8 +72,7 @@ export function Hero() {
       {/* 
         EXPANSIVE SEAMLESS BACKGROUND ARTWORK LAYER
         - Spans across the entire hero background (1600px width)
-        - Screen blend mode + deep radial & linear mask
-        - Zero rectangular edges, zero borders, zero box boundaries
+        - Screen blend mode in dark theme + adaptive soft bloom in light theme
       */}
       <div className="pointer-events-none absolute inset-0 -top-8 -bottom-16 flex items-center justify-center select-none overflow-hidden">
         <div className="relative w-full max-w-[1600px] h-[720px] lg:h-[800px] flex items-center justify-center">
@@ -81,7 +80,7 @@ export function Hero() {
             src={heroBgImage || "/brand/hero_background_home.png"}
             alt=""
             aria-hidden="true"
-            className="w-full h-full object-cover object-center scale-110 opacity-95 mix-blend-screen select-none"
+            className="w-full h-full object-cover object-center scale-110 opacity-30 dark:opacity-95 dark:mix-blend-screen select-none transition-opacity"
             style={{
               maskImage:
                 "radial-gradient(ellipse 52% 52% at 50% 45%, black 20%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,0.3) 65%, transparent 85%)",
@@ -90,10 +89,15 @@ export function Hero() {
             }}
           />
 
-          {/* Deep directional fade overlays into #030712 */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#030712] via-[#030712]/50 to-transparent opacity-95" />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#030712] via-transparent to-transparent opacity-90" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#030712] via-transparent to-[#030712] opacity-95" />
+          {/* Dark theme gradient overlays into #030712 */}
+          <div className="hidden dark:block absolute inset-0 bg-gradient-to-t from-[#030712] via-[#030712]/50 to-transparent opacity-95" />
+          <div className="hidden dark:block absolute inset-0 bg-gradient-to-b from-[#030712] via-transparent to-transparent opacity-90" />
+          <div className="hidden dark:block absolute inset-0 bg-gradient-to-r from-[#030712] via-transparent to-[#030712] opacity-95" />
+
+          {/* Light theme gradient overlays into white background */}
+          <div className="dark:hidden absolute inset-0 bg-gradient-to-t from-background via-background/85 to-transparent opacity-95" />
+          <div className="dark:hidden absolute inset-0 bg-gradient-to-b from-background via-transparent to-transparent opacity-90" />
+          <div className="dark:hidden absolute inset-0 bg-gradient-to-r from-background via-transparent to-background opacity-95" />
         </div>
       </div>
 
@@ -103,18 +107,18 @@ export function Hero() {
         {/* LEFT COLUMN: Eyebrow + Headline + Description + 6 Feature Tiles */}
         <div className="space-y-6 pt-2">
           {/* Eyebrow Pill */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/40 bg-[#090e24]/90 px-3.5 py-1.5 text-xs text-cyan-300 shadow-[0_0_15px_rgba(6,215,247,0.2)] backdrop-blur-md">
-            <Sparkles className="size-3.5 text-cyan-400" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/40 bg-card/90 dark:bg-[#090e24]/90 px-3.5 py-1.5 text-xs text-cyan-600 dark:text-cyan-300 shadow-[0_0_15px_rgba(6,215,247,0.15)] backdrop-blur-md">
+            <Sparkles className="size-3.5 text-cyan-500" />
             <span className="font-semibold text-[10px] sm:text-[11px] tracking-wider uppercase">
               AI-Powered Career Intelligence for College Students
             </span>
           </div>
 
           {/* Headline */}
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-[3.6rem] xl:text-[3.9rem] font-extrabold tracking-tight text-white leading-[1.08]">
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-[3.6rem] xl:text-[3.9rem] font-extrabold tracking-tight text-foreground leading-[1.08]">
             Turn ambition <br />
             into a career <br />
-            <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(6,215,247,0.35)]">
+            <span className="bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 dark:from-cyan-400 dark:via-blue-500 dark:to-purple-500 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(6,215,247,0.35)]">
               roadmap.
             </span>
           </h1>
@@ -131,13 +135,13 @@ export function Hero() {
               return (
                 <div
                   key={tile.title}
-                  className="flex items-start gap-3 rounded-2xl border border-border/60 bg-[#090e24]/80 p-3 sm:p-3.5 backdrop-blur-md transition-all hover:border-cyan-500/40 hover:-translate-y-0.5"
+                  className="flex items-start gap-3 rounded-2xl border border-border/80 bg-card/85 dark:bg-[#090e24]/80 p-3 sm:p-3.5 backdrop-blur-md transition-all hover:border-cyan-500/40 hover:-translate-y-0.5 shadow-sm"
                 >
                   <div className={`grid size-9 shrink-0 place-items-center rounded-xl border ${tile.glowColor}`}>
                     <Icon className={`size-4.5 ${tile.iconColor}`} />
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-display text-xs font-bold text-white">
+                    <span className="font-display text-xs font-bold text-foreground">
                       {tile.title}
                     </span>
                     <span className="text-[10px] text-muted-foreground leading-tight mt-0.5">

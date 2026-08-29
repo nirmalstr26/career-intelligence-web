@@ -61,13 +61,13 @@ function Landing() {
   }, [status, onboardingRequired, user, navigate]);
 
   return (
-    <div className="relative min-h-screen bg-[#030712] text-foreground flex flex-col justify-between selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden">
-      {/* Deep Cosmic Background Glow & Horizon Mountain Landscape */}
+    <div className="relative min-h-screen bg-background text-foreground flex flex-col justify-between selection:bg-cyan-500/30 selection:text-cyan-600 dark:selection:text-cyan-200 overflow-x-hidden transition-colors duration-300">
+      {/* Dynamic Cosmic Background Glow for Dark Mode & Soft Radiant Bloom for Light Mode */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-[960px] -z-20 opacity-70"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[960px] -z-20 opacity-75 dark:opacity-70 transition-opacity"
         style={{
           background:
-            "radial-gradient(ellipse 85% 60% at 50% 10%, rgba(6, 215, 247, 0.16), rgba(70, 87, 255, 0.12) 40%, rgba(9, 14, 36, 0.95) 75%, #030712 100%)",
+            "radial-gradient(ellipse 85% 60% at 50% 10%, rgba(6, 215, 247, 0.16), rgba(70, 87, 255, 0.12) 40%, transparent 80%)",
         }}
         aria-hidden="true"
       />

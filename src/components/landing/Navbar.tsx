@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
+  Sparkles,
   ChevronDown,
   Menu,
-  Sparkles,
-  UserRound,
   X,
   Compass,
   Map,
@@ -13,57 +12,58 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { UnifiedAuthModal } from "@/components/auth/UnifiedAuthModal";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { UnifiedAuthModal } from "@/components/auth/UnifiedAuthModal";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
 
 export function Navbar() {
-  const [open, setOpen] = useState(false);
+  const { status, onboardingRequired } = useAuth();
+  const isAuthenticated = status === "authenticated";
+
   const [productMenuOpen, setProductMenuOpen] = useState(false);
   const [resourcesMenuOpen, setResourcesMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [authModalMode, setAuthModalMode] = useState<"signin" | "get_started">("get_started");
+  const [open, setOpen] = useState(false);
 
-  const { isAuthenticated, onboardingRequired } = useAuth();
+  const handleSignInClick = () => {
+    setAuthModalOpen(true);
+  };
 
   const handleGetStartedClick = () => {
     const authCard = document.getElementById("auth-card");
-    if (authCard && window.innerWidth >= 1024) {
+    if (authCard) {
       authCard.scrollIntoView({ behavior: "smooth", block: "center" });
-      const emailInput = authCard.querySelector("input[type='email']") as HTMLInputElement | null;
-      if (emailInput) {
-        setTimeout(() => emailInput.focus(), 400);
-      }
     } else {
-      setAuthModalMode("get_started");
       setAuthModalOpen(true);
     }
   };
 
-  const handleSignInClick = () => {
-    setAuthModalMode("signin");
-    setAuthModalOpen(true);
-  };
-
   return (
     <>
-      <header className="sticky top-0 z-40 w-full pt-4 px-4 sm:px-6 lg:px-10 select-none">
-        <div className="mx-auto max-w-[1440px] rounded-2xl border border-border/60 bg-[#090e24]/75 backdrop-blur-xl px-5 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+      <header className="sticky top-0 z-50 w-full pt-3 pb-2 px-4 sm:px-6 lg:px-10">
+        <div className="mx-auto max-w-[1440px] rounded-2xl border border-border/80 bg-background/80 dark:bg-[#090e24]/85 px-4 sm:px-6 py-2.5 shadow-xl backdrop-blur-2xl transition-all">
           <div className="flex items-center justify-between">
-            {/* Official Logo: SPAR AI Icon + Brand Typography */}
+            {/* Brand Logo Lockup */}
             <Link to="/" className="flex items-center gap-2.5 group">
-              <img
-                src="/brand/icon/spar-ai-icon-64.png"
-                srcSet="/brand/icon/spar-ai-icon-64.png 1x, /brand/icon/spar-ai-icon-128.png 2x"
-                alt="SPAR AI"
-                className="size-9 object-contain drop-shadow-[0_0_12px_rgba(6,215,247,0.4)] transition-transform duration-300 group-hover:scale-105"
-              />
-              <span className="font-display text-xl font-extrabold tracking-tight text-white">
-                SPAR <span className="text-cyan-400">AI</span>
-              </span>
+              <div className="relative grid size-9 place-items-center rounded-xl bg-gradient-to-tr from-cyan-500/20 via-blue-500/20 to-purple-500/20 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,215,247,0.3)] transition-transform duration-300 group-hover:scale-105">
+                <img
+                  src="/brand/icon/spar-ai-icon-64.png"
+                  alt="SPAR AI"
+                  className="size-5.5 object-contain"
+                />
+              </div>
+              <div className="flex items-baseline">
+                <span className="font-display text-lg font-black tracking-tight text-foreground">
+                  SPAR
+                </span>
+                <span className="ml-1 text-sm font-extrabold text-cyan-500 dark:text-cyan-400 drop-shadow-[0_0_8px_rgba(6,215,247,0.4)]">
+                  AI
+                </span>
+              </div>
             </Link>
 
             {/* Desktop Navigation Links */}
-            <nav aria-label="Main" className="hidden lg:flex items-center gap-8">
+            <nav className="hidden lg:flex items-center gap-6">
               {/* Product Dropdown */}
               <div
                 className="relative"
@@ -72,51 +72,51 @@ export function Navbar() {
               >
                 <button
                   type="button"
-                  className="flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-white transition-colors"
+                  className="flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Product
-                  <ChevronDown className={`size-3.5 transition-transform duration-200 ${productMenuOpen ? "rotate-180 text-cyan-400" : ""}`} />
+                  <ChevronDown className={`size-3.5 transition-transform duration-200 ${productMenuOpen ? "rotate-180 text-cyan-500" : ""}`} />
                 </button>
 
                 {productMenuOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-[440px] rounded-2xl border border-border/80 bg-[#090e24]/95 p-3 shadow-2xl backdrop-blur-2xl grid grid-cols-2 gap-1 animate-in fade-in zoom-in-95 duration-150">
-                    <a href="#discovery" className="flex items-start gap-2.5 rounded-xl p-2 hover:bg-secondary/70 transition-colors">
-                      <div className="grid size-7 place-items-center rounded-lg bg-cyan-500/10 text-cyan-400">
+                  <div className="absolute top-full left-0 mt-2 w-[280px] rounded-2xl border border-border/80 bg-popover/95 dark:bg-[#090e24]/95 p-3 shadow-2xl backdrop-blur-2xl space-y-2 animate-in fade-in zoom-in-95 duration-150 z-50">
+                    <a href="#capabilities" className="flex items-start gap-2.5 rounded-xl p-2 hover:bg-secondary/70 transition-colors">
+                      <div className="grid size-7 place-items-center rounded-lg bg-cyan-500/10 text-cyan-500 dark:text-cyan-400">
                         <Compass className="size-4" />
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-white">Career Discovery</p>
-                        <p className="text-[10px] text-muted-foreground">AI path direction matching</p>
+                        <p className="text-xs font-semibold text-foreground">AI Career Discovery</p>
+                        <p className="text-[10px] text-muted-foreground">Matching engine</p>
                       </div>
                     </a>
 
-                    <a href="#roadmap" className="flex items-start gap-2.5 rounded-xl p-2 hover:bg-secondary/70 transition-colors">
-                      <div className="grid size-7 place-items-center rounded-lg bg-blue-500/10 text-blue-400">
+                    <a href="#architecture" className="flex items-start gap-2.5 rounded-xl p-2 hover:bg-secondary/70 transition-colors">
+                      <div className="grid size-7 place-items-center rounded-lg bg-blue-500/10 text-blue-500 dark:text-blue-400">
                         <Map className="size-4" />
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-white">Personalized Roadmap</p>
-                        <p className="text-[10px] text-muted-foreground">Adaptive skill curriculum</p>
+                        <p className="text-xs font-semibold text-foreground">Unified Architecture</p>
+                        <p className="text-[10px] text-muted-foreground">Connected intelligence hub</p>
                       </div>
                     </a>
 
-                    <a href="#projects" className="flex items-start gap-2.5 rounded-xl p-2 hover:bg-secondary/70 transition-colors">
-                      <div className="grid size-7 place-items-center rounded-lg bg-indigo-500/10 text-indigo-400">
+                    <a href="#how-it-works" className="flex items-start gap-2.5 rounded-xl p-2 hover:bg-secondary/70 transition-colors">
+                      <div className="grid size-7 place-items-center rounded-lg bg-indigo-500/10 text-indigo-500 dark:text-indigo-400">
                         <Terminal className="size-4" />
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-white">Practical Projects</p>
-                        <p className="text-[10px] text-muted-foreground">Verified code artifacts</p>
+                        <p className="text-xs font-semibold text-foreground">Methodology Roadmap</p>
+                        <p className="text-[10px] text-muted-foreground">5-stage guided path</p>
                       </div>
                     </a>
 
-                    <a href="#interviews" className="flex items-start gap-2.5 rounded-xl p-2 hover:bg-secondary/70 transition-colors">
-                      <div className="grid size-7 place-items-center rounded-lg bg-purple-500/10 text-purple-400">
+                    <a href="#careers" className="flex items-start gap-2.5 rounded-xl p-2 hover:bg-secondary/70 transition-colors">
+                      <div className="grid size-7 place-items-center rounded-lg bg-purple-500/10 text-purple-500 dark:text-purple-400">
                         <MessageSquare className="size-4" />
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-white">Mock Interviews</p>
-                        <p className="text-[10px] text-muted-foreground">Technical simulation</p>
+                        <p className="text-xs font-semibold text-foreground">Supported Careers</p>
+                        <p className="text-[10px] text-muted-foreground">High-growth tech tracks</p>
                       </div>
                     </a>
                   </div>
@@ -126,7 +126,7 @@ export function Navbar() {
               {/* Career Paths */}
               <a
                 href="#careers"
-                className="text-xs font-semibold text-muted-foreground hover:text-white transition-colors"
+                className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
               >
                 Career Paths
               </a>
@@ -134,7 +134,7 @@ export function Navbar() {
               {/* For Colleges */}
               <Link
                 to="/colleges"
-                className="text-xs font-semibold text-muted-foreground hover:text-white transition-colors"
+                className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
               >
                 For Colleges
               </Link>
@@ -147,22 +147,22 @@ export function Navbar() {
               >
                 <button
                   type="button"
-                  className="flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-white transition-colors"
+                  className="flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Resources
-                  <ChevronDown className={`size-3.5 transition-transform duration-200 ${resourcesMenuOpen ? "rotate-180 text-cyan-400" : ""}`} />
+                  <ChevronDown className={`size-3.5 transition-transform duration-200 ${resourcesMenuOpen ? "rotate-180 text-cyan-500" : ""}`} />
                 </button>
 
                 {resourcesMenuOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-[220px] rounded-2xl border border-border/80 bg-[#090e24]/95 p-2 shadow-2xl backdrop-blur-2xl space-y-1 animate-in fade-in zoom-in-95 duration-150">
-                    <a href="#roadmap" className="block rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-secondary hover:text-white">
-                      Career Guides
+                  <div className="absolute top-full left-0 mt-2 w-[220px] rounded-2xl border border-border/80 bg-popover/95 dark:bg-[#090e24]/95 p-2 shadow-2xl backdrop-blur-2xl space-y-1 animate-in fade-in zoom-in-95 duration-150 z-50">
+                    <a href="#how-it-works" className="block rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-secondary hover:text-foreground">
+                      Methodology
                     </a>
-                    <a href="#interviews" className="block rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-secondary hover:text-white">
-                      Interview Preparation
+                    <a href="#architecture" className="block rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-secondary hover:text-foreground">
+                      Platform Architecture
                     </a>
-                    <a href="#projects" className="block rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-secondary hover:text-white">
-                      Project Templates
+                    <a href="#careers" className="block rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-secondary hover:text-foreground">
+                      Career Directions
                     </a>
                   </div>
                 )}
@@ -171,14 +171,17 @@ export function Navbar() {
               {/* About */}
               <a
                 href="#about"
-                className="text-xs font-semibold text-muted-foreground hover:text-white transition-colors"
+                className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
               >
                 About
               </a>
             </nav>
 
-            {/* Right Action CTAs */}
-            <div className="flex items-center gap-3">
+            {/* Right Action CTAs + Theme Toggle */}
+            <div className="flex items-center gap-2.5">
+              {/* Theme Toggle Button */}
+              <ThemeToggle className="size-8 rounded-xl border border-border/60" />
+
               {isAuthenticated ? (
                 <Link
                   to={onboardingRequired ? "/onboarding" : "/app/today"}
@@ -192,7 +195,7 @@ export function Navbar() {
                   <button
                     type="button"
                     onClick={handleSignInClick}
-                    className="text-xs font-semibold text-white/90 hover:text-cyan-400 transition-colors px-2 py-1"
+                    className="text-xs font-semibold text-foreground/90 hover:text-cyan-500 transition-colors px-2 py-1"
                   >
                     Sign In
                   </button>
@@ -214,7 +217,7 @@ export function Navbar() {
                 onClick={() => setOpen((v) => !v)}
                 aria-expanded={open}
                 aria-label={open ? "Close menu" : "Open menu"}
-                className="grid size-9 place-items-center rounded-xl border border-border/80 bg-[#0d1436] text-muted-foreground hover:text-white lg:hidden"
+                className="grid size-9 place-items-center rounded-xl border border-border/80 bg-secondary/80 text-muted-foreground hover:text-foreground lg:hidden"
               >
                 {open ? <X className="size-4" /> : <Menu className="size-4" />}
               </button>
@@ -224,16 +227,16 @@ export function Navbar() {
           {/* Mobile Drawer */}
           {open && (
             <div className="mt-3 border-t border-border/60 pt-3 lg:hidden space-y-1 animate-in slide-in-from-top-2 duration-150">
-              <a href="#discovery" onClick={() => setOpen(false)} className="block rounded-xl px-3 py-2 text-xs font-semibold text-muted-foreground hover:bg-secondary hover:text-white">
+              <a href="#capabilities" onClick={() => setOpen(false)} className="block rounded-xl px-3 py-2 text-xs font-semibold text-muted-foreground hover:bg-secondary hover:text-foreground">
                 Product
               </a>
-              <a href="#careers" onClick={() => setOpen(false)} className="block rounded-xl px-3 py-2 text-xs font-semibold text-muted-foreground hover:bg-secondary hover:text-white">
+              <a href="#careers" onClick={() => setOpen(false)} className="block rounded-xl px-3 py-2 text-xs font-semibold text-muted-foreground hover:bg-secondary hover:text-foreground">
                 Career Paths
               </a>
-              <Link to="/colleges" onClick={() => setOpen(false)} className="block rounded-xl px-3 py-2 text-xs font-semibold text-cyan-400 hover:bg-secondary">
+              <Link to="/colleges" onClick={() => setOpen(false)} className="block rounded-xl px-3 py-2 text-xs font-semibold text-cyan-500 hover:bg-secondary">
                 For Colleges
               </Link>
-              <a href="#about" onClick={() => setOpen(false)} className="block rounded-xl px-3 py-2 text-xs font-semibold text-muted-foreground hover:bg-secondary hover:text-white">
+              <a href="#about" onClick={() => setOpen(false)} className="block rounded-xl px-3 py-2 text-xs font-semibold text-muted-foreground hover:bg-secondary hover:text-foreground">
                 About
               </a>
 
