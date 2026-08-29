@@ -6,11 +6,13 @@ import {
   BookOpen,
   Briefcase,
   Check,
+  CheckCircle2,
   Compass,
   GraduationCap,
   Layers,
   Lock,
   School,
+  Search,
   ShieldCheck,
   Sparkles,
   User,
@@ -20,16 +22,23 @@ import {
 import { InlineSpinner } from "@/components/common/Loader";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth/AuthProvider";
-import { useOnboardingReference } from "@/lib/careerai/hooks";
-import { careerai } from "@/lib/careerai/client";
+import {
+  useCompleteOnboarding,
+  useInstitutionSearch,
+  useOnboardingReference,
+  useOnboardingStatus,
+  useSaveStep1About,
+  useSaveStep2Education,
+  useSaveStep3Goals,
+} from "@/lib/careerai/hooks";
 import { cn } from "@/lib/utils";
 
 const CONSENT_VERSION = "1.0";
 
 const STEPS = [
-  { key: "about", title: "About you", subtitle: "Confirm your details" },
+  { key: "about", title: "About You", subtitle: "Confirm your details" },
   { key: "education", title: "Education", subtitle: "Your academic stage" },
-  { key: "goals", title: "Goals & Interests", subtitle: "What you want to achieve" },
+  { key: "goals", title: "Your Goal", subtitle: "What you want to achieve" },
 ];
 
 const DEFAULT_COUNTRIES = [
@@ -64,80 +73,105 @@ const DEFAULT_DEPARTMENTS = [
   { value: "OTHER", label: "Other Department" },
 ];
 
-const DEFAULT_GOALS = [
-  { value: "JOB", label: "Land a Full-Time Job", description: "Targeting entry-level or junior role" },
-  { value: "INTERNSHIP", label: "Find an Internship", description: "Seeking practical industry exposure" },
-  { value: "SKILLS", label: "Build Verified Skills", description: "Closing domain and tech gaps" },
-  { value: "CAREER_SWITCH", label: "Switch Career Path", description: "Transitioning to a new field" },
-  { value: "HIGHER_ED", label: "Higher Studies / Research", description: "Preparing for Masters or PhD" },
+const GOAL_OPTIONS = [
+  { value: "JOB", label: "Prepare for a job", description: "Targeting entry-level or junior roles" },
+  { value: "INTERNSHIP", label: "Prepare for internships", description: "Seeking practical industry exposure" },
+  { value: "SKILLS", label: "Build technical skills", description: "Closing domain and tech gaps" },
+  { value: "PROJECTS", label: "Build verified projects", description: "Creating portfolio evidence" },
+  { value: "INTERVIEW", label: "Improve interview skills", description: "Mock drills and communication" },
+  { value: "EXPLORE", label: "Explore career options", description: "Discovering high-fit paths" },
 ];
 
-const DEFAULT_CLARITY = [
-  { value: "EXPLORING", label: "Still Exploring", description: "Need guidance on best-fit paths" },
-  { value: "SOME_IDEA", label: "Have an Idea", description: "Know general area, deciding role" },
-  { value: "CONFIDENT", label: "Target Role Chosen", description: "Ready to focus and prepare" },
+const CLARITY_OPTIONS = [
+  { value: "CONFIDENT", label: "I know exactly what I want", description: "Ready to focus and prepare" },
+  { value: "SOME_IDEA", label: "I have a few ideas", description: "Deciding between 2-3 paths" },
+  { value: "EXPLORING", label: "I'm exploring", description: "Need guidance on best-fit roles" },
+  { value: "NO_IDEA", label: "I have no idea yet", description: "Starting fresh from zero" },
 ];
 
-const DEFAULT_INTERESTS = [
-  { value: "DATA", label: "Data Engineering & Analytics" },
-  { value: "AI_ML", label: "AI & Machine Learning" },
+const INTEREST_PILLS = [
+  { value: "SOFTWARE", label: "Software" },
+  { value: "DATA", label: "Data" },
+  { value: "AI", label: "AI & ML" },
+  { value: "CYBER", label: "Cybersecurity" },
   { value: "CLOUD", label: "Cloud & DevOps" },
-  { value: "FULLSTACK", label: "Full-Stack Development" },
-  { value: "CYBER", label: "Cybersecurity & Networks" },
-  { value: "PRODUCT", label: "Product & System Design" },
+  { value: "PRODUCT", label: "Product" },
+  { value: "EXPLORING", label: "Still exploring" },
 ];
 
 export function OnboardingFlow() {
   const navigate = useNavigate();
-  const { student, user, refreshSession } = useAuth();
+  const { user, student, refreshSession } = useAuth();
 
+  const { data: statusData, isLoading: isStatusLoading } = useOnboardingStatus();
   const { data: refData } = useOnboardingReference();
 
+  const saveStep1Mutation = useSaveStep1About();
+  const saveStep2Mutation = useSaveStep2Education();
+  const saveStep3Mutation = useSaveStep3Goals();
+  const completeMutation = useCompleteOnboarding();
+
   const [stepIdx, setStepIdx] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [transitioning, setTransitioning] = useState(false);
+  const [transitionStage, setTransitionStage] = useState(0);
 
-  // --- Step 1: About You State ---
-  const [firstName, setFirstName] = useState(() => {
-    if (user?.name) {
-      const parts = user.name.trim().split(/\s+/);
-      return parts[0] || "";
-    }
-    return user?.email?.split("@")[0] || "";
-  });
-  const [lastName, setLastName] = useState(() => {
-    if (user?.name) {
-      const parts = user.name.trim().split(/\s+/);
-      return parts.slice(1).join(" ") || "";
-    }
-    return "";
-  });
+  // --- Step 1 State ---
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [countryCode, setCountryCode] = useState("IN");
-  const [city, setCity] = useState("Bengaluru");
+  const [city, setCity] = useState("");
 
-  // --- Step 2: Education State ---
-  const [academicStatus, setAcademicStatus] = useState<string>("COLLEGE");
-  const [institutionName, setInstitutionName] = useState("MIT College of Engineering");
-  const [isCustomInstitution, setIsCustomInstitution] = useState(false);
+  // --- Step 2 State ---
+  const [academicStatus, setAcademicStatus] = useState("COLLEGE");
+  const [instSearchQuery, setInstSearchQuery] = useState("");
+  const [selectedInstId, setSelectedInstId] = useState<string | null>(null);
+  const [selectedInstName, setSelectedInstName] = useState("");
+  const [isCustomInst, setIsCustomInst] = useState(false);
   const [degreeType, setDegreeType] = useState("B_TECH");
   const [department, setDepartment] = useState("CSE");
   const [currentYear, setCurrentYear] = useState<number>(3);
   const [graduationYear, setGraduationYear] = useState<number>(new Date().getFullYear() + 1);
 
-  // --- Step 3: Goals, Interests & Consent State ---
+  // --- Step 3 State ---
   const [selectedGoals, setSelectedGoals] = useState<string[]>(["JOB", "SKILLS"]);
   const [clarityLevel, setClarityLevel] = useState<string>("EXPLORING");
-  const [selectedInterests, setSelectedInterests] = useState<string[]>(["DATA", "AI_ML"]);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>(["DATA", "AI"]);
   const [consentGranted, setConsentGranted] = useState(true);
 
-  // Update initial names if user loads asynchronously
+  // Master institution search
+  const { data: instData } = useInstitutionSearch(instSearchQuery, countryCode);
+
+  // Populate state from authoritative backend status or session on mount
   useEffect(() => {
-    if (user?.name && !firstName) {
-      const parts = user.name.trim().split(/\s+/);
-      setFirstName(parts[0] || "");
-      setLastName(parts.slice(1).join(" ") || "");
+    if (statusData) {
+      if (statusData.current_step && statusData.current_step >= 1) {
+        setStepIdx(statusData.current_step - 1);
+      }
+      const pre = statusData.prefilled_data || {};
+      if (pre.first_name) setFirstName(pre.first_name);
+      if (pre.last_name) setLastName(pre.last_name);
+      if (pre.country_code) setCountryCode(pre.country_code);
+      if (pre.city) setCity(pre.city);
+      if (pre.academic_status) setAcademicStatus(pre.academic_status);
+      if (pre.institution_id) setSelectedInstId(pre.institution_id);
+      if (pre.degree_type) setDegreeType(pre.degree_type);
+      if (pre.department) setDepartment(pre.department);
+      if (pre.current_year) setCurrentYear(pre.current_year);
+      if (pre.expected_graduation_year) setGraduationYear(pre.expected_graduation_year);
+      if (pre.primary_goal) setSelectedGoals([pre.primary_goal]);
+      if (pre.clarity_level) setClarityLevel(pre.clarity_level);
+      if (pre.interests && pre.interests.length > 0) setSelectedInterests(pre.interests);
+    } else if (user) {
+      if (user.name) {
+        const parts = user.name.trim().split(/\s+/);
+        setFirstName(parts[0] || "");
+        setLastName(parts.slice(1).join(" ") || "");
+      } else if (user.email) {
+        setFirstName(user.email.split("@")[0] || "Student");
+      }
     }
-  }, [user, firstName]);
+  }, [statusData, user]);
 
   const currentYearOptions = useMemo(() => {
     const current = new Date().getFullYear();
@@ -166,24 +200,48 @@ export function OnboardingFlow() {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     setErrorMsg(null);
+
+    // Validate and Autosave Step 1
     if (stepIdx === 0) {
       if (!firstName.trim()) {
         setErrorMsg("Please enter your first name.");
         return;
       }
-      if (!countryCode) {
-        setErrorMsg("Please select your country.");
-        return;
+      try {
+        await saveStep1Mutation.mutateAsync({
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          country_code: countryCode,
+          city: city.trim() || undefined,
+        });
+        setStepIdx(1);
+      } catch (err: any) {
+        setErrorMsg(err?.message || "Failed to save personal details. Please try again.");
       }
-    } else if (stepIdx === 1) {
-      if (academicStatus === "COLLEGE" && !institutionName.trim()) {
+    }
+    // Validate and Autosave Step 2
+    else if (stepIdx === 1) {
+      if (academicStatus === "COLLEGE" && !selectedInstId && !selectedInstName.trim() && !isCustomInst) {
         setErrorMsg("Please select or enter your institution name.");
         return;
       }
+      try {
+        await saveStep2Mutation.mutateAsync({
+          academic_status: academicStatus,
+          institution_id: isCustomInst ? undefined : (selectedInstId || undefined),
+          custom_institution_name: isCustomInst ? selectedInstName.trim() : (selectedInstName.trim() || undefined),
+          degree_type: degreeType,
+          department: department,
+          current_year: currentYear,
+          expected_graduation_year: graduationYear,
+        });
+        setStepIdx(2);
+      } catch (err: any) {
+        setErrorMsg(err?.message || "Failed to save education details. Please try again.");
+      }
     }
-    setStepIdx((prev) => Math.min(prev + 1, STEPS.length - 1));
   };
 
   const handleBack = () => {
@@ -191,97 +249,86 @@ export function OnboardingFlow() {
     setStepIdx((prev) => Math.max(prev - 1, 0));
   };
 
-  const handleCompleteOnboarding = async () => {
-    const studentId = student?.id;
-    if (!studentId) {
-      setErrorMsg("No active student identity found. Please reload or sign in again.");
-      return;
-    }
+  const handleMeetSPAR = async () => {
     if (!consentGranted) {
-      setErrorMsg("Please agree to the SPAR personalized guidance consent to continue.");
+      setErrorMsg("Please agree to SPAR AI Career Intelligence processing to continue.");
       return;
     }
 
-    setIsSubmitting(true);
     setErrorMsg(null);
+    setTransitioning(true);
+    setTransitionStage(1);
 
     try {
-      // 1. Update Identity
-      await careerai.updateIdentity(studentId, {
-        first_name: firstName.trim() || "Student",
-        last_name: lastName.trim() || "",
-        country_code: countryCode,
-        city: city.trim() || undefined,
+      // 1. Save Step 3 Goals
+      await saveStep3GoalsMutation.mutateAsync({
+        primary_goal: selectedGoals[0] || "JOB",
+        secondary_goals: selectedGoals.slice(1),
+        career_clarity_level: clarityLevel,
+        interest_area_codes: selectedInterests,
       });
 
-      // 2. Update Academics
-      await careerai.updateAcademics(studentId, {
-        institution: {
-          name: institutionName.trim() || "MIT College of Engineering",
-          country_code: countryCode,
-          institution_type: academicStatus === "SCHOOL" ? "SCHOOL" : "COLLEGE",
-          city: city.trim() || undefined,
-        },
-        program: {
-          degree_type: degreeType,
-          department: department,
-          program_name: `${degreeType} in ${department}`,
-          duration_years: 4,
-        },
-        current_year: currentYear,
-        current_semester: (currentYear * 2) - 1,
-        expected_graduation_year: graduationYear,
-        grading_system: "CGPA_10",
-        academic_status: "ACTIVE",
-      });
+      // 2. Transition animation stage 2
+      setTransitionStage(2);
 
-      // 3. Update Career Preferences (Non-blocking)
-      try {
-        await careerai.updateCareerPreferences(studentId, {
-          primary_career_goal: selectedGoals[0] || "JOB",
-          secondary_career_goals: selectedGoals.slice(1),
-          career_clarity_level: clarityLevel,
-        });
-      } catch {
-        // Continue
-      }
+      // 3. Complete Onboarding atomically
+      const completeRes = await completeMutation.mutateAsync(CONSENT_VERSION);
 
-      // 4. Update Interests (Non-blocking)
-      try {
-        if (selectedInterests.length > 0) {
-          await careerai.updateInterests(studentId, {
-            interest_area_codes: selectedInterests,
-          });
-        }
-      } catch {
-        // Continue
-      }
+      // 4. Transition animation stage 3
+      setTransitionStage(3);
+      await refreshSession();
 
-      // 5. Grant Consent
-      await careerai.recordConsent(studentId, {
-        consent_type: "CAREER_PROFILE_PROCESSING",
-        consent_version: CONSENT_VERSION,
-      });
-
-      // 6. Refresh Auth Session & Transition to Career Discovery
-      if (refreshSession) {
-        await refreshSession();
-      }
-      void navigate({ to: "/app/discover" });
+      // 5. Navigate to Career Discovery
+      setTimeout(() => {
+        void navigate({ to: completeRes.next_route || "/app/discover" });
+      }, 1200);
     } catch (err: any) {
-      console.error("Onboarding submission error:", err);
+      console.error("Onboarding completion error:", err);
+      setTransitioning(false);
       setErrorMsg(err?.message || "Failed to complete setup. Please try again.");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   const countries = refData?.countries && refData.countries.length > 0 ? refData.countries : DEFAULT_COUNTRIES;
   const degrees = refData?.degrees && refData.degrees.length > 0 ? refData.degrees : DEFAULT_DEGREES;
   const departments = refData?.departments && refData.departments.length > 0 ? refData.departments : DEFAULT_DEPARTMENTS;
-  const careerGoals = refData?.career_goals && refData.career_goals.length > 0 ? refData.career_goals : DEFAULT_GOALS;
-  const clarityLevels = refData?.career_clarity_levels && refData.career_clarity_levels.length > 0 ? refData.career_clarity_levels : DEFAULT_CLARITY;
-  const interestAreas = refData?.interest_areas && refData.interest_areas.length > 0 ? refData.interest_areas : DEFAULT_INTERESTS;
+
+  // --- TRANSITION SCREEN ("Meet SPAR") ---
+  if (transitioning) {
+    return (
+      <div className="flex min-h-[70vh] flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
+        <div className="relative mb-6">
+          <div className="flex size-20 items-center justify-center rounded-3xl bg-primary/10 text-primary border border-primary/20 shadow-lg">
+            <Sparkles className="size-10 animate-pulse text-primary" />
+          </div>
+        </div>
+
+        <h2 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+          Preparing Your Career Discovery
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground max-w-md">
+          SPAR AI is calibrating your personalized career landscape…
+        </p>
+
+        <div className="mt-8 w-full max-w-sm space-y-3 text-left">
+          <div className={cn("flex items-center gap-3 rounded-xl border p-3.5 transition-all", transitionStage >= 1 ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 font-semibold" : "border-border text-muted-foreground")}>
+            <CheckCircle2 className="size-4" />
+            <span className="text-xs">Profile & Academic baseline saved</span>
+          </div>
+
+          <div className={cn("flex items-center gap-3 rounded-xl border p-3.5 transition-all", transitionStage >= 2 ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 font-semibold" : "border-border text-muted-foreground")}>
+            <CheckCircle2 className="size-4" />
+            <span className="text-xs">Goals & Readiness calibration indexed</span>
+          </div>
+
+          <div className={cn("flex items-center gap-3 rounded-xl border p-3.5 transition-all", transitionStage >= 3 ? "border-primary/40 bg-primary/10 text-primary font-bold shadow-xs" : "border-border text-muted-foreground")}>
+            <Sparkles className="size-4 animate-spin" />
+            <span className="text-xs">Launching SPAR Career Discovery…</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:py-12">
@@ -289,16 +336,16 @@ export function OnboardingFlow() {
       <div className="mb-8 text-center">
         <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary">
           <Sparkles className="size-3.5" />
-          <span>Quick 2-Minute Setup</span>
+          <span>Quick 2-Minute Profile</span>
         </div>
         <h1 className="mt-3 font-display text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
-          Welcome to SPAR AI
+          Welcome to SPAR
         </h1>
-        <p className="mt-1.5 text-sm text-muted-foreground">
+        <p className="mt-1.5 text-xs text-muted-foreground">
           {STEPS[stepIdx].subtitle} · Step {stepIdx + 1} of {STEPS.length}
         </p>
 
-        {/* Progress Bar */}
+        {/* Progress Dots */}
         <div className="mt-6 flex items-center justify-center gap-2">
           {STEPS.map((s, idx) => (
             <div
@@ -319,7 +366,7 @@ export function OnboardingFlow() {
       {/* Main Card */}
       <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
         {errorMsg && (
-          <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+          <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-xs text-destructive">
             {errorMsg}
           </div>
         )}
@@ -328,13 +375,19 @@ export function OnboardingFlow() {
         {stepIdx === 0 && (
           <div className="space-y-6">
             <div className="flex items-center gap-4 border-b border-border pb-6">
-              <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary font-bold text-xl border border-primary/20">
-                {firstName ? firstName[0].toUpperCase() : <User className="size-6" />}
+              <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary font-bold text-xl border border-primary/20 overflow-hidden">
+                {user?.picture ? (
+                  <img src={user.picture} alt={firstName} className="size-full object-cover" />
+                ) : firstName ? (
+                  firstName[0].toUpperCase()
+                ) : (
+                  <User className="size-6" />
+                )}
               </div>
               <div>
                 <h2 className="text-base font-semibold text-foreground">Personal Details</h2>
                 <p className="text-xs text-muted-foreground">
-                  Prefilled from your account. Verify below.
+                  {user?.email ? `Authenticated as ${user.email}` : "Confirm your profile identity below."}
                 </p>
               </div>
             </div>
@@ -416,7 +469,7 @@ export function OnboardingFlow() {
 
             <div>
               <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2.5">
-                What describes your current academic status? *
+                Where are you currently? *
               </label>
               <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
                 {[
@@ -451,40 +504,63 @@ export function OnboardingFlow() {
             <div className="space-y-4 pt-2 border-t border-border">
               <div>
                 <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
-                  Institution / College *
+                  College / Institution *
                 </label>
-                {!isCustomInstitution ? (
+                {!isCustomInst ? (
                   <div className="space-y-2">
-                    <select
-                      value={institutionName}
-                      onChange={(e) => {
-                        if (e.target.value === "__OTHER__") {
-                          setIsCustomInstitution(true);
-                          setInstitutionName("");
-                        } else {
-                          setInstitutionName(e.target.value);
-                        }
+                    <div className="relative">
+                      <Search className="absolute left-3.5 top-3 size-4 text-muted-foreground" />
+                      <input
+                        type="text"
+                        value={instSearchQuery}
+                        onChange={(e) => setInstSearchQuery(e.target.value)}
+                        placeholder="Search your college name…"
+                        className="w-full rounded-xl border border-border bg-background pl-10 pr-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
+                      />
+                    </div>
+
+                    {instData?.items && instData.items.length > 0 && (
+                      <div className="max-h-36 overflow-y-auto rounded-xl border border-border bg-card p-1 space-y-1">
+                        {instData.items.map((it) => (
+                          <button
+                            key={it.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedInstId(it.id);
+                              setSelectedInstName(it.name);
+                              setInstSearchQuery(it.name);
+                            }}
+                            className={cn(
+                              "w-full text-left px-3 py-2 rounded-lg text-xs transition-colors flex items-center justify-between",
+                              selectedInstId === it.id
+                                ? "bg-primary/10 text-primary font-semibold"
+                                : "hover:bg-secondary text-foreground"
+                            )}
+                          >
+                            <span>{it.name} ({it.city || it.country_code})</span>
+                            {selectedInstId === it.id && <Check className="size-3.5" />}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsCustomInst(true);
+                        setSelectedInstId(null);
                       }}
-                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
+                      className="text-xs text-primary hover:underline font-medium block pt-1"
                     >
-                      <option value="">Select your institution…</option>
-                      <option value="MIT College of Engineering">MIT College of Engineering</option>
-                      <option value="National Institute of Technology">National Institute of Technology (NIT)</option>
-                      <option value="Indian Institute of Information Technology">IIIT</option>
-                      <option value="Delhi Technological University">DTU</option>
-                      <option value="Vellore Institute of Technology">VIT</option>
-                      <option value="SRM Institute of Science and Technology">SRM Institute</option>
-                      <option value="PES University">PES University</option>
-                      <option value="Anna University">Anna University</option>
-                      <option value="__OTHER__">+ Can't find my institution (Type manually)</option>
-                    </select>
+                      + Can't find my college (Type manually)
+                    </button>
                   </div>
                 ) : (
                   <div className="flex gap-2">
                     <input
                       type="text"
-                      value={institutionName}
-                      onChange={(e) => setInstitutionName(e.target.value)}
+                      value={selectedInstName}
+                      onChange={(e) => setSelectedInstName(e.target.value)}
                       placeholder="Enter your college / university name"
                       className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
                     />
@@ -492,9 +568,9 @@ export function OnboardingFlow() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => setIsCustomInstitution(false)}
+                      onClick={() => setIsCustomInst(false)}
                     >
-                      List
+                      Search List
                     </Button>
                   </div>
                 )}
@@ -573,7 +649,7 @@ export function OnboardingFlow() {
           </div>
         )}
 
-        {/* --- STEP 3: GOALS & INTERESTS --- */}
+        {/* --- STEP 3: YOUR GOAL --- */}
         {stepIdx === 2 && (
           <div className="space-y-6">
             <div className="flex items-center gap-4 border-b border-border pb-6">
@@ -581,7 +657,7 @@ export function OnboardingFlow() {
                 <Compass className="size-6" />
               </div>
               <div>
-                <h2 className="text-base font-semibold text-foreground">Goals & Interests</h2>
+                <h2 className="text-base font-semibold text-foreground">Your Goal & Interests</h2>
                 <p className="text-xs text-muted-foreground">
                   Personalizes AI career suggestions and milestone pathways.
                 </p>
@@ -590,10 +666,10 @@ export function OnboardingFlow() {
 
             <div>
               <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
-                Primary Career Goal (Select up to 3) *
+                What would you like SPAR to help you with? (Select up to 3) *
               </label>
               <div className="grid gap-2 sm:grid-cols-2">
-                {careerGoals.map((g) => {
+                {GOAL_OPTIONS.map((g) => {
                   const isSelected = selectedGoals.includes(g.value);
                   return (
                     <button
@@ -633,10 +709,10 @@ export function OnboardingFlow() {
 
             <div>
               <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
-                How clear is your target career direction? *
+                How clear are you about your career direction? *
               </label>
-              <div className="grid grid-cols-3 gap-2">
-                {clarityLevels.map((lvl) => {
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {CLARITY_OPTIONS.map((lvl) => {
                   const isSelected = clarityLevel === lvl.value;
                   return (
                     <button
@@ -650,12 +726,7 @@ export function OnboardingFlow() {
                           : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
                       )}
                     >
-                      <div className="text-xs font-semibold">{lvl.label}</div>
-                      {lvl.description && (
-                        <div className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">
-                          {lvl.description}
-                        </div>
-                      )}
+                      <div className="text-xs font-semibold leading-tight">{lvl.label}</div>
                     </button>
                   );
                 })}
@@ -667,7 +738,7 @@ export function OnboardingFlow() {
                 Areas of Interest *
               </label>
               <div className="flex flex-wrap gap-2">
-                {interestAreas.map((ia) => {
+                {INTEREST_PILLS.map((ia) => {
                   const isSelected = selectedInterests.includes(ia.value);
                   return (
                     <button
@@ -695,7 +766,7 @@ export function OnboardingFlow() {
                 <span>SPAR Privacy & AI Career Guidance Consent</span>
               </div>
               <p className="text-[11px] text-muted-foreground leading-relaxed">
-                By clicking Complete Setup, you consent to SPAR processing your academic profile, skill assessments, and project artifacts to provide personalized career recommendations and readiness scoring.
+                By clicking Meet SPAR, you consent to SPAR processing your academic profile, skill assessments, and project artifacts to provide personalized career recommendations and readiness scoring.
               </p>
               <label className="flex items-center gap-2 cursor-pointer pt-1">
                 <input
@@ -720,7 +791,7 @@ export function OnboardingFlow() {
               variant="outline"
               size="sm"
               onClick={handleBack}
-              disabled={isSubmitting}
+              disabled={saveStep1Mutation.isPending || saveStep2Mutation.isPending || completeMutation.isPending}
               className="gap-1.5"
             >
               <ArrowLeft className="size-4" />
@@ -735,30 +806,31 @@ export function OnboardingFlow() {
               type="button"
               size="sm"
               onClick={handleNext}
-              className="gap-1.5"
+              disabled={saveStep1Mutation.isPending || saveStep2Mutation.isPending}
+              className="gap-1.5 font-semibold"
             >
-              Next Step
-              <ArrowRight className="size-4" />
+              {saveStep1Mutation.isPending || saveStep2Mutation.isPending ? (
+                <>
+                  <InlineSpinner className="size-4" />
+                  Saving…
+                </>
+              ) : (
+                <>
+                  Next Step
+                  <ArrowRight className="size-4" />
+                </>
+              )}
             </Button>
           ) : (
             <Button
               type="button"
               size="sm"
-              onClick={handleCompleteOnboarding}
-              disabled={isSubmitting || !consentGranted}
-              className="gap-1.5 font-bold"
+              onClick={handleMeetSPAR}
+              disabled={completeMutation.isPending || !consentGranted}
+              className="gap-2 font-bold px-6 bg-gradient-to-r from-primary to-indigo-600 shadow-md"
             >
-              {isSubmitting ? (
-                <>
-                  <InlineSpinner className="size-4" />
-                  Completing Setup…
-                </>
-              ) : (
-                <>
-                  Complete Setup & Discover Careers
-                  <Sparkles className="size-4" />
-                </>
-              )}
+              Meet SPAR
+              <Sparkles className="size-4" />
             </Button>
           )}
         </div>

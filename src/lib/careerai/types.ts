@@ -2207,3 +2207,118 @@ export interface WeeklyPilotReportResponse {
   top_friction_areas: string[];
   recommended_product_actions: string[];
 }
+
+// --- Redesign: Unified Auth, Onboarding & Institution Master Data Types ---
+
+export interface SendEmailOtpResponse {
+  status: string;
+  email: string;
+  expires_in_seconds: number;
+  retry_after_seconds: number;
+  message: string;
+}
+
+export interface VerifyEmailOtpRequest {
+  email: string;
+  code: string;
+  first_name?: string;
+  last_name?: string;
+}
+
+export interface OnboardingStatusResponse {
+  state: string;
+  current_step: number;
+  completed_steps: number[];
+  profile_completion: number;
+  missing_required_fields: string[];
+  next_route: string;
+  prefilled_data: {
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+    picture_url?: string | null;
+    country_code?: string;
+    city?: string;
+    academic_status?: string;
+    institution_id?: string | null;
+    degree_type?: string;
+    department?: string;
+    current_year?: number;
+    expected_graduation_year?: number;
+    primary_goal?: string;
+    clarity_level?: string;
+    interests?: string[];
+  };
+}
+
+export interface Step1AboutRequest {
+  first_name: string;
+  last_name?: string;
+  country_code: string;
+  city?: string;
+}
+
+export interface Step2EducationRequest {
+  academic_status: string;
+  institution_id?: string | null;
+  custom_institution_name?: string | null;
+  degree_type: string;
+  department: string;
+  current_year: number;
+  expected_graduation_year: number;
+}
+
+export interface Step3GoalsRequest {
+  primary_goal: string;
+  secondary_goals?: string[];
+  career_clarity_level: string;
+  interest_area_codes?: string[];
+}
+
+export interface CompleteOnboardingResponse {
+  completed: boolean;
+  state: string;
+  next_route: string;
+  message: string;
+}
+
+export interface InstitutionSearchItem {
+  id: string;
+  name: string;
+  normalized_name: string;
+  country_code: string;
+  city?: string | null;
+  state_region?: string | null;
+  website?: string | null;
+  institution_type?: string | null;
+  verification_status: string;
+}
+
+export interface InstitutionSearchResponse {
+  total: number;
+  items: InstitutionSearchItem[];
+}
+
+export interface CollegeRegistrationSubmitRequest {
+  institution_name: string;
+  institution_id?: string | null;
+  contact_name: string;
+  contact_email: string;
+  contact_phone?: string | null;
+  designation?: string;
+  department?: string | null;
+  website?: string | null;
+  country_code?: string;
+  city?: string | null;
+  state_region?: string | null;
+  notes?: string | null;
+}
+
+export interface CollegeRegistrationResponse {
+  id: string;
+  institution_name: string;
+  contact_email: string;
+  verification_status: string;
+  message: string;
+  created_at: string;
+}

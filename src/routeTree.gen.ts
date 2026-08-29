@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/app'
+import { Route as CollegesRouteImport } from './routes/colleges'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
@@ -47,6 +48,11 @@ const IndexRoute = IndexRouteImport.update({
 const AppRoute = AppRouteImport.update({
   id: '/app',
   path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CollegesRoute = CollegesRouteImport.update({
+  id: '/colleges',
+  path: '/colleges',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -188,6 +194,7 @@ const AppProjectsProjectCodeRoute = AppProjectsProjectCodeRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/colleges': typeof CollegesRoute
   '/onboarding': typeof OnboardingRoute
   '/app/agent': typeof AppAgentRoute
   '/app/career': typeof AppCareerRoute
@@ -218,6 +225,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/colleges': typeof CollegesRoute
   '/onboarding': typeof OnboardingRoute
   '/app/agent': typeof AppAgentRoute
   '/app/career': typeof AppCareerRoute
@@ -250,6 +258,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/colleges': typeof CollegesRoute
   '/onboarding': typeof OnboardingRoute
   '/app/agent': typeof AppAgentRoute
   '/app/career': typeof AppCareerRoute
@@ -283,6 +292,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/app'
+    | '/colleges'
     | '/onboarding'
     | '/app/agent'
     | '/app/career'
@@ -313,6 +323,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/colleges'
     | '/onboarding'
     | '/app/agent'
     | '/app/career'
@@ -344,6 +355,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/app'
+    | '/colleges'
     | '/onboarding'
     | '/app/agent'
     | '/app/career'
@@ -376,6 +388,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
+  CollegesRoute: typeof CollegesRoute
   OnboardingRoute: typeof OnboardingRoute
   CollegeDashboardRoute: typeof CollegeDashboardRoute
   RecruiterDashboardRoute: typeof RecruiterDashboardRoute
@@ -397,6 +410,13 @@ declare module '@tanstack/react-router' {
       path: '/app'
       fullPath: '/app'
       preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/colleges': {
+      id: '/colleges'
+      path: '/colleges'
+      fullPath: '/colleges'
+      preLoaderRoute: typeof CollegesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -646,6 +666,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
+  CollegesRoute: CollegesRoute,
   OnboardingRoute: OnboardingRoute,
   CollegeDashboardRoute: CollegeDashboardRoute,
   RecruiterDashboardRoute: RecruiterDashboardRoute,

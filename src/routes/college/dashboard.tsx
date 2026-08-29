@@ -1,3 +1,4 @@
+import { Protected } from "@/components/auth/Protected";
 import React, { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
@@ -56,7 +57,11 @@ import {
 } from "@/lib/careerai/types";
 
 export const Route = createFileRoute("/college/dashboard")({
-  component: CollegeDashboardPage,
+  component: () => (
+    <Protected mode="college">
+      <CollegeDashboardPage />
+    </Protected>
+  ),
 });
 
 function CollegeDashboardPage() {

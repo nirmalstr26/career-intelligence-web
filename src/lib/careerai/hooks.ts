@@ -1353,3 +1353,96 @@ export function useTrackProductEvent() {
       careerai.trackProductEvent(data),
   });
 }
+
+import {
+  sendEmailOtp,
+  verifyEmailOtp,
+  getOnboardingStatus,
+  saveStep1About,
+  saveStep2Education,
+  saveStep3Goals,
+  completeOnboarding,
+  searchInstitutions,
+  registerCollege,
+  getMyCollegeRegistrations,
+} from "./client";
+import type {
+  Step1AboutRequest,
+  Step2EducationRequest,
+  Step3GoalsRequest,
+  CollegeRegistrationSubmitRequest,
+} from "./types";
+
+export function useOnboardingStatus() {
+  return useQuery({
+    queryKey: ["onboarding-status"],
+    queryFn: getOnboardingStatus,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useSaveStep1About() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Step1AboutRequest) => saveStep1About(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["onboarding-status"] });
+    },
+  });
+}
+
+export function useSaveStep2Education() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Step2EducationRequest) => saveStep2Education(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["onboarding-status"] });
+    },
+  });
+}
+
+export function useSaveStep3Goals() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Step3GoalsRequest) => saveStep3Goals(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["onboarding-status"] });
+    },
+  });
+}
+
+export function useCompleteOnboarding() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (consentVersion?: string) => completeOnboarding(consentVersion),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["onboarding-status"] });
+      qc.invalidateQueries({ queryKey: ["auth-me"] });
+    },
+  });
+}
+
+export function useInstitutionSearch(q = "", countryCode = "IN") {
+  return useQuery({
+    queryKey: ["institutions", q, countryCode],
+    queryFn: () => searchInstitutions(q, countryCode),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useRegisterCollege() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CollegeRegistrationSubmitRequest) => registerCollege(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-college-registrations"] });
+    },
+  });
+}
+
+export function useMyCollegeRegistrations() {
+  return useQuery({
+    queryKey: ["my-college-registrations"],
+    queryFn: getMyCollegeRegistrations,
+  });
+}

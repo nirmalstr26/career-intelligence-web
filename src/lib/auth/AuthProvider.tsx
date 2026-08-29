@@ -1,15 +1,11 @@
 /**
- * Client-side authentication context.
+ * Unified Client-Side Authentication Context (Google Sign-In + Passwordless Email OTP).
  *
- * The CareerAI session is an HttpOnly cookie owned by the backend, so this
- * provider never reads or stores tokens. It only:
- *  - resolves the current identity by calling `GET /auth/me` on mount,
- *  - drives Google Sign-In (ID-token flow) and exchanges the credential at
- *    `POST /auth/google`,
- *  - exposes `logout` and a `refreshSession` used after onboarding writes.
- *
- * Navigation is intentionally left to route guards, which redirect based on the
- * `status` / `onboardingRequired` exposed here.
+ * The SPAR session is an HttpOnly cookie owned by the backend. This provider:
+ *  - resolves current identity by calling `GET /auth/me` on mount,
+ *  - drives Google Sign-In (ID-token flow) and exchanges at `POST /auth/google`,
+ *  - drives Passwordless Email OTP at `POST /auth/email/otp/send` and `/auth/email/otp/verify`,
+ *  - exposes authoritative `user.role`, `student.lifecycleState`, and `refreshSession`.
  */
 
 import {
@@ -30,6 +26,7 @@ import {
   type GoogleButtonOptions,
   type GoogleCredentialResponse,
 } from "@/lib/auth/google";
+import type { SendEmailOtpResponse, VerifyEmailOtpRequest } from "@/lib/careerai/types";
 
 export type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 
@@ -37,6 +34,7 @@ export interface AuthUser {
   id: string;
   email: string;
   name: string;
+  role: string;
   picture: string | null;
 }
 
@@ -44,12 +42,21 @@ export interface AuthStudent {
   id: string;
   profileCompletion: number;
   profileStatus: string;
+  lifecycleState: string;
+  onboardingStep: number;
 }
 
 interface SessionResponse {
-  user: { id: string; email: string; name: string; picture: string | null };
-  student: { id: string; profile_completion: number; profile_status: string };
+  user: { id: string; email: string; name: string; role?: string; picture: string | null };
+  student: {
+    id: string;
+    profile_completion: number;
+    profile_status: string;
+    lifecycle_state?: string;
+    onboarding_step?: number;
+  };
   onboarding_required: boolean;
+  redirect_route?: string;
 }
 
 export interface AuthContextValue {
@@ -58,9 +65,12 @@ export interface AuthContextValue {
   user: AuthUser | null;
   student: AuthStudent | null;
   onboardingRequired: boolean;
+  redirectRoute: string;
   googleConfigured: boolean;
   signingIn: boolean;
   error: string | null;
+  sendEmailOtp: (email: string) => Promise<SendEmailOtpResponse>;
+  verifyEmailOtp: (email: string, code: string, firstName?: string, lastName?: string) => Promise<void>;
   refreshSession: () => Promise<void>;
   logout: () => Promise<void>;
   promptGoogleSignIn: () => Promise<void>;
@@ -83,6 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [student, setStudent] = useState<AuthStudent | null>(null);
   const [onboardingRequired, setOnboardingRequired] = useState(false);
+  const [redirectRoute, setRedirectRoute] = useState("/app/today");
   const [signingIn, setSigningIn] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const googleInitialized = useRef(false);
@@ -92,14 +103,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       id: session.user.id,
       email: session.user.email,
       name: session.user.name,
+      role: session.user.role || "STUDENT",
       picture: session.user.picture ?? null,
     });
     setStudent({
       id: session.student.id,
       profileCompletion: session.student.profile_completion,
       profileStatus: session.student.profile_status,
+      lifecycleState: session.student.lifecycle_state || "ACCOUNT_CREATED",
+      onboardingStep: session.student.onboarding_step || 1,
     });
     setOnboardingRequired(session.onboarding_required);
+    if (session.redirect_route) {
+      setRedirectRoute(session.redirect_route);
+    }
     setStatus("authenticated");
     setError(null);
   }, []);
@@ -108,6 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setStudent(null);
     setOnboardingRequired(false);
+    setRedirectRoute("/");
     setStatus("unauthenticated");
   }, []);
 
@@ -120,9 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         clearSession();
         return;
       }
-      // Network or unexpected error: treat as signed-out but surface a message.
       clearSession();
-      setError("We couldn't reach CareerAI. Please try again.");
     }
   }, [applySession, clearSession]);
 
@@ -150,6 +166,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [applySession],
   );
 
+  const sendEmailOtp = useCallback(async (email: string): Promise<SendEmailOtpResponse> => {
+    setError(null);
+    try {
+      return await api.post<SendEmailOtpResponse>("/auth/email/otp/send", { body: { email } });
+    } catch (err: any) {
+      setError(err?.message || "Failed to send verification code. Please check your email.");
+      throw err;
+    }
+  }, []);
+
+  const verifyEmailOtp = useCallback(
+    async (email: string, code: string, firstName?: string, lastName?: string) => {
+      setSigningIn(true);
+      setError(null);
+      try {
+        const session = await api.post<SessionResponse>("/auth/email/otp/verify", {
+          body: { email, code, first_name: firstName, last_name: lastName },
+        });
+        applySession(session);
+      } catch (err: any) {
+        setError(err?.message || "Verification code failed. Please check the code and try again.");
+        throw err;
+      } finally {
+        setSigningIn(false);
+      }
+    },
+    [applySession],
+  );
+
   // Keep a stable reference for the Google callback registered with GIS.
   const exchangeRef = useRef(exchangeCredential);
   useEffect(() => {
@@ -158,49 +203,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const ensureGoogleInitialized = useCallback(async () => {
     if (!isGoogleConfigured) {
-      throw new Error("Google Sign-In is not configured.");
+      return null;
     }
-    const google = await loadGoogleIdentity();
-    if (!googleInitialized.current) {
-      google.accounts.id.initialize({
-        client_id: env.googleClientId,
-        callback: (response: GoogleCredentialResponse) => {
-          void exchangeRef.current(response.credential);
-        },
-        cancel_on_tap_outside: false,
-      });
-      googleInitialized.current = true;
+    try {
+      const google = await loadGoogleIdentity();
+      if (!googleInitialized.current) {
+        google.accounts.id.initialize({
+          client_id: env.googleClientId,
+          callback: (response: GoogleCredentialResponse) => {
+            void exchangeRef.current(response.credential);
+          },
+          cancel_on_tap_outside: false,
+        });
+        googleInitialized.current = true;
+      }
+      return google;
+    } catch {
+      return null;
     }
-    return google;
   }, []);
 
-  // On mount: resolve the existing session and warm up Google (best-effort).
+  // On mount: resolve the existing session and warm up Google.
   useEffect(() => {
     void refreshSession();
     if (isGoogleConfigured) {
-      void ensureGoogleInitialized().catch(() => {
-        setError("Google Sign-In could not be loaded.");
-      });
+      void ensureGoogleInitialized().catch(() => {});
     }
   }, [refreshSession, ensureGoogleInitialized]);
 
   const promptGoogleSignIn = useCallback(async () => {
     const google = await ensureGoogleInitialized();
-    google.accounts.id.prompt();
+    if (google) google.accounts.id.prompt();
   }, [ensureGoogleInitialized]);
 
   const renderGoogleButton = useCallback(
     async (el: HTMLElement, options?: GoogleButtonOptions) => {
       const google = await ensureGoogleInitialized();
-      google.accounts.id.renderButton(el, {
-        type: "standard",
-        theme: "filled_black",
-        size: "large",
-        text: "continue_with",
-        shape: "pill",
-        logo_alignment: "center",
-        ...(options ?? {}),
-      });
+      if (google) {
+        google.accounts.id.renderButton(el, {
+          type: "standard",
+          theme: "filled_black",
+          size: "large",
+          text: "continue_with",
+          shape: "pill",
+          logo_alignment: "center",
+          ...(options ?? {}),
+        });
+      }
     },
     [ensureGoogleInitialized],
   );
@@ -208,9 +257,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     try {
       await api.post("/auth/logout");
-    } catch {
-      // Logout is best-effort; clear local state regardless.
-    }
+    } catch {}
     if (isGoogleConfigured && typeof window !== "undefined" && window.google) {
       window.google.accounts.id.disableAutoSelect();
     }
@@ -226,9 +273,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       student,
       onboardingRequired,
+      redirectRoute,
       googleConfigured: isGoogleConfigured,
       signingIn,
       error,
+      sendEmailOtp,
+      verifyEmailOtp,
       refreshSession,
       logout,
       promptGoogleSignIn,
@@ -240,8 +290,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       student,
       onboardingRequired,
+      redirectRoute,
       signingIn,
       error,
+      sendEmailOtp,
+      verifyEmailOtp,
       refreshSession,
       logout,
       promptGoogleSignIn,

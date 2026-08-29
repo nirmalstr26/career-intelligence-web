@@ -625,3 +625,49 @@ export async function selectDiscoveryCareer(
     body: { career_code: careerCode },
   });
 }
+
+// --- Redesign: Unified Auth, Onboarding & Institution Master Data Client Methods ---
+
+export async function sendEmailOtp(email: string): Promise<SendEmailOtpResponse> {
+  return api.post<SendEmailOtpResponse>("/auth/email/otp/send", { body: { email } });
+}
+
+export async function verifyEmailOtp(data: VerifyEmailOtpRequest): Promise<any> {
+  return api.post("/auth/email/otp/verify", { body: data });
+}
+
+export async function getOnboardingStatus(): Promise<OnboardingStatusResponse> {
+  return api.get<OnboardingStatusResponse>("/students/me/onboarding-status");
+}
+
+export async function saveStep1About(data: Step1AboutRequest): Promise<OnboardingStatusResponse> {
+  return api.put<OnboardingStatusResponse>("/students/me/onboarding/about", { body: data });
+}
+
+export async function saveStep2Education(data: Step2EducationRequest): Promise<OnboardingStatusResponse> {
+  return api.put<OnboardingStatusResponse>("/students/me/onboarding/education", { body: data });
+}
+
+export async function saveStep3Goals(data: Step3GoalsRequest): Promise<OnboardingStatusResponse> {
+  return api.put<OnboardingStatusResponse>("/students/me/onboarding/goals", { body: data });
+}
+
+export async function completeOnboarding(consentVersion = "1.0"): Promise<CompleteOnboardingResponse> {
+  return api.post<CompleteOnboardingResponse>("/students/me/onboarding/complete", {
+    body: { consent_version: consentVersion, consent_granted: true },
+  });
+}
+
+export async function searchInstitutions(q = "", countryCode = "IN"): Promise<InstitutionSearchResponse> {
+  const query = new URLSearchParams({ country_code: countryCode, status: "VERIFIED", limit: "50" });
+  if (q.trim()) query.set("q", q.trim());
+  return api.get<InstitutionSearchResponse>(`/reference/institutions?${query.toString()}`);
+}
+
+export async function registerCollege(data: CollegeRegistrationSubmitRequest): Promise<CollegeRegistrationResponse> {
+  return api.post<CollegeRegistrationResponse>("/colleges/register", { body: data });
+}
+
+export async function getMyCollegeRegistrations(): Promise<CollegeRegistrationResponse[]> {
+  return api.get<CollegeRegistrationResponse[]>("/colleges/my-registration");
+}
