@@ -8,6 +8,7 @@ import {
   Target,
   Sparkles,
 } from "lucide-react";
+import heroBgImage from "@/assets/hero_background_home.png";
 import { CareerRoadArt } from "@/components/landing/CareerRoadArt";
 import { StatsFloatingCard } from "@/components/landing/StatsFloatingCard";
 import { AuthCard } from "@/components/landing/AuthCard";
@@ -69,36 +70,30 @@ export function Hero() {
   return (
     <section className="relative pt-6 pb-8 overflow-visible">
       {/* 
-        CINEMATIC FULL-HERO BACKGROUND ARTWORK LAYER
-        - Spans across the hero background extending behind the left feature cards and right signup panel
-        - Strong 4-sided gradient mask (15% left/right, 8% top, 22% bottom)
-        - Bottom dark gradient to reduce brightness near metrics card
-        - Zero rectangular card borders or visible boundaries
+        EXPANSIVE SEAMLESS BACKGROUND ARTWORK LAYER
+        - Positioned behind the entire hero content
+        - Universal smooth radial mask fading softly on all 4 sides
+        - Directional edge gradient overlays to seamlessly blend into page background
       */}
-      <div className="pointer-events-none absolute -inset-x-6 sm:-inset-x-12 -top-10 bottom-0 -z-10 flex items-center justify-center overflow-hidden">
-        <div
-          className="relative w-full h-full min-h-[640px] max-w-[1540px] opacity-95"
-          style={{
-            backgroundImage: "url('/brand/hero_background_home.png')",
-            backgroundPosition: "center 38%",
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-            WebkitMaskImage:
-              "linear-gradient(to right, transparent 0%, black 16%, black 84%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 8%, black 76%, transparent 100%)",
-            maskImage:
-              "linear-gradient(to right, transparent 0%, black 16%, black 84%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 8%, black 76%, transparent 100%)",
-            WebkitMaskComposite: "destination-in",
-            maskComposite: "intersect",
-          }}
-        >
-          {/* Subtle bottom dark navy fade overlay to soften bottom road brightness */}
-          <div
-            className="absolute inset-0"
+      <div className="pointer-events-none absolute inset-0 -top-8 -bottom-10 -z-10 flex items-center justify-center overflow-hidden">
+        <div className="relative w-full h-full max-w-[1500px]">
+          <img
+            src={heroBgImage || "/brand/hero_background_home.png"}
+            alt=""
+            aria-hidden="true"
+            className="w-full h-full object-cover object-center scale-105 select-none opacity-90"
             style={{
-              background:
-                "linear-gradient(to bottom, transparent 40%, rgba(3, 7, 18, 0.45) 65%, rgba(3, 7, 18, 0.9) 88%, #030712 100%)",
+              maskImage:
+                "radial-gradient(ellipse 72% 65% at 50% 42%, black 35%, rgba(0,0,0,0.8) 58%, rgba(0,0,0,0.2) 80%, transparent 100%)",
+              WebkitMaskImage:
+                "radial-gradient(ellipse 72% 65% at 50% 42%, black 35%, rgba(0,0,0,0.8) 58%, rgba(0,0,0,0.2) 80%, transparent 100%)",
             }}
           />
+
+          {/* Directional Soft Gradient Overlays for Zero Hard Edges */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#030712] via-transparent to-transparent opacity-80" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#030712] via-[#030712]/60 to-transparent opacity-95" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#030712] via-transparent to-[#030712] opacity-70" />
         </div>
       </div>
 
@@ -155,7 +150,7 @@ export function Hero() {
           </div>
         </div>
 
-        {/* CENTER COLUMN: Interactive Pathway Milestone Chips + Floating Bottom Stats Card */}
+        {/* CENTER COLUMN: Floating Pathway Milestone Chips + Floating Bottom Stats Card */}
         <div className="flex flex-col items-center justify-between h-full pt-1">
           {/* Floating Pathway Milestone Chips */}
           <CareerRoadArt />
