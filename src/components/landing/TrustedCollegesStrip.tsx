@@ -1,14 +1,13 @@
 import React from "react";
-import { Link } from "@tanstack/react-router";
 
 export function TrustedCollegesStrip() {
   return (
     <section aria-label="Trusted by leading colleges" className="w-full mt-6 mb-10">
-      <div className="mx-auto max-w-[1440px] rounded-2xl border border-border/60 bg-[#090e24]/70 p-4 sm:p-5 backdrop-blur-xl shadow-lg">
+      <div className="mx-auto max-w-[1440px] rounded-2xl border border-border/80 dark:bg-[#090e24]/70 bg-card/90 p-4 sm:p-5 backdrop-blur-xl shadow-md transition-colors">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
           {/* Left Title */}
           <div className="shrink-0">
-            <span className="text-[11px] font-bold tracking-[0.14em] uppercase text-muted-foreground/80">
+            <span className="text-[11px] font-bold tracking-[0.14em] uppercase text-muted-foreground">
               TRUSTED BY LEADING COLLEGES
             </span>
           </div>

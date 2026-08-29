@@ -55,9 +55,9 @@ const CAREER_PATHS: CareerPath[] = [
     icon: Database,
     themeColor: "from-cyan-500/20 to-blue-600/10",
     glowBorder: "hover:border-cyan-400/60 hover:shadow-[0_0_30px_rgba(6,215,247,0.25)]",
-    badgeColor: "border-cyan-400/40 bg-cyan-950/60 text-cyan-300",
+    badgeColor: "border-cyan-400/40 bg-cyan-500/10 text-cyan-600 dark:text-cyan-300",
     renderVisual: () => (
-      <div className="relative h-44 w-full rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-[#091338] to-[#060b1e] p-3.5 flex flex-col justify-between overflow-hidden">
+      <div className="relative h-44 w-full rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-slate-900 to-slate-950 p-3.5 flex flex-col justify-between overflow-hidden">
         <div className="absolute -top-10 -right-10 size-28 bg-cyan-500/20 rounded-full blur-xl pointer-events-none" />
         
         <div className="flex items-center justify-between z-10">
@@ -73,19 +73,19 @@ const CAREER_PATHS: CareerPath[] = [
         </div>
 
         {/* Pipeline Node Simulation */}
-        <div className="flex items-center justify-between rounded-xl bg-[#090e24] border border-border/50 p-2.5 z-10">
+        <div className="flex items-center justify-between rounded-xl bg-slate-900/90 border border-border/50 p-2.5 z-10">
           <div className="text-center">
-            <span className="text-[8px] text-muted-foreground block">Ingestion</span>
+            <span className="text-[8px] text-slate-400 block">Ingestion</span>
             <span className="text-[10px] font-bold text-cyan-300">Kafka 3.2</span>
           </div>
           <div className="h-0.5 w-6 bg-gradient-to-r from-cyan-400 to-blue-500 animate-pulse" />
           <div className="text-center">
-            <span className="text-[8px] text-muted-foreground block">Processing</span>
+            <span className="text-[8px] text-slate-400 block">Processing</span>
             <span className="text-[10px] font-bold text-blue-300">PySpark ETL</span>
           </div>
           <div className="h-0.5 w-6 bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse" />
           <div className="text-center">
-            <span className="text-[8px] text-muted-foreground block">Lakehouse</span>
+            <span className="text-[8px] text-slate-400 block">Lakehouse</span>
             <span className="text-[10px] font-bold text-purple-300">Iceberg</span>
           </div>
         </div>
@@ -113,9 +113,9 @@ const CAREER_PATHS: CareerPath[] = [
     icon: Brain,
     themeColor: "from-indigo-500/20 to-purple-600/10",
     glowBorder: "hover:border-indigo-400/60 hover:shadow-[0_0_30px_rgba(70,87,255,0.25)]",
-    badgeColor: "border-indigo-400/40 bg-indigo-950/60 text-indigo-300",
+    badgeColor: "border-indigo-400/40 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300",
     renderVisual: () => (
-      <div className="relative h-44 w-full rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-[#0c123d] to-[#070b1e] p-3.5 flex flex-col justify-between overflow-hidden">
+      <div className="relative h-44 w-full rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-slate-900 to-slate-950 p-3.5 flex flex-col justify-between overflow-hidden">
         <div className="absolute -top-10 -right-10 size-28 bg-indigo-500/20 rounded-full blur-xl pointer-events-none" />
 
         <div className="flex items-center justify-between z-10">
@@ -131,15 +131,15 @@ const CAREER_PATHS: CareerPath[] = [
         </div>
 
         {/* Neural Network Attention Layer Visual */}
-        <div className="space-y-1.5 rounded-xl bg-[#090e24] border border-border/50 p-2.5 z-10">
+        <div className="space-y-1.5 rounded-xl bg-slate-900/90 border border-border/50 p-2.5 z-10">
           <div className="flex justify-between text-[9px]">
-            <span className="text-muted-foreground">Self-Attention Accuracy</span>
+            <span className="text-slate-400">Self-Attention Accuracy</span>
             <span className="text-indigo-300 font-bold">96.8%</span>
           </div>
-          <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
+          <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
             <div className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 w-[96%]" />
           </div>
-          <div className="flex justify-between text-[8px] text-muted-foreground pt-0.5">
+          <div className="flex justify-between text-[8px] text-slate-400 pt-0.5">
             <span>Inference: 18ms</span>
             <span>Context: 128k tokens</span>
           </div>
@@ -168,9 +168,9 @@ const CAREER_PATHS: CareerPath[] = [
     icon: Code2,
     themeColor: "from-blue-500/20 to-cyan-600/10",
     glowBorder: "hover:border-blue-400/60 hover:shadow-[0_0_30px_rgba(0,140,255,0.25)]",
-    badgeColor: "border-blue-400/40 bg-blue-950/60 text-blue-300",
+    badgeColor: "border-blue-400/40 bg-blue-500/10 text-blue-600 dark:text-blue-300",
     renderVisual: () => (
-      <div className="relative h-44 w-full rounded-2xl border border-blue-500/30 bg-gradient-to-br from-[#091338] to-[#060b1e] p-3.5 flex flex-col justify-between overflow-hidden">
+      <div className="relative h-44 w-full rounded-2xl border border-blue-500/30 bg-gradient-to-br from-slate-900 to-slate-950 p-3.5 flex flex-col justify-between overflow-hidden">
         <div className="absolute -top-10 -right-10 size-28 bg-blue-500/20 rounded-full blur-xl pointer-events-none" />
 
         <div className="flex items-center justify-between z-10">
@@ -186,9 +186,9 @@ const CAREER_PATHS: CareerPath[] = [
         </div>
 
         {/* IDE Code Snapshot */}
-        <div className="rounded-xl bg-[#090e24] border border-border/50 p-2 font-mono text-[9px] text-cyan-200 z-10 space-y-0.5">
+        <div className="rounded-xl bg-slate-900/90 border border-border/50 p-2 font-mono text-[9px] text-cyan-200 z-10 space-y-0.5">
           <p><span className="text-purple-400">export async function</span> <span className="text-blue-400">handleOrder</span>(ctx) &#123;</p>
-          <p className="pl-3 text-muted-foreground">// Distributed ACID Transaction</p>
+          <p className="pl-3 text-slate-400">// Distributed ACID Transaction</p>
           <p className="pl-3"><span className="text-cyan-400">await</span> db.tx.commit(); <span className="text-emerald-400">// &lt;4ms</span></p>
           <p>&#125;</p>
         </div>
@@ -216,9 +216,9 @@ const CAREER_PATHS: CareerPath[] = [
     icon: Cloud,
     themeColor: "from-teal-500/20 to-emerald-600/10",
     glowBorder: "hover:border-teal-400/60 hover:shadow-[0_0_30px_rgba(20,184,166,0.25)]",
-    badgeColor: "border-teal-400/40 bg-teal-950/60 text-teal-300",
+    badgeColor: "border-teal-400/40 bg-teal-500/10 text-teal-600 dark:text-teal-300",
     renderVisual: () => (
-      <div className="relative h-44 w-full rounded-2xl border border-teal-500/30 bg-gradient-to-br from-[#08182b] to-[#060b1e] p-3.5 flex flex-col justify-between overflow-hidden">
+      <div className="relative h-44 w-full rounded-2xl border border-teal-500/30 bg-gradient-to-br from-slate-900 to-slate-950 p-3.5 flex flex-col justify-between overflow-hidden">
         <div className="absolute -top-10 -right-10 size-28 bg-teal-500/20 rounded-full blur-xl pointer-events-none" />
 
         <div className="flex items-center justify-between z-10">
@@ -234,17 +234,17 @@ const CAREER_PATHS: CareerPath[] = [
         </div>
 
         {/* Terraform IaC Status Bar */}
-        <div className="grid grid-cols-3 gap-1.5 rounded-xl bg-[#090e24] border border-border/50 p-2 text-center z-10">
+        <div className="grid grid-cols-3 gap-1.5 rounded-xl bg-slate-900/90 border border-border/50 p-2 text-center z-10">
           <div>
-            <span className="text-[8px] text-muted-foreground block">Terraform</span>
+            <span className="text-[8px] text-slate-400 block">Terraform</span>
             <span className="text-[10px] font-bold text-emerald-400">Applied ✓</span>
           </div>
           <div>
-            <span className="text-[8px] text-muted-foreground block">Multi-AZ</span>
+            <span className="text-[8px] text-slate-400 block">Multi-AZ</span>
             <span className="text-[10px] font-bold text-cyan-400">99.99%</span>
           </div>
           <div>
-            <span className="text-[8px] text-muted-foreground block">Security</span>
+            <span className="text-[8px] text-slate-400 block">Security</span>
             <span className="text-[10px] font-bold text-teal-300">SOC2 Hardened</span>
           </div>
         </div>
@@ -272,9 +272,9 @@ const CAREER_PATHS: CareerPath[] = [
     icon: Shield,
     themeColor: "from-purple-500/20 to-pink-600/10",
     glowBorder: "hover:border-purple-400/60 hover:shadow-[0_0_30px_rgba(130,71,255,0.25)]",
-    badgeColor: "border-purple-400/40 bg-purple-950/60 text-purple-300",
+    badgeColor: "border-purple-400/40 bg-purple-500/10 text-purple-600 dark:text-purple-300",
     renderVisual: () => (
-      <div className="relative h-44 w-full rounded-2xl border border-purple-500/30 bg-gradient-to-br from-[#160c38] to-[#070b1e] p-3.5 flex flex-col justify-between overflow-hidden">
+      <div className="relative h-44 w-full rounded-2xl border border-purple-500/30 bg-gradient-to-br from-slate-900 to-slate-950 p-3.5 flex flex-col justify-between overflow-hidden">
         <div className="absolute -top-10 -right-10 size-28 bg-purple-500/20 rounded-full blur-xl pointer-events-none" />
 
         <div className="flex items-center justify-between z-10">
@@ -290,13 +290,13 @@ const CAREER_PATHS: CareerPath[] = [
         </div>
 
         {/* Security SIEM Matrix */}
-        <div className="space-y-1.5 rounded-xl bg-[#090e24] border border-border/50 p-2 z-10">
+        <div className="space-y-1.5 rounded-xl bg-slate-900/90 border border-border/50 p-2 z-10">
           <div className="flex justify-between text-[9px]">
-            <span className="text-muted-foreground">End-to-End Encryption</span>
+            <span className="text-slate-400">End-to-End Encryption</span>
             <span className="text-purple-300 font-bold">AES-256-GCM ✓</span>
           </div>
           <div className="flex justify-between text-[9px]">
-            <span className="text-muted-foreground">Intrusion Detection (IDS)</span>
+            <span className="text-slate-400">Intrusion Detection (IDS)</span>
             <span className="text-cyan-400 font-bold">Active Shielding</span>
           </div>
         </div>
@@ -324,9 +324,9 @@ const CAREER_PATHS: CareerPath[] = [
     icon: BarChart3,
     themeColor: "from-amber-500/20 to-orange-600/10",
     glowBorder: "hover:border-amber-400/60 hover:shadow-[0_0_30px_rgba(245,158,11,0.25)]",
-    badgeColor: "border-amber-400/40 bg-amber-950/60 text-amber-300",
+    badgeColor: "border-amber-400/40 bg-amber-500/10 text-amber-600 dark:text-amber-300",
     renderVisual: () => (
-      <div className="relative h-44 w-full rounded-2xl border border-amber-500/30 bg-gradient-to-br from-[#181108] to-[#070b1e] p-3.5 flex flex-col justify-between overflow-hidden">
+      <div className="relative h-44 w-full rounded-2xl border border-amber-500/30 bg-gradient-to-br from-slate-900 to-slate-950 p-3.5 flex flex-col justify-between overflow-hidden">
         <div className="absolute -top-10 -right-10 size-28 bg-amber-500/20 rounded-full blur-xl pointer-events-none" />
 
         <div className="flex items-center justify-between z-10">
@@ -342,9 +342,9 @@ const CAREER_PATHS: CareerPath[] = [
         </div>
 
         {/* Animated BI Telemetry Bars */}
-        <div className="flex items-end justify-between gap-1.5 h-12 rounded-xl bg-[#090e24] border border-border/50 p-2 z-10">
+        <div className="flex items-end justify-between gap-1.5 h-12 rounded-xl bg-slate-900/90 border border-border/50 p-2 z-10">
           {[35, 55, 45, 75, 60, 90, 80, 100, 70, 85].map((val, i) => (
-            <div key={i} className="flex-1 bg-secondary/80 rounded-sm h-full flex items-end">
+            <div key={i} className="flex-1 bg-slate-800 rounded-sm h-full flex items-end">
               <div
                 className="w-full bg-gradient-to-t from-amber-500 to-orange-400 rounded-sm transition-all"
                 style={{ height: `${val}%` }}
@@ -392,13 +392,13 @@ export function CareerPathsSection() {
 
       {/* Section Header */}
       <div className="text-center max-w-3xl mx-auto space-y-3 px-4">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-500/40 bg-[#090e24]/90 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-cyan-300 shadow-[0_0_15px_rgba(6,215,247,0.25)] backdrop-blur">
-          <Sparkles className="size-3.5 text-cyan-400" />
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-500/40 bg-card/90 dark:bg-[#090e24]/90 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-300 shadow-sm backdrop-blur">
+          <Sparkles className="size-3.5 text-cyan-500" />
           Supported Career Directions
         </span>
-        <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+        <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight leading-tight">
           Explore where SPAR can{" "}
-          <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(6,215,247,0.35)]">
+          <span className="bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 dark:from-cyan-400 dark:via-blue-500 dark:to-purple-500 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(6,215,247,0.35)]">
             take you.
           </span>
         </h2>
@@ -416,8 +416,8 @@ export function CareerPathsSection() {
             onClick={() => setActiveCategory(cat)}
             className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
               activeCategory === cat
-                ? "bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-[0_0_15px_rgba(6,215,247,0.4)]"
-                : "border border-border/70 bg-[#090e24]/80 text-muted-foreground hover:text-white hover:border-cyan-400/40"
+                ? "bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-md"
+                : "border border-border/70 bg-card/90 dark:bg-[#090e24]/80 text-muted-foreground hover:text-foreground hover:border-cyan-500/40"
             }`}
           >
             {cat}
@@ -433,7 +433,7 @@ export function CareerPathsSection() {
             <div
               key={path.id}
               onClick={() => handleCardClick(path.title)}
-              className={`surface-panel group relative rounded-3xl p-5 sm:p-6 border border-border/80 bg-[#090e24]/85 backdrop-blur-2xl shadow-xl cursor-pointer transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between ${path.glowBorder}`}
+              className={`surface-panel group relative rounded-3xl p-5 sm:p-6 border border-border/80 bg-card/95 dark:bg-[#090e24]/85 backdrop-blur-2xl shadow-xl cursor-pointer transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between ${path.glowBorder}`}
             >
               {/* Top: Rich Visual Architecture Preview */}
               <div className="space-y-4">
@@ -451,10 +451,10 @@ export function CareerPathsSection() {
 
                 {/* Title & Tagline */}
                 <div>
-                  <h3 className="font-display text-lg font-bold text-white group-hover:text-cyan-400 transition-colors">
+                  <h3 className="font-display text-lg font-bold text-foreground group-hover:text-cyan-500 dark:group-hover:text-cyan-400 transition-colors">
                     {path.title}
                   </h3>
-                  <p className="text-[11px] font-semibold text-cyan-300 mt-0.5">
+                  <p className="text-[11px] font-semibold text-cyan-600 dark:text-cyan-300 mt-0.5">
                     {path.tagline}
                   </p>
                   <p className="mt-2 text-xs text-muted-foreground leading-relaxed line-clamp-2">
@@ -464,13 +464,13 @@ export function CareerPathsSection() {
 
                 {/* Salary & Demand Metrics Pill Bar */}
                 <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border/50">
-                  <div className="rounded-xl bg-[#0d1436] p-2 border border-border/60 text-center">
+                  <div className="rounded-xl bg-slate-100 dark:bg-[#0d1436] p-2 border border-border/60 text-center">
                     <span className="text-[8px] uppercase tracking-wider text-muted-foreground block">Campus Salary</span>
-                    <span className="text-xs font-bold text-white">{path.salaryBand}</span>
+                    <span className="text-xs font-bold text-foreground">{path.salaryBand}</span>
                   </div>
-                  <div className="rounded-xl bg-[#0d1436] p-2 border border-border/60 text-center">
+                  <div className="rounded-xl bg-slate-100 dark:bg-[#0d1436] p-2 border border-border/60 text-center">
                     <span className="text-[8px] uppercase tracking-wider text-muted-foreground block">Hiring Growth</span>
-                    <span className="text-xs font-bold text-emerald-400">{path.demandGrowth}</span>
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{path.demandGrowth}</span>
                   </div>
                 </div>
 
@@ -479,7 +479,7 @@ export function CareerPathsSection() {
                   {path.skills.map((skill) => (
                     <span
                       key={skill}
-                      className="rounded-lg bg-[#0d1436]/90 border border-border/60 px-2 py-0.5 text-[10px] font-medium text-white/90 group-hover:border-cyan-500/30 transition-colors"
+                      className="rounded-lg bg-slate-100/90 dark:bg-[#0d1436]/90 border border-border/60 px-2 py-0.5 text-[10px] font-medium text-foreground group-hover:border-cyan-500/30 transition-colors"
                     >
                       {skill}
                     </span>
@@ -488,9 +488,9 @@ export function CareerPathsSection() {
               </div>
 
               {/* Bottom CTA Action Bar */}
-              <div className="mt-6 pt-3.5 border-t border-border/60 flex items-center justify-between text-xs font-bold text-cyan-400 group-hover:text-cyan-300">
+              <div className="mt-6 pt-3.5 border-t border-border/60 flex items-center justify-between text-xs font-bold text-cyan-600 dark:text-cyan-400 group-hover:underline">
                 <span className="flex items-center gap-1.5">
-                  <Sparkles className="size-3.5 text-cyan-400" />
+                  <Sparkles className="size-3.5 text-cyan-500" />
                   <span>Start Path Diagnostic</span>
                 </span>
                 <ArrowRight className="size-3.5 transition-transform duration-200 group-hover:translate-x-1.5" />
