@@ -261,7 +261,7 @@ export function OnboardingFlow() {
 
     try {
       // 1. Save Step 3 Goals
-      await saveStep3GoalsMutation.mutateAsync({
+      await saveStep3Mutation.mutateAsync({
         primary_goal: selectedGoals[0] || "JOB",
         secondary_goals: selectedGoals.slice(1),
         career_clarity_level: clarityLevel,
