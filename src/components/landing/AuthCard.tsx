@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { User, Mail, Lock, Eye, EyeOff, Sparkles, Shield, ArrowRight, CheckCircle2, KeyRound, RefreshCw } from "lucide-react";
+import { User, Mail, Lock, Eye, EyeOff, Sparkles, Shield, ArrowRight, CheckCircle2, KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
@@ -46,11 +46,9 @@ export function AuthCard() {
     const lastName = nameParts.slice(1).join(" ") || "User";
 
     try {
-      // Seamless authentication: logs in/registers directly or sends challenge
       await devLogin(email.trim(), firstName, lastName);
       await refreshSession();
     } catch {
-      // Fallback to passwordless OTP if direct auth requires challenge
       try {
         await sendEmailOtp(email.trim());
         setOtpStep(true);
@@ -92,13 +90,13 @@ export function AuthCard() {
   return (
     <div
       id="auth-card"
-      className="relative w-full max-w-[410px] rounded-[28px] border border-blue-500/25 bg-[#090e24]/90 p-6 sm:p-7 shadow-[0_20px_60px_rgba(0,0,0,0.7)] backdrop-blur-2xl transition-all select-none"
+      className="relative w-full max-w-[395px] lg:max-w-[410px] rounded-[28px] border border-blue-500/25 bg-[#090e24]/90 p-5 sm:p-6 lg:p-7 shadow-[0_20px_60px_rgba(0,0,0,0.7)] backdrop-blur-2xl transition-all select-none"
     >
       {/* Top Outer Edge Subtle Cyan Highlight */}
       <div className="pointer-events-none absolute -top-px left-12 right-12 h-px bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent" />
 
       {/* Role Switcher Pills */}
-      <div className="flex rounded-full bg-[#0d1436] p-1 border border-border/60 mb-5">
+      <div className="flex rounded-full bg-[#0d1436] p-1 border border-border/60 mb-4">
         <button
           type="button"
           onClick={() => {
@@ -146,8 +144,8 @@ export function AuthCard() {
       {!otpStep ? (
         <>
           {/* Header Title & Subtitle */}
-          <div className="text-center space-y-1 mb-5">
-            <h2 className="text-xl font-bold font-display text-white">
+          <div className="text-center space-y-1 mb-4">
+            <h2 className="text-lg sm:text-xl font-bold font-display text-white">
               {roleTab === "college" ? "Register Your College" : "Start your career journey"}
             </h2>
             <p className="text-xs text-muted-foreground leading-relaxed">
@@ -158,25 +156,56 @@ export function AuthCard() {
           </div>
 
           {/* Google Button */}
-          {isGoogleConfigured && roleTab !== "college" ? (
-            <div className="space-y-4 mb-4">
-              <div className="flex justify-center">
-                <GoogleSignInButton options={{ width: 330, text: "continue_with" }} />
-              </div>
+          {roleTab !== "college" && (
+            <div className="space-y-3 mb-3.5">
+              {isGoogleConfigured ? (
+                <div className="flex justify-center">
+                  <GoogleSignInButton options={{ width: 320, text: "continue_with" }} />
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const emailInput = document.querySelector("#auth-card input[type='email']") as HTMLInputElement | null;
+                    if (emailInput) emailInput.focus();
+                  }}
+                  className="w-full flex items-center justify-center gap-2.5 rounded-full bg-white py-2 px-4 text-xs font-semibold text-[#1f1f1f] shadow-md hover:bg-gray-50 transition-all border border-gray-200"
+                >
+                  <svg className="size-4" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                    />
+                  </svg>
+                  <span>Continue with Google</span>
+                </button>
+              )}
 
               {/* Divider */}
               <div className="relative flex items-center justify-center">
                 <div className="w-full border-t border-border/70" />
-                <span className="bg-[#090e24] px-3 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                <span className="bg-[#090e24] px-3 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
                   or
                 </span>
                 <div className="w-full border-t border-border/70" />
               </div>
             </div>
-          ) : null}
+          )}
 
           {/* Inputs Form */}
-          <form onSubmit={handleFormSubmit} className="space-y-3">
+          <form onSubmit={handleFormSubmit} className="space-y-2.5">
             {/* Full Name */}
             <div className="relative">
               <User className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
@@ -243,7 +272,7 @@ export function AuthCard() {
               type="submit"
               size="lg"
               disabled={loading}
-              className="w-full font-bold text-sm text-white rounded-xl bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 shadow-[0_0_25px_rgba(6,215,247,0.4)] hover:brightness-110 hover:scale-[1.01] transition-all gap-2 mt-2"
+              className="w-full font-bold text-sm text-white rounded-xl bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 shadow-[0_0_25px_rgba(6,215,247,0.4)] hover:brightness-110 hover:scale-[1.01] transition-all gap-2 mt-1.5"
             >
               {loading ? (
                 "Creating Account…"
@@ -257,7 +286,7 @@ export function AuthCard() {
           </form>
 
           {/* Terms text */}
-          <p className="mt-4 text-center text-[10px] text-muted-foreground leading-relaxed">
+          <p className="mt-3 text-center text-[10px] text-muted-foreground leading-relaxed">
             By signing up, you agree to our{" "}
             <a href="#terms" className="text-cyan-400 hover:underline">
               Terms of Service
