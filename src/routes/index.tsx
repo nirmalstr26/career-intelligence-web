@@ -5,6 +5,7 @@ import { Navbar } from "@/components/landing/Navbar";
 import { Hero } from "@/components/landing/Hero";
 import { TrustedCollegesStrip } from "@/components/landing/TrustedCollegesStrip";
 import { PlatformCapabilities } from "@/components/landing/PlatformCapabilities";
+import { UnifiedArchitecture } from "@/components/landing/UnifiedArchitecture";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { CoachPreview } from "@/components/landing/CoachPreview";
 import { KnowledgeGraphPreview } from "@/components/landing/KnowledgeGraphPreview";
@@ -81,9 +82,16 @@ function Landing() {
           {/* Bottom Trusted by Leading Colleges Strip */}
           <TrustedCollegesStrip />
 
-          {/* Deep Feature Exploration & Capabilities */}
+          {/* Deep Feature Exploration & Single-Row Auto-Scrolling Showcase */}
           <PlatformCapabilities />
+
+          {/* Unified Career Intelligence Architecture Hub */}
+          <UnifiedArchitecture />
+
+          {/* Methodology: How SPAR Guides Your Entire Journey Roadmap */}
           <HowItWorks />
+
+          {/* Supporting Deep Dives */}
           <CoachPreview />
           <KnowledgeGraphPreview />
           <ReadinessPreview />

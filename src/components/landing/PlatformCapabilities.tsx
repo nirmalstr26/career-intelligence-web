@@ -560,21 +560,6 @@ export function PlatformCapabilities() {
           />
         ))}
       </div>
-
-      {/* Unified Platform Statement Box */}
-      <div className="rounded-3xl border border-cyan-500/30 bg-gradient-to-r from-cyan-950/40 via-indigo-950/30 to-purple-950/40 p-6 sm:p-8 text-center backdrop-blur-xl shadow-2xl max-w-4xl mx-auto">
-        <div className="flex justify-center mb-3">
-          <span className="grid size-10 place-items-center rounded-2xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,215,247,0.4)]">
-            <Sparkles className="size-5" />
-          </span>
-        </div>
-        <h4 className="font-display text-lg sm:text-xl font-extrabold text-white tracking-tight">
-          Unified Career Intelligence Architecture
-        </h4>
-        <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Unlike ordinary course platforms, SPAR connects every diagnostic quiz, code challenge, project repository, and mock interview into a single authoritative readiness profile that proves your capability to recruiters.
-        </p>
-      </div>
     </section>
   );
 }
