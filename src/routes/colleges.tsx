@@ -97,12 +97,15 @@ function CollegeLandingRoute() {
       {/* Top Navbar */}
       <header className="border-b border-border bg-card/60 backdrop-blur-md sticky top-0 z-30">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link to="/" className="flex items-center gap-2.5">
-            <span className="grid size-8 place-items-center rounded-xl bg-primary text-primary-foreground font-bold text-base shadow-sm">
-              S
-            </span>
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <img
+              src="/brand/icon/spar-ai-icon-64.png"
+              srcSet="/brand/icon/spar-ai-icon-64.png 1x, /brand/icon/spar-ai-icon-128.png 2x"
+              alt="SPAR AI"
+              className="size-8 object-contain drop-shadow-sm transition-transform duration-200 group-hover:scale-105"
+            />
             <span className="font-display text-lg font-bold">
-              SPAR <span className="text-primary">for Colleges</span>
+              SPAR <span className="text-cyan-400">for Colleges</span>
             </span>
           </Link>
 

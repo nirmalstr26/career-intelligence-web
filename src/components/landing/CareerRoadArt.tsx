@@ -21,11 +21,13 @@ export function CareerRoadArt() {
           <div className="absolute inset-2 rounded-full border border-blue-500/40 opacity-70" />
           <div className="absolute inset-4 rounded-full border-2 border-cyan-400/80 shadow-[0_0_30px_rgba(6,215,247,0.8)]" />
 
-          {/* Inner Portal Circle */}
+          {/* Inner Portal Circle with Official SPAR AI Symbol */}
           <div className="relative grid size-16 place-items-center rounded-full bg-gradient-to-tr from-cyan-500/40 via-blue-600/60 to-purple-600/80 backdrop-blur-md border border-cyan-300/80 shadow-[0_0_25px_rgba(6,215,247,0.9)]">
-            <svg viewBox="0 0 24 24" className="size-8 text-cyan-200 drop-shadow-[0_0_8px_#06d7f7]" fill="none">
-              <path d="M12 3L21 19H3L12 3Z" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" />
-            </svg>
+            <img
+              src="/brand/icon/spar-ai-icon-128.png"
+              alt="SPAR AI Destination"
+              className="size-9 object-contain drop-shadow-[0_0_10px_#06d7f7]"
+            />
           </div>
         </div>
       </div>

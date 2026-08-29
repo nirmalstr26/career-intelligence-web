@@ -54,18 +54,15 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="mx-auto flex h-16 w-full max-w-[1240px] items-center justify-between gap-4 px-4 sm:px-6">
           {/* Brand */}
           <div className="flex items-center gap-2.5">
-            <Link to="/app/today" className="flex items-center gap-2.5">
-              <span
-                className="grid size-8 shrink-0 place-items-center rounded-lg"
-                style={{ backgroundImage: "var(--gradient-primary)" }}
-                aria-hidden="true"
-              >
-                <svg viewBox="0 0 24 24" className="size-4" fill="none">
-                  <path d="M12 4 20 20H4L12 4Z" stroke="var(--background)" strokeWidth="2" />
-                </svg>
-              </span>
+            <Link to="/app/today" className="flex items-center gap-2.5 group">
+              <img
+                src="/brand/icon/spar-ai-icon-64.png"
+                srcSet="/brand/icon/spar-ai-icon-64.png 1x, /brand/icon/spar-ai-icon-128.png 2x"
+                alt="SPAR AI"
+                className="size-8 object-contain drop-shadow-sm transition-transform duration-200 group-hover:scale-105"
+              />
               <span className="font-display text-lg font-bold tracking-tight">
-                Career<span className="text-gradient">AI</span>
+                SPAR <span className="text-cyan-400">AI</span>
               </span>
             </Link>
           </div>

@@ -78,17 +78,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "CareerAI — AI Career Intelligence for College Students" },
+      { title: "SPAR AI — AI Career Intelligence for College Students" },
       {
         name: "description",
         content:
-          "CareerAI is an AI-powered career operating system for college students: discovery, readiness tracking, and placement guidance.",
+          "SPAR AI is an AI-powered career operating system for college students: discovery, readiness tracking, and placement guidance.",
       },
-      { property: "og:title", content: "CareerAI" },
+      { property: "og:title", content: "SPAR AI — Turn ambition into a career roadmap" },
       {
         property: "og:description",
         content: "An AI-powered career operating system for college students.",
       },
+      { property: "og:image", content: "/brand/lockup/spar-ai-logo-dark-bg-640.png" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -104,6 +105,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { rel: "icon", href: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
     ],
   }),
 

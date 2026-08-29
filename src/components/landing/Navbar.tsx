@@ -10,9 +10,6 @@ import {
   Map,
   Terminal,
   MessageSquare,
-  Award,
-  Target,
-  Building2,
   ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -52,13 +49,14 @@ export function Navbar() {
       <header className="sticky top-0 z-40 w-full pt-4 px-4 sm:px-6 lg:px-10 select-none">
         <div className="mx-auto max-w-[1440px] rounded-2xl border border-border/60 bg-[#090e24]/75 backdrop-blur-xl px-5 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
           <div className="flex items-center justify-between">
-            {/* Logo: Triangle + SPAR AI */}
+            {/* Official Logo: SPAR AI Icon + Brand Typography */}
             <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="grid size-9 place-items-center rounded-xl bg-gradient-to-tr from-cyan-400 via-blue-500 to-indigo-600 text-white shadow-[0_0_15px_rgba(6,215,247,0.4)] transition-transform duration-300 group-hover:scale-105">
-                <svg viewBox="0 0 24 24" className="size-5" fill="none">
-                  <path d="M12 3L21 19H3L12 3Z" stroke="currentColor" strokeWidth="2.4" strokeLinejoin="round" />
-                </svg>
-              </div>
+              <img
+                src="/brand/icon/spar-ai-icon-64.png"
+                srcSet="/brand/icon/spar-ai-icon-64.png 1x, /brand/icon/spar-ai-icon-128.png 2x"
+                alt="SPAR AI"
+                className="size-9 object-contain drop-shadow-[0_0_12px_rgba(6,215,247,0.4)] transition-transform duration-300 group-hover:scale-105"
+              />
               <span className="font-display text-xl font-extrabold tracking-tight text-white">
                 SPAR <span className="text-cyan-400">AI</span>
               </span>

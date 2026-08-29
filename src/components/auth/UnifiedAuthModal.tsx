@@ -127,12 +127,18 @@ export function UnifiedAuthModal({ isOpen, onClose, initialMode = "student" }: U
 
         {/* Modal Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary mb-3">
-            <Sparkles className="size-3.5" />
+          <img
+            src="/brand/icon/spar-ai-icon-64.png"
+            srcSet="/brand/icon/spar-ai-icon-64.png 1x, /brand/icon/spar-ai-icon-128.png 2x"
+            alt="SPAR AI"
+            className="size-11 object-contain mx-auto mb-2.5 drop-shadow-[0_0_12px_rgba(6,215,247,0.3)]"
+          />
+          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-950/40 px-3.5 py-1 text-xs font-semibold text-cyan-300 mb-2">
+            <Sparkles className="size-3.5 text-cyan-400" />
             <span>Unified Platform Access</span>
           </div>
           <h2 className="font-display text-2xl font-bold tracking-tight text-foreground">
-            Welcome to SPAR
+            Welcome to SPAR <span className="text-cyan-400">AI</span>
           </h2>
           <p className="mt-1 text-xs text-muted-foreground">
             {initialMode === "college"

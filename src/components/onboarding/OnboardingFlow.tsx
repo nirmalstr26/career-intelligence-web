@@ -298,9 +298,12 @@ export function OnboardingFlow() {
     return (
       <div className="flex min-h-[70vh] flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
         <div className="relative mb-6">
-          <div className="flex size-20 items-center justify-center rounded-3xl bg-primary/10 text-primary border border-primary/20 shadow-lg">
-            <Sparkles className="size-10 animate-pulse text-primary" />
-          </div>
+          <img
+            src="/brand/icon/spar-ai-icon-128.png"
+            srcSet="/brand/icon/spar-ai-icon-128.png 1x, /brand/icon/spar-ai-icon-256.png 2x"
+            alt="SPAR AI"
+            className="size-20 object-contain drop-shadow-[0_0_20px_rgba(6,215,247,0.5)] animate-pulse mx-auto"
+          />
         </div>
 
         <h2 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -334,12 +337,18 @@ export function OnboardingFlow() {
     <div className="mx-auto max-w-2xl px-4 py-8 sm:py-12">
       {/* Header & Step Indicator */}
       <div className="mb-8 text-center">
-        <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary">
-          <Sparkles className="size-3.5" />
+        <img
+          src="/brand/icon/spar-ai-icon-64.png"
+          srcSet="/brand/icon/spar-ai-icon-64.png 1x, /brand/icon/spar-ai-icon-128.png 2x"
+          alt="SPAR AI"
+          className="size-12 object-contain mx-auto mb-3 drop-shadow-sm"
+        />
+        <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-950/40 px-3.5 py-1 text-xs font-semibold text-cyan-300">
+          <Sparkles className="size-3.5 text-cyan-400" />
           <span>Quick 2-Minute Profile</span>
         </div>
         <h1 className="mt-3 font-display text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
-          Welcome to SPAR
+          Welcome to SPAR <span className="text-cyan-400">AI</span>
         </h1>
         <p className="mt-1.5 text-xs text-muted-foreground">
           {STEPS[stepIdx].subtitle} · Step {stepIdx + 1} of {STEPS.length}

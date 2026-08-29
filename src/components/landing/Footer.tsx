@@ -4,18 +4,19 @@ import { Lock, Sparkles, ShieldCheck } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border/80 bg-card/60 backdrop-blur-xl pt-14 pb-8 text-xs text-muted-foreground">
+    <footer className="border-t border-border/80 bg-[#090e24]/75 backdrop-blur-xl pt-14 pb-8 text-xs text-muted-foreground select-none">
       <div className="mx-auto max-w-[1440px] px-6 lg:px-10">
         <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-5 pb-12 border-b border-border/60">
           {/* Brand & Mission Column */}
           <div className="space-y-4 md:col-span-2">
-            <Link to="/" className="flex items-center gap-2.5">
-              <div className="grid size-8 place-items-center rounded-xl bg-gradient-to-tr from-cyan-400 via-blue-500 to-indigo-600 text-white shadow-sm">
-                <svg viewBox="0 0 24 24" className="size-4" fill="none">
-                  <path d="M12 3L21 19H3L12 3Z" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" />
-                </svg>
-              </div>
-              <span className="font-display text-base font-bold tracking-tight text-foreground">
+            <Link to="/" className="flex items-center gap-2.5 group">
+              <img
+                src="/brand/icon/spar-ai-icon-64.png"
+                srcSet="/brand/icon/spar-ai-icon-64.png 1x, /brand/icon/spar-ai-icon-128.png 2x"
+                alt="SPAR AI"
+                className="size-8 object-contain drop-shadow-sm transition-transform duration-300 group-hover:scale-105"
+              />
+              <span className="font-display text-base font-bold tracking-tight text-white">
                 SPAR <span className="text-cyan-400">AI</span>
               </span>
             </Link>
@@ -32,42 +33,42 @@ export function Footer() {
 
           {/* Product Links */}
           <div className="space-y-3">
-            <p className="font-display text-xs font-bold text-foreground uppercase tracking-wider">
+            <p className="font-display text-xs font-bold text-white uppercase tracking-wider">
               Product
             </p>
             <ul className="space-y-2">
-              <li><a href="#discovery" className="hover:text-foreground transition-colors">AI Career Discovery</a></li>
-              <li><a href="#roadmap" className="hover:text-foreground transition-colors">Personalized Roadmap</a></li>
-              <li><a href="#projects" className="hover:text-foreground transition-colors">Practical Projects</a></li>
-              <li><a href="#interviews" className="hover:text-foreground transition-colors">Mock Interviews</a></li>
-              <li><a href="#readiness" className="hover:text-foreground transition-colors">Readiness Scoring</a></li>
-              <li><a href="#opportunities" className="hover:text-foreground transition-colors">Job Gap Optimizer</a></li>
+              <li><a href="#discovery" className="hover:text-white transition-colors">AI Career Discovery</a></li>
+              <li><a href="#roadmap" className="hover:text-white transition-colors">Personalized Roadmap</a></li>
+              <li><a href="#projects" className="hover:text-white transition-colors">Practical Projects</a></li>
+              <li><a href="#interviews" className="hover:text-white transition-colors">Mock Interviews</a></li>
+              <li><a href="#readiness" className="hover:text-white transition-colors">Readiness Scoring</a></li>
+              <li><a href="#opportunities" className="hover:text-white transition-colors">Job Gap Optimizer</a></li>
             </ul>
           </div>
 
           {/* For Colleges Links */}
           <div className="space-y-3">
-            <p className="font-display text-xs font-bold text-foreground uppercase tracking-wider">
+            <p className="font-display text-xs font-bold text-white uppercase tracking-wider">
               For Colleges
             </p>
             <ul className="space-y-2">
-              <li><Link to="/colleges" className="hover:text-foreground transition-colors">University Platform</Link></li>
-              <li><Link to="/colleges" className="hover:text-foreground transition-colors">Register Institution</Link></li>
-              <li><Link to="/colleges" className="hover:text-foreground transition-colors">Cohort Analytics</Link></li>
-              <li><a href="#colleges-section" className="hover:text-foreground transition-colors">Placement Intelligence</a></li>
+              <li><Link to="/colleges" className="hover:text-white transition-colors">University Platform</Link></li>
+              <li><Link to="/colleges" className="hover:text-white transition-colors">Register Institution</Link></li>
+              <li><Link to="/colleges" className="hover:text-white transition-colors">Cohort Analytics</Link></li>
+              <li><a href="#colleges-section" className="hover:text-white transition-colors">Placement Intelligence</a></li>
             </ul>
           </div>
 
           {/* Resources & Legal Links */}
           <div className="space-y-3">
-            <p className="font-display text-xs font-bold text-foreground uppercase tracking-wider">
+            <p className="font-display text-xs font-bold text-white uppercase tracking-wider">
               Company & Legal
             </p>
             <ul className="space-y-2">
-              <li><a href="#about" className="hover:text-foreground transition-colors">About SPAR AI</a></li>
-              <li><a href="#privacy" className="hover:text-foreground transition-colors">Privacy Notice</a></li>
-              <li><a href="#terms" className="hover:text-foreground transition-colors">Terms of Service</a></li>
-              <li><a href="#ai-notice" className="hover:text-foreground transition-colors">AI Usage & Safety</a></li>
+              <li><a href="#about" className="hover:text-white transition-colors">About SPAR AI</a></li>
+              <li><a href="#privacy" className="hover:text-white transition-colors">Privacy Notice</a></li>
+              <li><a href="#terms" className="hover:text-white transition-colors">Terms of Service</a></li>
+              <li><a href="#ai-notice" className="hover:text-white transition-colors">AI Usage & Safety</a></li>
             </ul>
           </div>
         </div>
@@ -77,11 +78,11 @@ export function Footer() {
           <p>© {new Date().getFullYear()} SPAR AI Inc. All rights reserved.</p>
 
           <div className="flex items-center gap-4">
-            <a href="#privacy" className="hover:text-foreground transition-colors">Privacy</a>
-            <a href="#terms" className="hover:text-foreground transition-colors">Terms</a>
+            <a href="#privacy" className="hover:text-white transition-colors">Privacy</a>
+            <a href="#terms" className="hover:text-white transition-colors">Terms</a>
             <Link
               to="/admin"
-              className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/50 hover:text-foreground transition-colors border border-border/40 rounded-md px-2 py-0.5"
+              className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/50 hover:text-white transition-colors border border-border/40 rounded-md px-2 py-0.5"
             >
               <Lock className="size-3" />
               Admin
