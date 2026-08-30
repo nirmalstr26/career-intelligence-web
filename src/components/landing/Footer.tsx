@@ -25,7 +25,7 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
               <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Pilot Platform Active · Release v1.0.0</span>
+              <span>Pilot Platform Active</span>
             </div>
           </div>
 
@@ -122,9 +122,14 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom Copyright & Status */}
+        {/* Bottom Copyright, Disclaimer & Status */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-          <p>© 2026 SPAR AI Inc. All rights reserved.</p>
+          <div className="space-y-1 text-center sm:text-left">
+            <p>© 2026 SPAR AI. All rights reserved.</p>
+            <p className="text-[10px] text-muted-foreground/70">
+              Product previews and benchmark metrics shown are illustrative demonstrations for the pilot release.
+            </p>
+          </div>
           <div className="flex items-center gap-1 text-[11px]">
             <span>Crafted for student career empowerment</span>
             <Sparkles className="size-3 text-cyan-500 inline" />
