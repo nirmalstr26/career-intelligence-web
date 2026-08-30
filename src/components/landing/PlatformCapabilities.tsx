@@ -412,34 +412,32 @@ export function PlatformCapabilities() {
 
   return (
     <section id="capabilities" className="my-20 scroll-mt-24 space-y-10 select-none">
-      {/* Section Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4 max-w-[1440px] mx-auto">
-        <div className="space-y-3 max-w-2xl">
-          <span className="text-xs font-bold uppercase tracking-widest text-cyan-600 dark:text-cyan-400 flex items-center gap-1.5">
-            <Layers className="size-3.5" />
-            Full-Stack Career Operating System
+      {/* Section Header (Centered like bottom sections) */}
+      <div className="text-center max-w-3xl mx-auto space-y-3 px-4">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-500/40 bg-card/90 dark:bg-[#090e24]/90 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-300 shadow-sm backdrop-blur">
+          <Layers className="size-3.5 text-cyan-500" />
+          Full-Stack Career Operating System
+        </span>
+        <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight leading-tight">
+          Everything you need to go from{" "}
+          <span className="bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 dark:from-cyan-400 dark:via-blue-500 dark:to-purple-500 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(6,215,247,0.35)]">
+            curiosity to hired.
           </span>
-          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight leading-tight">
-            Everything you need to go from{" "}
-            <span className="bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 dark:from-cyan-400 dark:via-blue-500 dark:to-purple-500 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(6,215,247,0.35)]">
-              curiosity to hired.
-            </span>
-          </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-            SPAR connects your career path, skills, projects, readiness, and interview preparation into one intelligent student journey.
-          </p>
-        </div>
+        </h2>
+        <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+          SPAR connects your career path, skills, projects, readiness, and interview preparation into one intelligent student journey.
+        </p>
 
-        {/* Carousel Controls (Prev/Next, Auto-scroll Pause, Dots) */}
-        <div className="flex items-center gap-3 shrink-0">
+        {/* Carousel Controls (Prev/Next, Auto-scroll Pause, Centered Indicators) */}
+        <div className="flex items-center justify-center gap-3 pt-3">
           {/* Pause / Play Toggle */}
           <button
             type="button"
             onClick={() => setIsPaused((v) => !v)}
             aria-label={isPaused ? "Resume auto-scroll" : "Pause auto-scroll"}
-            className="grid size-10 place-items-center rounded-2xl border border-border/80 bg-card/90 dark:bg-[#090e24]/90 text-muted-foreground hover:text-foreground hover:border-cyan-500/40 transition-all backdrop-blur shadow-sm"
+            className="grid size-9 place-items-center rounded-2xl border border-border/80 bg-card/90 dark:bg-[#090e24]/90 text-muted-foreground hover:text-foreground hover:border-cyan-500/40 transition-all backdrop-blur shadow-sm"
           >
-            {isPaused ? <Play className="size-4 text-cyan-500" /> : <Pause className="size-4" />}
+            {isPaused ? <Play className="size-3.5 text-cyan-500" /> : <Pause className="size-3.5" />}
           </button>
 
           {/* Left Arrow */}
@@ -447,19 +445,36 @@ export function PlatformCapabilities() {
             type="button"
             onClick={handlePrev}
             aria-label="Previous showcase card"
-            className="grid size-10 place-items-center rounded-2xl border border-border/80 bg-card/90 dark:bg-[#090e24]/90 text-muted-foreground hover:text-foreground hover:border-cyan-500/40 transition-all backdrop-blur shadow-sm"
+            className="grid size-9 place-items-center rounded-2xl border border-border/80 bg-card/90 dark:bg-[#090e24]/90 text-muted-foreground hover:text-foreground hover:border-cyan-500/40 transition-all backdrop-blur shadow-sm"
           >
-            <ChevronLeft className="size-5" />
+            <ChevronLeft className="size-4" />
           </button>
+
+          {/* Slide Indicator Dots (Centered) */}
+          <div className="flex items-center gap-1.5 px-2">
+            {CARDS.map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => scrollToSlide(idx)}
+                aria-label={`Jump to slide ${idx + 1}`}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  currentIndex === idx
+                    ? "w-6 bg-gradient-to-r from-cyan-500 to-indigo-600 shadow-md"
+                    : "w-2 bg-secondary/80 hover:bg-muted-foreground"
+                }`}
+              />
+            ))}
+          </div>
 
           {/* Right Arrow */}
           <button
             type="button"
             onClick={handleNext}
             aria-label="Next showcase card"
-            className="grid size-10 place-items-center rounded-2xl border border-border/80 bg-card/90 dark:bg-[#090e24]/90 text-muted-foreground hover:text-foreground hover:border-cyan-500/40 transition-all backdrop-blur shadow-sm"
+            className="grid size-9 place-items-center rounded-2xl border border-border/80 bg-card/90 dark:bg-[#090e24]/90 text-muted-foreground hover:text-foreground hover:border-cyan-500/40 transition-all backdrop-blur shadow-sm"
           >
-            <ChevronRight className="size-5" />
+            <ChevronRight className="size-4" />
           </button>
         </div>
       </div>
