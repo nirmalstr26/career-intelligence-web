@@ -18,10 +18,10 @@ const NODES: NodeItem[] = [
     title: "Career Discovery",
     subtitle: "Discover roles that fit your strengths",
     icon: Compass,
-    glowColor: "shadow-[0_0_25px_rgba(168,85,247,0.6)]",
-    nodeBorder: "border-purple-400/70",
-    nodeBg: "bg-purple-950/90",
-    iconColor: "text-purple-300",
+    glowColor: "shadow-[0_4px_16px_rgba(168,85,247,0.35)] dark:shadow-[0_0_25px_rgba(168,85,247,0.6)]",
+    nodeBorder: "border-purple-500/60 dark:border-purple-400/70",
+    nodeBg: "bg-white/95 dark:bg-purple-950/90",
+    iconColor: "text-purple-600 dark:text-purple-300",
     rippleColor: "border-purple-500/30",
     animationDelay: "0ms",
   },
@@ -29,10 +29,10 @@ const NODES: NodeItem[] = [
     title: "Personalized Roadmap",
     subtitle: "Get a step-by-step career plan",
     icon: Map,
-    glowColor: "shadow-[0_0_25px_rgba(59,130,246,0.6)]",
-    nodeBorder: "border-blue-400/70",
-    nodeBg: "bg-blue-950/90",
-    iconColor: "text-blue-300",
+    glowColor: "shadow-[0_4px_16px_rgba(59,130,246,0.35)] dark:shadow-[0_0_25px_rgba(59,130,246,0.6)]",
+    nodeBorder: "border-blue-500/60 dark:border-blue-400/70",
+    nodeBg: "bg-white/95 dark:bg-blue-950/90",
+    iconColor: "text-blue-600 dark:text-blue-300",
     rippleColor: "border-blue-500/30",
     animationDelay: "300ms",
   },
@@ -40,10 +40,10 @@ const NODES: NodeItem[] = [
     title: "Verified Projects",
     subtitle: "Build real projects. Earn credibility",
     icon: ShieldCheck,
-    glowColor: "shadow-[0_0_25px_rgba(6,215,247,0.6)]",
-    nodeBorder: "border-cyan-400/70",
-    nodeBg: "bg-cyan-950/90",
-    iconColor: "text-cyan-300",
+    glowColor: "shadow-[0_4px_16px_rgba(6,215,247,0.35)] dark:shadow-[0_0_25px_rgba(6,215,247,0.6)]",
+    nodeBorder: "border-cyan-500/60 dark:border-cyan-400/70",
+    nodeBg: "bg-white/95 dark:bg-cyan-950/90",
+    iconColor: "text-cyan-600 dark:text-cyan-300",
     rippleColor: "border-cyan-500/30",
     animationDelay: "600ms",
   },
@@ -51,10 +51,10 @@ const NODES: NodeItem[] = [
     title: "Placement Readiness",
     subtitle: "Prepare. Practice. Get placed.",
     icon: Award,
-    glowColor: "shadow-[0_0_25px_rgba(16,185,129,0.6)]",
-    nodeBorder: "border-emerald-400/70",
-    nodeBg: "bg-emerald-950/90",
-    iconColor: "text-emerald-300",
+    glowColor: "shadow-[0_4px_16px_rgba(16,185,129,0.35)] dark:shadow-[0_0_25px_rgba(16,185,129,0.6)]",
+    nodeBorder: "border-emerald-500/60 dark:border-emerald-400/70",
+    nodeBg: "bg-white/95 dark:bg-emerald-950/90",
+    iconColor: "text-emerald-600 dark:text-emerald-300",
     rippleColor: "border-emerald-500/30",
     animationDelay: "900ms",
   },
@@ -125,7 +125,7 @@ export function ConstellationCapabilityRoadmap() {
               </div>
 
               {/* Node Title & Subtitle */}
-              <h4 className="font-display text-xs sm:text-[13px] font-bold text-foreground group-hover:text-cyan-400 transition-colors leading-tight">
+              <h4 className="font-display text-xs sm:text-[13px] font-bold text-foreground group-hover:text-cyan-500 dark:group-hover:text-cyan-400 transition-colors leading-tight">
                 {node.title}
               </h4>
               <p className="text-[10px] text-muted-foreground leading-tight mt-1 max-w-[120px]">

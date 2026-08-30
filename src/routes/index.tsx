@@ -62,10 +62,20 @@ function Landing() {
     <div className="relative min-h-screen bg-background text-foreground flex flex-col justify-between selection:bg-cyan-500/30 selection:text-cyan-600 dark:selection:text-cyan-200 overflow-x-hidden transition-colors duration-300">
       {/* Dynamic Ambient Background Glow */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-[960px] -z-20 opacity-75 dark:opacity-70 transition-opacity"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[960px] -z-20 opacity-85 dark:opacity-70 transition-opacity"
         style={{
           background:
-            "radial-gradient(ellipse 85% 60% at 50% 10%, rgba(6, 215, 247, 0.14), rgba(70, 87, 255, 0.1) 40%, transparent 80%)",
+            "radial-gradient(ellipse 85% 60% at 50% 12%, rgba(6, 215, 247, 0.2), rgba(70, 87, 255, 0.14) 45%, transparent 80%)",
+        }}
+        aria-hidden="true"
+      />
+      
+      {/* Secondary Ambient Light Aura for Light Theme */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-[120px] h-[640px] -z-20 opacity-70 dark:hidden transition-opacity"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 50% at 50% 30%, rgba(168, 85, 247, 0.12), rgba(6, 215, 247, 0.15) 50%, transparent 75%)",
         }}
         aria-hidden="true"
       />

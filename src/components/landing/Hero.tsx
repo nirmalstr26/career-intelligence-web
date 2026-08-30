@@ -10,17 +10,27 @@ export function Hero() {
     <section className="relative pt-6 pb-12 overflow-hidden">
       {/* EXPANSIVE SEAMLESS BACKGROUND ARTWORK LAYER */}
       <div className="pointer-events-none absolute inset-0 -top-8 -bottom-16 flex items-center justify-center select-none overflow-hidden">
-        <div className="relative w-full max-w-[1600px] h-[720px] lg:h-[820px] flex items-center justify-center">
+        <div className="relative w-full max-w-[1600px] h-[720px] lg:h-[840px] flex items-center justify-center">
+          
+          {/* Light Theme Vibrant Ambient Illumination Backdrop */}
+          <div 
+            className="dark:hidden absolute inset-0 -z-10 opacity-70"
+            style={{
+              background:
+                "radial-gradient(ellipse 75% 65% at 50% 45%, rgba(6, 215, 247, 0.18), rgba(99, 102, 241, 0.14) 40%, rgba(168, 85, 247, 0.08) 65%, transparent 85%)",
+            }}
+          />
+
           <img
             src={heroBgImage || "/brand/hero_background_home.png"}
             alt=""
             aria-hidden="true"
-            className="w-full h-full object-cover object-center scale-105 opacity-85 dark:opacity-95 select-none transition-opacity"
+            className="w-full h-full object-cover object-center scale-105 select-none transition-all duration-300 opacity-95 dark:opacity-95 contrast-[1.08] saturate-[1.18] brightness-[1.02] dark:contrast-100 dark:saturate-100 dark:brightness-100"
             style={{
               maskImage:
-                "radial-gradient(ellipse 60% 60% at 50% 45%, black 30%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,0.3) 75%, transparent 95%)",
+                "radial-gradient(ellipse 70% 65% at 50% 45%, black 35%, rgba(0,0,0,0.9) 60%, rgba(0,0,0,0.4) 80%, transparent 96%)",
               WebkitMaskImage:
-                "radial-gradient(ellipse 60% 60% at 50% 45%, black 30%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,0.3) 75%, transparent 95%)",
+                "radial-gradient(ellipse 70% 65% at 50% 45%, black 35%, rgba(0,0,0,0.9) 60%, rgba(0,0,0,0.4) 80%, transparent 96%)",
             }}
           />
 
@@ -29,10 +39,10 @@ export function Hero() {
           <div className="hidden dark:block absolute inset-0 bg-gradient-to-b from-[#030712] via-transparent to-transparent opacity-85" />
           <div className="hidden dark:block absolute inset-0 bg-gradient-to-r from-[#030712] via-transparent to-[#030712] opacity-90" />
 
-          {/* Light theme gradient overlays */}
-          <div className="dark:hidden absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent opacity-90" />
-          <div className="dark:hidden absolute inset-0 bg-gradient-to-b from-background via-transparent to-transparent opacity-80" />
-          <div className="dark:hidden absolute inset-0 bg-gradient-to-r from-background via-transparent to-background opacity-90" />
+          {/* Light theme soft feathered perimeter overlays - preserves central visibility & vibrancy */}
+          <div className="dark:hidden absolute inset-0 bg-gradient-to-t from-background via-background/25 to-transparent opacity-75" />
+          <div className="dark:hidden absolute inset-0 bg-gradient-to-b from-background/50 via-transparent to-transparent opacity-60" />
+          <div className="dark:hidden absolute inset-0 bg-gradient-to-r from-background/60 via-transparent to-background/60 opacity-60" />
         </div>
       </div>
 
