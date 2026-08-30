@@ -1,33 +1,34 @@
 import React from "react";
-import { Target, FolderGit2, UserCheck } from "lucide-react";
+import { Target, FolderGit2, UserCheck, Sparkles } from "lucide-react";
 
 export function CareerRoadArt() {
   return (
-    <div className="relative w-full h-[500px] sm:h-[540px] lg:h-[600px] flex items-center justify-center select-none pointer-events-none">
+    <div className="relative w-full h-[460px] sm:h-[500px] lg:h-[540px] flex items-center justify-center select-none pointer-events-none">
       {/* 4 Interactive Floating Milestone Chips Overlaying the Seamless Center Pathway */}
-      <div className="relative w-full h-full max-w-[480px]">
-        {/* 1. Dream Career (Top Center near portal) */}
-        <div className="absolute top-[105px] sm:top-[120px] left-[26%] sm:left-[30%] flex items-center gap-1.5 rounded-xl border border-cyan-400/40 bg-[#090e24]/90 px-3 py-1.5 text-xs text-white shadow-[0_0_20px_rgba(6,215,247,0.4)] backdrop-blur-md">
+      <div className="relative w-full h-full max-w-[440px]">
+        
+        {/* 1. Dream Career (Top Center inside Glowing Portal) */}
+        <div className="absolute top-[85px] sm:top-[95px] left-[32%] sm:left-[35%] flex items-center gap-1.5 rounded-full border border-cyan-400/60 bg-[#06102b]/90 px-3.5 py-1.5 text-xs text-white shadow-[0_0_25px_rgba(6,215,247,0.6)] backdrop-blur-md">
           <Target className="size-3.5 text-cyan-400" />
-          <span className="font-semibold text-[11px]">Dream Career</span>
+          <span className="font-bold text-[11px] tracking-wide">Dream Career</span>
         </div>
 
         {/* 2. Build Skills (Middle Left) */}
-        <div className="absolute top-[200px] sm:top-[215px] left-[8%] sm:left-[12%] flex items-center gap-1.5 rounded-xl border border-purple-400/40 bg-[#090e24]/90 px-3 py-1.5 text-xs text-white shadow-[0_0_20px_rgba(130,71,255,0.4)] backdrop-blur-md">
+        <div className="absolute top-[180px] sm:top-[190px] left-[10%] sm:left-[14%] flex items-center gap-1.5 rounded-full border border-purple-400/60 bg-[#06102b]/90 px-3.5 py-1.5 text-xs text-white shadow-[0_0_25px_rgba(168,85,247,0.6)] backdrop-blur-md">
           <span className="text-purple-400 font-mono text-xs font-bold">&lt;/&gt;</span>
-          <span className="font-semibold text-[11px]">Build Skills</span>
+          <span className="font-bold text-[11px] tracking-wide">Build Skills</span>
         </div>
 
         {/* 3. Real Projects (Middle Right) */}
-        <div className="absolute top-[240px] sm:top-[255px] right-[6%] sm:right-[10%] flex items-center gap-1.5 rounded-xl border border-blue-400/40 bg-[#090e24]/90 px-3 py-1.5 text-xs text-white shadow-[0_0_20px_rgba(0,140,255,0.4)] backdrop-blur-md">
+        <div className="absolute top-[215px] sm:top-[225px] right-[8%] sm:right-[12%] flex items-center gap-1.5 rounded-full border border-blue-400/60 bg-[#06102b]/90 px-3.5 py-1.5 text-xs text-white shadow-[0_0_25px_rgba(59,130,246,0.6)] backdrop-blur-md">
           <FolderGit2 className="size-3.5 text-blue-400" />
-          <span className="font-semibold text-[11px]">Real Projects</span>
+          <span className="font-bold text-[11px] tracking-wide">Real Projects</span>
         </div>
 
         {/* 4. Get Hired (Bottom Left) */}
-        <div className="absolute top-[295px] sm:top-[310px] left-[4%] sm:left-[8%] flex items-center gap-1.5 rounded-xl border border-indigo-400/40 bg-[#090e24]/90 px-3 py-1.5 text-xs text-white shadow-[0_0_20px_rgba(70,87,255,0.4)] backdrop-blur-md">
+        <div className="absolute top-[275px] sm:top-[285px] left-[6%] sm:left-[10%] flex items-center gap-1.5 rounded-full border border-indigo-400/60 bg-[#06102b]/90 px-3.5 py-1.5 text-xs text-white shadow-[0_0_25px_rgba(99,102,241,0.6)] backdrop-blur-md">
           <UserCheck className="size-3.5 text-indigo-400" />
-          <span className="font-semibold text-[11px]">Get Hired</span>
+          <span className="font-bold text-[11px] tracking-wide">Get Hired</span>
         </div>
       </div>
     </div>

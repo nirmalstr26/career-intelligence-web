@@ -19,7 +19,7 @@ interface FeatureTile {
   glowColor: string;
 }
 
-// 4 Focused Hero Capabilities (AI Coach & Colleges are deeply explored in dedicated sections)
+// 4 Focused Hero Capabilities
 const FEATURE_TILES: FeatureTile[] = [
   {
     title: "Career Discovery",
@@ -53,37 +53,37 @@ const FEATURE_TILES: FeatureTile[] = [
 
 export function Hero() {
   return (
-    <section className="relative pt-6 pb-8 overflow-hidden">
+    <section className="relative pt-6 pb-12 overflow-hidden">
       {/* EXPANSIVE SEAMLESS BACKGROUND ARTWORK LAYER */}
       <div className="pointer-events-none absolute inset-0 -top-8 -bottom-16 flex items-center justify-center select-none overflow-hidden">
-        <div className="relative w-full max-w-[1600px] h-[720px] lg:h-[800px] flex items-center justify-center">
+        <div className="relative w-full max-w-[1600px] h-[720px] lg:h-[820px] flex items-center justify-center">
           <img
             src={heroBgImage || "/brand/hero_background_home.png"}
             alt=""
             aria-hidden="true"
-            className="w-full h-full object-cover object-center scale-110 opacity-25 dark:opacity-90 dark:mix-blend-screen select-none transition-opacity"
+            className="w-full h-full object-cover object-center scale-105 opacity-85 dark:opacity-95 select-none transition-opacity"
             style={{
               maskImage:
-                "radial-gradient(ellipse 52% 52% at 50% 45%, black 20%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,0.3) 65%, transparent 85%)",
+                "radial-gradient(ellipse 60% 60% at 50% 45%, black 30%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,0.3) 75%, transparent 95%)",
               WebkitMaskImage:
-                "radial-gradient(ellipse 52% 52% at 50% 45%, black 20%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,0.3) 65%, transparent 85%)",
+                "radial-gradient(ellipse 60% 60% at 50% 45%, black 30%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,0.3) 75%, transparent 95%)",
             }}
           />
 
           {/* Dark theme gradient overlays */}
-          <div className="hidden dark:block absolute inset-0 bg-gradient-to-t from-[#030712] via-[#030712]/50 to-transparent opacity-95" />
-          <div className="hidden dark:block absolute inset-0 bg-gradient-to-b from-[#030712] via-transparent to-transparent opacity-90" />
-          <div className="hidden dark:block absolute inset-0 bg-gradient-to-r from-[#030712] via-transparent to-[#030712] opacity-95" />
+          <div className="hidden dark:block absolute inset-0 bg-gradient-to-t from-[#030712] via-[#030712]/35 to-transparent opacity-90" />
+          <div className="hidden dark:block absolute inset-0 bg-gradient-to-b from-[#030712] via-transparent to-transparent opacity-85" />
+          <div className="hidden dark:block absolute inset-0 bg-gradient-to-r from-[#030712] via-transparent to-[#030712] opacity-90" />
 
           {/* Light theme gradient overlays */}
-          <div className="dark:hidden absolute inset-0 bg-gradient-to-t from-background via-background/85 to-transparent opacity-95" />
-          <div className="dark:hidden absolute inset-0 bg-gradient-to-b from-background via-transparent to-transparent opacity-90" />
-          <div className="dark:hidden absolute inset-0 bg-gradient-to-r from-background via-transparent to-background opacity-95" />
+          <div className="dark:hidden absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent opacity-90" />
+          <div className="dark:hidden absolute inset-0 bg-gradient-to-b from-background via-transparent to-transparent opacity-80" />
+          <div className="dark:hidden absolute inset-0 bg-gradient-to-r from-background via-transparent to-background opacity-90" />
         </div>
       </div>
 
       {/* 3-Column Clean Three-Zone Composition */}
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1.1fr_1fr_400px] xl:grid-cols-[1.15fr_1.05fr_410px] items-start gap-8 lg:gap-6 xl:gap-8">
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1.1fr_1fr_420px] xl:grid-cols-[1.15fr_1.05fr_430px] items-center gap-8 lg:gap-6 xl:gap-8">
         
         {/* LEFT COLUMN: Value Proposition + 4 Clean Capability Chips */}
         <div className="space-y-6 pt-2">
@@ -146,7 +146,7 @@ export function Hero() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Pixel-Perfect Auth Panel */}
+        {/* RIGHT COLUMN: Radiant Light Glowing Glassmorphic Auth Panel */}
         <div className="flex justify-center lg:justify-end pt-1">
           <AuthCard />
         </div>
