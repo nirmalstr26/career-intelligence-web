@@ -10,6 +10,7 @@ import { HowItWorks } from "@/components/landing/HowItWorks";
 import { IntelligenceInAction } from "@/components/landing/IntelligenceInAction";
 import { CareerPathsSection } from "@/components/landing/CareerPathsSection";
 import { CollegesSection } from "@/components/landing/CollegesSection";
+import { OutcomesSlider } from "@/components/landing/OutcomesSlider";
 import { Footer } from "@/components/landing/Footer";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { trackLandingEvent } from "@/lib/analytics/landingEvents";
@@ -105,7 +106,10 @@ function Landing() {
           {/* 06 — Career Directions (Where SPAR can take the student) */}
           <CareerPathsSection />
 
-          {/* 07 — Colleges (Institutional Value Proposition) */}
+          {/* 07 — Outcomes Journey (Auto-playing image slider) */}
+          <OutcomesSlider />
+
+          {/* 08 — Colleges (Institutional Value Proposition) */}
           <CollegesSection />
         </main>
       </div>

@@ -5,10 +5,14 @@ import {
   Terminal,
   Award,
   Rocket,
-  ShieldCheck,
   Sparkles,
-  ChevronRight,
 } from "lucide-react";
+import { Reveal } from "@/components/landing/Reveal";
+import imgDiscover from "@/assets/landing/outcome-discovery.png";
+import imgAssess from "@/assets/landing/outcome-readiness.png";
+import imgBuild from "@/assets/landing/outcome-build.png";
+import imgProve from "@/assets/landing/outcome-projects.png";
+import imgPrepare from "@/assets/landing/outcome-placement.png";
 
 interface JourneyStep {
   num: string;
@@ -19,7 +23,9 @@ interface JourneyStep {
   iconColor: string;
   glow: string;
   offsetY: string;
-  renderMicroVisual: () => React.ReactNode;
+  image: string;
+  /** Floating stat overlay rendered over the image */
+  stat: { label: string; value: string; tone: string };
 }
 
 const STEPS: JourneyStep[] = [
@@ -32,17 +38,8 @@ const STEPS: JourneyStep[] = [
     iconColor: "text-cyan-400",
     glow: "border-cyan-500/40 shadow-[0_0_25px_rgba(6,215,247,0.2)]",
     offsetY: "lg:translate-y-2",
-    renderMicroVisual: () => (
-      <div className="rounded-xl border border-cyan-500/30 bg-slate-950/90 p-2 space-y-1">
-        <div className="flex items-center justify-between text-[10px]">
-          <span className="font-bold text-white">Top Match: 94%</span>
-          <span className="text-cyan-400 font-mono">Cloud Data</span>
-        </div>
-        <div className="h-1.5 w-full rounded-full bg-slate-900 overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 w-[94%]" />
-        </div>
-      </div>
-    ),
+    image: imgDiscover,
+    stat: { label: "Top Match", value: "94%", tone: "text-cyan-300" },
   },
   {
     num: "02",
@@ -53,12 +50,8 @@ const STEPS: JourneyStep[] = [
     iconColor: "text-blue-400",
     glow: "border-blue-500/40 shadow-[0_0_25px_rgba(0,140,255,0.2)]",
     offsetY: "lg:-translate-y-2",
-    renderMicroVisual: () => (
-      <div className="rounded-xl border border-blue-500/30 bg-slate-950/90 p-2 text-center">
-        <span className="text-[9px] uppercase font-bold text-muted-foreground block">Readiness Meter</span>
-        <span className="font-display text-sm font-extrabold text-white">82<span className="text-[9px] text-blue-400">/100</span></span>
-      </div>
-    ),
+    image: imgAssess,
+    stat: { label: "Readiness", value: "82/100", tone: "text-blue-300" },
   },
   {
     num: "03",
@@ -69,15 +62,8 @@ const STEPS: JourneyStep[] = [
     iconColor: "text-indigo-400",
     glow: "border-indigo-500/40 shadow-[0_0_25px_rgba(70,87,255,0.2)]",
     offsetY: "lg:translate-y-3",
-    renderMicroVisual: () => (
-      <div className="rounded-xl border border-indigo-500/30 bg-slate-950/90 p-2 space-y-1">
-        <div className="flex items-center justify-between text-[10px]">
-          <span className="font-bold text-white truncate">stream-pipeline</span>
-          <span className="text-emerald-400 font-bold">PASS ✓</span>
-        </div>
-        <span className="text-[9px] text-indigo-300 font-mono block">Automated Tests Passed</span>
-      </div>
-    ),
+    image: imgBuild,
+    stat: { label: "Tests", value: "PASS ✓", tone: "text-emerald-300" },
   },
   {
     num: "04",
@@ -88,15 +74,8 @@ const STEPS: JourneyStep[] = [
     iconColor: "text-purple-400",
     glow: "border-purple-500/40 shadow-[0_0_25px_rgba(130,71,255,0.2)]",
     offsetY: "lg:-translate-y-1",
-    renderMicroVisual: () => (
-      <div className="rounded-xl border border-purple-500/30 bg-slate-950/90 p-2 text-center">
-        <div className="flex items-center justify-center gap-1 text-[10px] text-purple-300 font-bold">
-          <ShieldCheck className="size-3 text-cyan-400" />
-          <span>SPAR Verified</span>
-        </div>
-        <span className="text-[9px] text-slate-400 block">Proof #SP-9042</span>
-      </div>
-    ),
+    image: imgProve,
+    stat: { label: "Proof", value: "#SP-9042", tone: "text-purple-300" },
   },
   {
     num: "05",
@@ -107,15 +86,8 @@ const STEPS: JourneyStep[] = [
     iconColor: "text-emerald-400",
     glow: "border-emerald-500/40 shadow-[0_0_25px_rgba(16,185,129,0.2)]",
     offsetY: "lg:translate-y-2",
-    renderMicroVisual: () => (
-      <div className="rounded-xl border border-emerald-500/30 bg-slate-950/90 p-2 space-y-1">
-        <div className="flex items-center justify-between text-[10px]">
-          <span className="font-bold text-white">Target JD Match</span>
-          <span className="text-emerald-400 font-bold">88%</span>
-        </div>
-        <span className="text-[9px] text-amber-300 font-bold block">Mock Drill Ready ⚡</span>
-      </div>
-    ),
+    image: imgPrepare,
+    stat: { label: "JD Match", value: "88%", tone: "text-emerald-300" },
   },
 ];
 
@@ -141,7 +113,7 @@ export function HowItWorks() {
         </span>
         <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight leading-tight">
           How SPAR turns ambition into a{" "}
-          <span className="bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 dark:from-cyan-400 dark:via-blue-500 dark:to-purple-500 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(6,215,247,0.35)]">
+          <span className="bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 dark:from-cyan-400 dark:via-blue-500 dark:to-purple-500 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(6,215,247,0.35)] animate-gradient-text">
             placement-ready journey.
           </span>
         </h2>
@@ -163,13 +135,15 @@ export function HowItWorks() {
             const Icon = step.icon;
             const isActive = activeStep === idx;
             return (
-              <div
+              <Reveal
                 key={step.num}
-                onMouseEnter={() => setActiveStep(idx)}
+                delay={idx * 90}
+                distance="md"
                 className={`transition-all duration-300 ${step.offsetY}`}
               >
                 <div
-                  className={`rounded-3xl border p-4 sm:p-5 backdrop-blur-2xl transition-all duration-300 flex flex-col justify-between h-full hover:-translate-y-1.5 shadow-md ${
+                  onMouseEnter={() => setActiveStep(idx)}
+                  className={`rounded-3xl border p-4 sm:p-5 backdrop-blur-2xl transition-all duration-300 flex flex-col justify-between h-full hover:-translate-y-1.5 shadow-md overflow-hidden ${
                     isActive
                       ? `${step.glow} border-cyan-500 bg-secondary/95 dark:bg-[#0c1538]`
                       : "border-border/80 bg-card/95 dark:bg-[#090e24]/85 hover:border-cyan-500/40"
@@ -186,6 +160,25 @@ export function HowItWorks() {
                       </span>
                     </div>
 
+                    {/* Image-driven step visual */}
+                    <div className="relative h-28 w-full overflow-hidden rounded-2xl border border-border/60">
+                      <img
+                        src={step.image}
+                        alt={`${step.title} illustration`}
+                        loading="lazy"
+                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/25 to-transparent" />
+                      <div className="absolute bottom-1.5 left-2 right-2 flex items-center justify-between font-mono text-[10px]">
+                        <span className="rounded-md bg-black/45 px-1.5 py-0.5 text-slate-200 backdrop-blur-md border border-white/10">
+                          {step.stat.label}
+                        </span>
+                        <span className={`font-bold ${step.stat.tone} drop-shadow`}>
+                          {step.stat.value}
+                        </span>
+                      </div>
+                    </div>
+
                     <div>
                       <h3 className="font-display text-base font-bold text-foreground">
                         {step.title}
@@ -195,16 +188,13 @@ export function HowItWorks() {
                       </p>
                     </div>
 
-                    {/* Micro Product Visualization */}
-                    <div className="pt-1">{step.renderMicroVisual()}</div>
-
                     {/* Compact 2-Line Explanation */}
                     <p className="text-[11px] text-muted-foreground leading-relaxed">
                       {step.explanation}
                     </p>
                   </div>
                 </div>
-              </div>
+              </Reveal>
             );
           })}
         </div>
