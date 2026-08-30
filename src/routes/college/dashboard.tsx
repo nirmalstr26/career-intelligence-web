@@ -1,7 +1,11 @@
 import { Protected } from "@/components/auth/Protected";
+import { useAuth } from "@/lib/auth/AuthProvider";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
 import React, { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
+  LogOut,
+  Building2,
   GraduationCap,
   Users,
   TrendingUp,
@@ -65,6 +69,7 @@ export const Route = createFileRoute("/college/dashboard")({
 });
 
 function CollegeDashboardPage() {
+  const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<"overview" | "students" | "assignments" | "sessions" | "ai">("overview");
 
   // Filters & State
@@ -203,7 +208,55 @@ function CollegeDashboardPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-background text-foreground">
+      {/* College Portal Top Navigation Bar */}
+      <header className="sticky top-0 z-30 border-b border-border bg-card/80 backdrop-blur-md">
+        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <Link to="/college/dashboard" className="flex items-center gap-2.5 group">
+              <img
+                src="/brand/icon/spar-ai-icon-64.png"
+                srcSet="/brand/icon/spar-ai-icon-64.png 1x, /brand/icon/spar-ai-icon-128.png 2x"
+                alt="SPAR AI"
+                className="size-8 object-contain drop-shadow-sm transition-transform duration-200 group-hover:scale-105"
+              />
+              <div className="flex flex-col">
+                <span className="font-display text-base font-bold tracking-tight leading-none">
+                  SPAR <span className="text-cyan-500">AI</span>
+                </span>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">
+                  College Intelligence Portal
+                </span>
+              </div>
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-2 rounded-full border border-border/80 bg-secondary/60 px-3 py-1.5">
+              <Building2 className="size-3.5 text-cyan-500" />
+              <span className="text-xs font-semibold text-foreground">{coordinator.institution_name}</span>
+            </div>
+
+            <div className="hidden md:flex items-center gap-2 text-xs text-muted-foreground border-l border-border/60 pl-3">
+              <span className="font-semibold text-foreground">{coordinator.name}</span>
+            </div>
+
+            <ThemeToggle className="size-8 rounded-xl border border-border/60" />
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => void logout()}
+              className="gap-1.5 rounded-full text-xs font-semibold hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
+            >
+              <LogOut className="size-3.5" />
+              <span>Sign Out</span>
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       {/* College Header */}
       <header className="surface-panel rounded-3xl p-6 sm:p-8 border border-border/80 bg-gradient-to-r from-primary/[0.08] via-card to-card space-y-4 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -1040,6 +1093,7 @@ function CollegeDashboardPage() {
           </div>
         </div>
       )}
+      </main>
     </div>
   );
 }

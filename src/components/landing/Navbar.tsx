@@ -183,13 +183,25 @@ export function Navbar() {
               <ThemeToggle className="size-8 rounded-xl border border-border/60" />
 
               {isAuthenticated ? (
-                <Link
-                  to={onboardingRequired ? "/onboarding" : "/app/today"}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 px-5 py-2 text-xs font-bold text-white shadow-[0_0_20px_rgba(6,215,247,0.4)] hover:brightness-110 transition-all"
-                >
-                  <Sparkles className="size-3.5" />
-                  Go to Workspace
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    to={user?.role === "COLLEGE_COORDINATOR" || user?.role === "COLLEGE_ADMIN" ? "/college/dashboard" : onboardingRequired ? "/onboarding" : "/app/today"}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-[0_0_20px_rgba(6,215,247,0.4)] hover:brightness-110 transition-all"
+                  >
+                    <Sparkles className="size-3.5" />
+                    {user?.role === "COLLEGE_COORDINATOR" || user?.role === "COLLEGE_ADMIN" ? "College Dashboard" : "Go to Workspace"}
+                  </Link>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => void logout()}
+                    className="gap-1.5 rounded-full text-xs font-semibold hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
+                  >
+                    <LogOut className="size-3.5" />
+                    <span className="hidden sm:inline">Sign Out</span>
+                  </Button>
+                </div>
               ) : (
                 <>
                   <button
@@ -240,7 +252,27 @@ export function Navbar() {
                 About
               </a>
 
-              {!isAuthenticated && (
+              {isAuthenticated ? (
+                <div className="flex flex-col gap-2 pt-2">
+                  <Link
+                    to={user?.role === "COLLEGE_COORDINATOR" || user?.role === "COLLEGE_ADMIN" ? "/college/dashboard" : onboardingRequired ? "/onboarding" : "/app/today"}
+                    onClick={() => setOpen(false)}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 px-4 py-2.5 text-xs font-bold text-white shadow-md text-center"
+                  >
+                    <Sparkles className="size-3.5" />
+                    {user?.role === "COLLEGE_COORDINATOR" || user?.role === "COLLEGE_ADMIN" ? "Go to College Dashboard" : "Go to Student Workspace"}
+                  </Link>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => { setOpen(false); void logout(); }}
+                    className="w-full gap-1.5 rounded-xl text-xs font-semibold text-destructive hover:bg-destructive/10 hover:border-destructive/30"
+                  >
+                    <LogOut className="size-3.5" />
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
                 <div className="grid grid-cols-2 gap-2 pt-2">
                   <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => { setOpen(false); handleSignInClick(); }}>
                     Sign In

@@ -129,21 +129,36 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         {/* Mobile Navigation Dropdown */}
         {open ? (
-          <nav aria-label="Primary mobile" className="border-t border-border px-4 py-2 md:hidden">
+          <nav aria-label="Primary mobile" className="border-t border-border px-4 py-3 md:hidden space-y-1">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-xs font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
+                className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-xs font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
                 activeProps={{
-                  className: "flex items-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold bg-primary text-primary-foreground",
+                  className: "flex items-center gap-2 rounded-xl px-3 py-2.5 text-xs font-semibold bg-primary text-primary-foreground",
                 }}
               >
                 <item.icon className="size-4" />
                 {item.label}
               </Link>
             ))}
+
+            <div className="pt-2 border-t border-border/60 mt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full gap-2 rounded-xl text-xs font-semibold text-destructive hover:bg-destructive/10 hover:border-destructive/30"
+                onClick={() => {
+                  setOpen(false);
+                  void logout();
+                }}
+              >
+                <LogOut className="size-3.5" />
+                Sign Out
+              </Button>
+            </div>
           </nav>
         ) : null}
       </header>
