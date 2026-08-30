@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Cpu,
   Compass,
   Map,
   Award,
@@ -7,118 +8,105 @@ import {
   MessageSquare,
   Target,
   Sparkles,
+  Activity,
   Zap,
+  CheckCircle2,
+  Database,
   ArrowRight,
-  ShieldCheck,
-  Bot,
 } from "lucide-react";
 
-interface SubsystemNode {
+interface GraphNode {
   id: string;
-  title: string;
-  badge: string;
-  desc: string;
+  label: string;
+  role: string;
+  tag: string;
   icon: React.ElementType;
-  color: string;
-  glow: string;
-  badgeBg: string;
-  metrics: string;
+  iconColor: string;
+  nodeColor: string;
+  bgGlow: string;
+  description: string;
 }
 
-const LEFT_NODES: SubsystemNode[] = [
+const NODES: GraphNode[] = [
   {
     id: "discovery",
-    title: "Career Discovery",
-    badge: "AFFINITY MATCHING",
-    desc: "Multi-dimensional capability modeling that maps strengths to high-growth tech careers.",
+    label: "Career Discovery",
+    role: "Direction & Fit",
+    tag: "Career",
     icon: Compass,
-    color: "text-cyan-600 dark:text-cyan-400",
-    glow: "border-cyan-500/40 bg-cyan-500/10 dark:bg-cyan-950/40 shadow-[0_0_20px_rgba(6,215,247,0.2)]",
-    badgeBg: "bg-cyan-500/20 text-cyan-600 dark:text-cyan-300 border-cyan-400/30",
-    metrics: "94% Match",
+    iconColor: "text-cyan-400",
+    nodeColor: "border-cyan-500/40 bg-card/90 dark:bg-[#090e24]/90",
+    bgGlow: "shadow-[0_0_20px_rgba(6,215,247,0.2)]",
+    description: "Maps strengths to high-trajectory tech career archetypes.",
   },
-  {
-    id: "gap",
-    title: "Job Gap Optimizer",
-    badge: "ROLE CALIBRATION",
-    desc: "Compares current student capabilities directly against target campus hiring drives.",
-    icon: Target,
-    color: "text-amber-600 dark:text-amber-400",
-    glow: "border-amber-500/40 bg-amber-500/10 dark:bg-amber-950/40 shadow-[0_0_20px_rgba(245,158,11,0.2)]",
-    badgeBg: "bg-amber-500/20 text-amber-600 dark:text-amber-300 border-amber-400/30",
-    metrics: "1-Click Drill",
-  },
-  {
-    id: "interviews",
-    title: "AI Interview Prep",
-    badge: "VOICE & CODE DEFENSE",
-    desc: "Adaptive technical interviewer simulating live loops with real-time speech feedback.",
-    icon: MessageSquare,
-    color: "text-purple-600 dark:text-purple-400",
-    glow: "border-purple-500/40 bg-purple-500/10 dark:bg-purple-950/40 shadow-[0_0_20px_rgba(130,71,255,0.2)]",
-    badgeBg: "bg-purple-500/20 text-purple-600 dark:text-purple-300 border-purple-400/30",
-    metrics: "STAR Rubric",
-  },
-];
-
-const RIGHT_NODES: SubsystemNode[] = [
   {
     id: "roadmap",
-    title: "Adaptive Roadmap",
-    badge: "MASTERY GATING",
-    desc: "Dynamically calibrated curriculum paths that unlock advanced topics as proficiency is verified.",
+    label: "Adaptive Roadmap",
+    role: "Milestone Curriculum",
+    tag: "Skill",
     icon: Map,
-    color: "text-blue-600 dark:text-blue-400",
-    glow: "border-blue-500/40 bg-blue-500/10 dark:bg-blue-950/40 shadow-[0_0_20px_rgba(0,140,255,0.2)]",
-    badgeBg: "bg-blue-500/20 text-blue-600 dark:text-blue-300 border-blue-400/30",
-    metrics: "Stage Unlocks",
-  },
-  {
-    id: "readiness",
-    title: "Continuous Readiness",
-    badge: "BENCHMARK SCORING",
-    desc: "Deterministic capability index tracking student progress across 6 core competencies.",
-    icon: Award,
-    color: "text-teal-600 dark:text-teal-400",
-    glow: "border-teal-500/40 bg-teal-500/10 dark:bg-teal-950/40 shadow-[0_0_20px_rgba(20,184,166,0.2)]",
-    badgeBg: "bg-teal-500/20 text-teal-600 dark:text-teal-300 border-teal-400/30",
-    metrics: "Top 12% Rank",
+    iconColor: "text-blue-400",
+    nodeColor: "border-blue-500/40 bg-card/90 dark:bg-[#090e24]/90",
+    bgGlow: "shadow-[0_0_20px_rgba(59,130,246,0.2)]",
+    description: "Unlocks progressive skills based on evaluated performance.",
   },
   {
     id: "projects",
-    title: "Production Projects",
-    badge: "PROOF OF WORK",
-    desc: "Hands-on full-stack & distributed repositories evaluated by automated unit rubrics.",
+    label: "Verified Projects",
+    role: "Practical Proof",
+    tag: "Project",
     icon: Terminal,
-    color: "text-indigo-600 dark:text-indigo-400",
-    glow: "border-indigo-500/40 bg-indigo-500/10 dark:bg-indigo-950/40 shadow-[0_0_20px_rgba(70,87,255,0.2)]",
-    badgeBg: "bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border-indigo-400/30",
-    metrics: "98.4% Tests",
+    iconColor: "text-amber-400",
+    nodeColor: "border-amber-500/40 bg-card/90 dark:bg-[#090e24]/90",
+    bgGlow: "shadow-[0_0_20px_rgba(245,158,11,0.2)]",
+    description: "Evaluates code against industry production standards.",
+  },
+  {
+    id: "readiness",
+    label: "Readiness Index",
+    role: "6D Scoring Engine",
+    tag: "Assessment",
+    icon: Award,
+    iconColor: "text-purple-400",
+    nodeColor: "border-purple-500/40 bg-card/90 dark:bg-[#090e24]/90",
+    bgGlow: "shadow-[0_0_20px_rgba(168,85,247,0.2)]",
+    description: "Computes continuous hiring readiness across all competencies.",
+  },
+  {
+    id: "interview",
+    label: "Interview Prep",
+    role: "Adaptive Mocks",
+    tag: "Evidence",
+    icon: MessageSquare,
+    iconColor: "text-indigo-400",
+    nodeColor: "border-indigo-500/40 bg-card/90 dark:bg-[#090e24]/90",
+    bgGlow: "shadow-[0_0_20px_rgba(99,102,241,0.2)]",
+    description: "Simulates technical rounds with real-time articulation feedback.",
+  },
+  {
+    id: "optimizer",
+    label: "Job Gap Optimizer",
+    role: "JD Alignment",
+    tag: "Opportunity",
+    icon: Target,
+    iconColor: "text-emerald-400",
+    nodeColor: "border-emerald-500/40 bg-card/90 dark:bg-[#090e24]/90",
+    bgGlow: "shadow-[0_0_20px_rgba(16,185,129,0.2)]",
+    description: "Scans open roles and pinpoints exact skill gaps to bridge.",
   },
 ];
 
-const ALL_NODES = [...LEFT_NODES, ...RIGHT_NODES];
-
 export function UnifiedArchitecture() {
-  const [selectedNode, setSelectedNode] = useState<string>("discovery");
-  const activeItem = ALL_NODES.find((n) => n.id === selectedNode) || ALL_NODES[0];
+  const [activeNode, setActiveNode] = useState<string>("readiness");
+  const selected = NODES.find((n) => n.id === activeNode) || NODES[3];
 
   return (
-    <section id="architecture" className="my-24 scroll-mt-24 select-none relative">
-      {/* Background Ambient Nebula Bloom */}
-      <div
-        className="pointer-events-none absolute inset-0 -z-10 opacity-70"
-        style={{
-          background:
-            "radial-gradient(circle 500px at 50% 50%, rgba(6, 215, 247, 0.12), rgba(70, 87, 255, 0.08) 40%, rgba(130, 71, 255, 0.05) 70%, transparent 95%)",
-        }}
-      />
-
-      {/* Section Header */}
+    <section id="architecture" className="my-24 scroll-mt-24 space-y-10">
+      {/* Centered Section Header */}
       <div className="text-center max-w-3xl mx-auto space-y-3 px-4">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-500/40 bg-card/90 dark:bg-[#090e24]/90 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-300 shadow-sm backdrop-blur">
-          <Sparkles className="size-3.5 text-cyan-500" />
-          Unified Architecture
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/40 bg-card/90 dark:bg-[#090e24]/90 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-300 shadow-sm backdrop-blur">
+          <Cpu className="size-3.5 text-blue-500" />
+          Connected Career Intelligence
         </span>
         <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight leading-tight">
           One connected intelligence engine for your{" "}
@@ -127,174 +115,154 @@ export function UnifiedArchitecture() {
           </span>
         </h2>
         <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-          Unlike fragmented tools, SPAR unifies career exploration, curriculum sequencing, live proof validation, and placement calibration into a single continuous feedback loop.
+          Every skill, project milestone, mock interview, and diagnostic dynamically connects into a continuous career knowledge graph.
         </p>
       </div>
 
-      {/* Live Status Indicators Bar */}
-      <div className="flex flex-wrap items-center justify-center gap-3 mt-6 px-4">
-        <div className="flex items-center gap-1.5 rounded-full border border-cyan-500/30 bg-card/90 dark:bg-[#090e24]/80 px-3 py-1 text-[11px] font-semibold text-cyan-600 dark:text-cyan-300 backdrop-blur shadow-sm">
-          <Zap className="size-3 text-cyan-500 animate-pulse" />
-          <span>Real-time Readiness Sync</span>
-        </div>
-        <div className="flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-card/90 dark:bg-[#090e24]/80 px-3 py-1 text-[11px] font-semibold text-blue-600 dark:text-blue-300 backdrop-blur shadow-sm">
-          <ShieldCheck className="size-3 text-blue-500" />
-          <span>Verified Capability Evidence</span>
-        </div>
-        <div className="flex items-center gap-1.5 rounded-full border border-purple-500/30 bg-card/90 dark:bg-[#090e24]/80 px-3 py-1 text-[11px] font-semibold text-purple-600 dark:text-purple-300 backdrop-blur shadow-sm">
-          <Bot className="size-3 text-purple-500" />
-          <span>Context-Aware AI Guidance</span>
-        </div>
-        <div className="flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-card/90 dark:bg-[#090e24]/80 px-3 py-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-300 backdrop-blur shadow-sm">
-          <span className="size-2 rounded-full bg-emerald-500 animate-ping" />
-          <span>Placement Drive Pipeline</span>
-        </div>
-      </div>
+      {/* HERO VISUALIZATION CANVAS: Central SPAR AI Core + Orbiting Connected Subsystems */}
+      <div className="relative mx-auto max-w-5xl rounded-3xl border border-border/80 bg-card/60 dark:bg-[#070c20]/80 p-6 sm:p-10 backdrop-blur-2xl shadow-2xl overflow-hidden">
+        {/* Subtle Ambient Background Gradients */}
+        <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 size-96 rounded-full bg-cyan-500/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 left-1/2 -translate-x-1/2 size-96 rounded-full bg-purple-500/10 blur-3xl" />
 
-      {/* 3-COLUMN STRUCTURED ARCHITECTURE MATRIX */}
-      <div className="relative mt-8 max-w-6xl mx-auto rounded-3xl border border-border/80 bg-card/90 dark:bg-[#090e24]/80 p-6 sm:p-8 lg:p-10 backdrop-blur-2xl shadow-xl overflow-hidden">
-        
-        {/* Subtle Tech Grid Circuit Pattern */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-20"
-          style={{
-            backgroundImage:
-              "radial-gradient(rgba(6, 215, 247, 0.4) 1px, transparent 1px), radial-gradient(rgba(70, 87, 255, 0.3) 1px, transparent 1px)",
-            backgroundSize: "28px 28px",
-            backgroundPosition: "0 0, 14px 14px",
-          }}
-        />
+        {/* Floating Graph Ontology Labels */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
+          {["Career", "Skill", "Assessment", "Project", "Evidence", "Opportunity"].map((tag) => (
+            <span
+              key={tag}
+              className="rounded-full border border-border/60 bg-secondary/50 px-3 py-0.5 text-[11px] font-mono text-muted-foreground"
+            >
+              #{tag}
+            </span>
+          ))}
+        </div>
 
-        {/* 3-Column Layout: Left Subsystems | Center Core Orb | Right Subsystems */}
-        <div className="relative z-20 grid grid-cols-1 lg:grid-cols-[1fr_260px_1fr] xl:grid-cols-[1fr_280px_1fr] items-center gap-6 lg:gap-8">
-          
-          {/* LEFT COLUMN: 3 Non-Overlapping Subsystem Cards */}
-          <div className="flex flex-col gap-4">
-            {LEFT_NODES.map((node) => {
+        {/* Desktop Interactive Graph & Central Hub Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px_1fr] items-center gap-6 relative z-10">
+          {/* Left 3 Nodes */}
+          <div className="space-y-3.5">
+            {NODES.slice(0, 3).map((node) => {
               const Icon = node.icon;
-              const isSelected = selectedNode === node.id;
+              const isSelected = activeNode === node.id;
               return (
                 <div
                   key={node.id}
-                  onClick={() => setSelectedNode(node.id)}
-                  className={`cursor-pointer rounded-2xl border p-4 sm:p-4.5 backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] shadow-sm ${
+                  onClick={() => setActiveNode(node.id)}
+                  className={`cursor-pointer rounded-2xl border p-4 transition-all duration-300 ${
                     isSelected
-                      ? `${node.glow} border-cyan-500 bg-secondary/80 dark:bg-[#0d173d]`
-                      : "border-border/70 bg-card dark:bg-[#090e24]/90 hover:border-cyan-500/40"
+                      ? `border-cyan-500 bg-secondary/90 dark:bg-[#0d173d] ${node.bgGlow} scale-[1.02]`
+                      : `${node.nodeColor} hover:border-cyan-500/40 hover:-translate-y-0.5`
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2.5">
-                      <span className={`grid size-8 place-items-center rounded-xl border ${node.badgeBg}`}>
-                        <Icon className="size-4" />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="grid size-8 place-items-center rounded-xl bg-secondary border border-border/80">
+                        <Icon className={`size-4 ${node.iconColor}`} />
                       </span>
-                      <span className="font-display text-xs sm:text-sm font-bold text-foreground">
-                        {node.title}
-                      </span>
+                      <div>
+                        <span className="font-display text-sm font-bold text-foreground block">
+                          {node.label}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground">
+                          {node.role}
+                        </span>
+                      </div>
                     </div>
-                    <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-300 bg-cyan-500/10 dark:bg-cyan-950/60 px-2 py-0.5 rounded-full border border-cyan-500/30">
-                      {node.metrics}
+                    <span className="text-[10px] font-mono text-cyan-500 uppercase font-bold bg-cyan-500/10 px-2 py-0.5 rounded-md border border-cyan-500/20">
+                      {node.tag}
                     </span>
                   </div>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    {node.desc}
-                  </p>
                 </div>
               );
             })}
           </div>
 
-          {/* CENTER COLUMN: Central SPAR AI Intelligence Core Orb */}
-          <div className="flex flex-col items-center justify-center my-4 lg:my-0">
-            {/* Concentric Pulsing Orbit Rings */}
-            <div className="relative grid size-48 sm:size-52 place-items-center">
-              <div className="absolute inset-0 rounded-full border border-cyan-500/20 animate-ping opacity-30" />
-              <div className="absolute inset-2 rounded-full border-2 border-blue-500/30 opacity-75 animate-pulse" />
-              <div className="absolute inset-5 rounded-full border border-cyan-500/60 shadow-[0_0_30px_rgba(6,215,247,0.4)]" />
+          {/* Center: Glowing SPAR AI Core */}
+          <div className="flex flex-col items-center justify-center p-4">
+            <div className="relative group">
+              {/* Outer pulsing ring */}
+              <div className="absolute -inset-3 rounded-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 opacity-40 blur-md animate-pulse" />
 
-              {/* Core Orb with Official SPAR AI Symbol */}
-              <div className="relative grid size-28 sm:size-32 place-items-center rounded-full bg-gradient-to-tr from-cyan-500/40 via-blue-600/60 to-purple-600/80 backdrop-blur-xl border border-cyan-300/80 shadow-[0_0_35px_rgba(6,215,247,0.85)]">
-                <img
-                  src="/brand/icon/spar-ai-icon-128.png"
-                  alt="SPAR AI Intelligence Core"
-                  className="size-12 sm:size-14 object-contain drop-shadow-[0_0_15px_#06d7f7] animate-pulse"
-                />
-                <span className="font-display text-[10px] font-black uppercase tracking-wider text-white mt-1 drop-shadow">
-                  AI CORE
+              {/* Core Body */}
+              <div className="relative size-36 sm:size-40 rounded-full border-2 border-cyan-400 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 flex flex-col items-center justify-center text-center p-4 shadow-[0_0_40px_rgba(6,215,247,0.3)]">
+                <span className="grid size-10 place-items-center rounded-full bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 mb-1 shadow-[0_0_15px_rgba(6,215,247,0.5)]">
+                  <Cpu className="size-5" />
+                </span>
+                <span className="font-display text-xs sm:text-sm font-extrabold text-white tracking-wider uppercase">
+                  SPAR AI Core
+                </span>
+                <span className="text-[9px] font-mono text-cyan-300 mt-0.5">
+                  Knowledge Graph
                 </span>
               </div>
             </div>
 
-            <div className="mt-2 text-center">
-              <span className="rounded-full bg-cyan-500/20 border border-cyan-500/40 px-3 py-0.5 text-[10px] font-bold text-cyan-600 dark:text-cyan-300 shadow-sm">
-                Continuous Sync Active
-              </span>
+            {/* Active Sync Pulse */}
+            <div className="mt-4 flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-[10px] font-bold text-cyan-600 dark:text-cyan-300">
+              <span className="size-2 rounded-full bg-cyan-400 animate-ping" />
+              <span>Real-Time Graph Sync Active</span>
             </div>
           </div>
 
-          {/* RIGHT COLUMN: 3 Non-Overlapping Subsystem Cards */}
-          <div className="flex flex-col gap-4">
-            {RIGHT_NODES.map((node) => {
+          {/* Right 3 Nodes */}
+          <div className="space-y-3.5">
+            {NODES.slice(3, 6).map((node) => {
               const Icon = node.icon;
-              const isSelected = selectedNode === node.id;
+              const isSelected = activeNode === node.id;
               return (
                 <div
                   key={node.id}
-                  onClick={() => setSelectedNode(node.id)}
-                  className={`cursor-pointer rounded-2xl border p-4 sm:p-4.5 backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] shadow-sm ${
+                  onClick={() => setActiveNode(node.id)}
+                  className={`cursor-pointer rounded-2xl border p-4 transition-all duration-300 ${
                     isSelected
-                      ? `${node.glow} border-cyan-500 bg-secondary/80 dark:bg-[#0d173d]`
-                      : "border-border/70 bg-card dark:bg-[#090e24]/90 hover:border-cyan-500/40"
+                      ? `border-cyan-500 bg-secondary/90 dark:bg-[#0d173d] ${node.bgGlow} scale-[1.02]`
+                      : `${node.nodeColor} hover:border-cyan-500/40 hover:-translate-y-0.5`
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2.5">
-                      <span className={`grid size-8 place-items-center rounded-xl border ${node.badgeBg}`}>
-                        <Icon className="size-4" />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="grid size-8 place-items-center rounded-xl bg-secondary border border-border/80">
+                        <Icon className={`size-4 ${node.iconColor}`} />
                       </span>
-                      <span className="font-display text-xs sm:text-sm font-bold text-foreground">
-                        {node.title}
-                      </span>
+                      <div>
+                        <span className="font-display text-sm font-bold text-foreground block">
+                          {node.label}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground">
+                          {node.role}
+                        </span>
+                      </div>
                     </div>
-                    <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-300 bg-cyan-500/10 dark:bg-cyan-950/60 px-2 py-0.5 rounded-full border border-cyan-500/30">
-                      {node.metrics}
+                    <span className="text-[10px] font-mono text-cyan-500 uppercase font-bold bg-cyan-500/10 px-2 py-0.5 rounded-md border border-cyan-500/20">
+                      {node.tag}
                     </span>
                   </div>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    {node.desc}
-                  </p>
                 </div>
               );
             })}
           </div>
-
         </div>
-      </div>
 
-      {/* Active Subsystem Detail Banner */}
-      <div className="mt-6 max-w-4xl mx-auto rounded-2xl border border-border/80 bg-card/95 dark:bg-gradient-to-r dark:from-cyan-950/40 dark:via-blue-950/30 dark:to-purple-950/40 p-4 sm:p-5 backdrop-blur-xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span className={`grid size-10 place-items-center rounded-xl border ${activeItem.badgeBg} shadow-sm`}>
-            {React.createElement(activeItem.icon, { className: "size-5" })}
-          </span>
-          <div>
-            <div className="flex items-center gap-2">
-              <h4 className="font-display text-sm font-bold text-foreground">{activeItem.title}</h4>
-              <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-300 bg-cyan-500/10 dark:bg-cyan-950/60 px-2 py-0.5 rounded-full border border-cyan-500/40">
-                {activeItem.badge}
-              </span>
+        {/* Dynamic Detail Callout for Selected Graph Node */}
+        <div className="mt-8 rounded-2xl border border-cyan-500/30 bg-secondary/40 dark:bg-card/40 p-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+          <div className="flex items-center gap-3">
+            <span className="grid size-8 place-items-center rounded-xl bg-cyan-500/20 text-cyan-400">
+              <Zap className="size-4" />
+            </span>
+            <div>
+              <p className="text-xs font-bold text-foreground">
+                {selected.label} Subsystem Active
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                {selected.description}
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground mt-0.5">{activeItem.desc}</p>
           </div>
+          <span className="text-xs font-semibold text-cyan-600 dark:text-cyan-400 flex items-center gap-1 shrink-0">
+            <span>Continuously Updated</span>
+            <CheckCircle2 className="size-3.5" />
+          </span>
         </div>
-
-        <a
-          href={`#${activeItem.id}`}
-          className="shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-cyan-600 dark:text-cyan-400 hover:underline transition-colors"
-        >
-          <span>Explore Subsystem</span>
-          <ArrowRight className="size-3.5" />
-        </a>
       </div>
     </section>
   );

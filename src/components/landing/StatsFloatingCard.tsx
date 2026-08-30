@@ -1,76 +1,54 @@
 import React from "react";
-import { Users, Building2, Star } from "lucide-react";
+import { Compass, CheckCircle2, TrendingUp, Sparkles } from "lucide-react";
 
 export function StatsFloatingCard() {
   return (
-    <div className="flex flex-col items-center gap-3.5 z-20 w-full max-w-[480px]">
-      {/* 3 Metric Card */}
-      <div className="w-full rounded-2xl border border-border/80 bg-card/90 dark:bg-[#090e24]/85 p-3.5 sm:p-4 backdrop-blur-xl shadow-xl transition-colors">
+    <div className="w-full max-w-lg rounded-2xl border border-border/80 bg-card/90 dark:bg-[#090e24]/90 p-3.5 backdrop-blur-xl shadow-xl space-y-3 transition-colors">
+      {/* 3 Core Pilot Pillars */}
+      <div className="rounded-xl border border-border/60 bg-secondary/40 dark:bg-card/40 p-2.5">
         <div className="grid grid-cols-3 divide-x divide-border/60 text-center">
-          {/* Stat 1 */}
+          {/* Pillar 1 */}
           <div className="flex flex-col items-center px-2">
-            <div className="flex items-center gap-1.5 text-purple-600 dark:text-purple-400 mb-0.5">
-              <Users className="size-4" />
-              <span className="font-display text-base sm:text-lg font-extrabold text-foreground">500K+</span>
+            <div className="flex items-center gap-1 text-cyan-600 dark:text-cyan-400 mb-0.5">
+              <Compass className="size-3.5" />
+              <span className="font-display text-xs sm:text-sm font-bold text-foreground">Personalized</span>
             </div>
-            <span className="text-[10px] sm:text-[11px] text-muted-foreground font-medium">Students Empowered</span>
+            <span className="text-[10px] text-muted-foreground font-medium">Career Pathways</span>
           </div>
 
-          {/* Stat 2 */}
+          {/* Pillar 2 */}
           <div className="flex flex-col items-center px-2">
-            <div className="flex items-center gap-1.5 text-cyan-600 dark:text-cyan-400 mb-0.5">
-              <Building2 className="size-4" />
-              <span className="font-display text-base sm:text-lg font-extrabold text-foreground">1,200+</span>
+            <div className="flex items-center gap-1 text-purple-600 dark:text-purple-400 mb-0.5">
+              <CheckCircle2 className="size-3.5" />
+              <span className="font-display text-xs sm:text-sm font-bold text-foreground">Verified</span>
             </div>
-            <span className="text-[10px] sm:text-[11px] text-muted-foreground font-medium">Colleges Onboarded</span>
+            <span className="text-[10px] text-muted-foreground font-medium">Hands-On Practice</span>
           </div>
 
-          {/* Stat 3 */}
+          {/* Pillar 3 */}
           <div className="flex flex-col items-center px-2">
-            <div className="flex items-center gap-1.5 text-amber-500 dark:text-amber-400 mb-0.5">
-              <Star className="size-4 fill-amber-500 dark:fill-amber-400" />
-              <span className="font-display text-base sm:text-lg font-extrabold text-foreground">4.8<span className="text-xs text-muted-foreground font-normal">/5</span></span>
+            <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 mb-0.5">
+              <TrendingUp className="size-3.5" />
+              <span className="font-display text-xs sm:text-sm font-bold text-foreground">Continuous</span>
             </div>
-            <span className="text-[10px] sm:text-[11px] text-muted-foreground font-medium">Student Satisfaction</span>
+            <span className="text-[10px] text-muted-foreground font-medium">Readiness Tracking</span>
           </div>
         </div>
       </div>
 
-      {/* Avatars + Stars + Trust Label */}
-      <div className="flex items-center gap-3">
-        <div className="flex -space-x-2 overflow-hidden">
-          <img
-            className="inline-block size-7 rounded-full ring-2 ring-card object-cover"
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
-            alt="Student avatar 1"
-          />
-          <img
-            className="inline-block size-7 rounded-full ring-2 ring-card object-cover"
-            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80"
-            alt="Student avatar 2"
-          />
-          <img
-            className="inline-block size-7 rounded-full ring-2 ring-card object-cover"
-            src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80"
-            alt="Student avatar 3"
-          />
-          <img
-            className="inline-block size-7 rounded-full ring-2 ring-card object-cover"
-            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80"
-            alt="Student avatar 4"
-          />
-        </div>
-
-        <div className="flex flex-col text-left">
-          <div className="flex items-center gap-0.5 text-amber-500 dark:text-amber-400">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="size-3 fill-amber-500 dark:fill-amber-400" />
-            ))}
-          </div>
-          <span className="text-[10px] sm:text-[11px] text-muted-foreground font-medium mt-0.5">
-            Trusted by students across top colleges in India
+      {/* Trust & Capability Badge */}
+      <div className="flex items-center justify-between px-1 text-left">
+        <div className="flex items-center gap-2">
+          <span className="grid size-6 place-items-center rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-500">
+            <Sparkles className="size-3" />
+          </span>
+          <span className="text-[11px] text-muted-foreground font-medium">
+            Full-stack career intelligence operating system
           </span>
         </div>
+        <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 rounded-full px-2 py-0.5 border border-cyan-500/20">
+          Pilot Active
+        </span>
       </div>
     </div>
   );

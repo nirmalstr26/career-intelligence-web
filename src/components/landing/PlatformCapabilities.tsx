@@ -12,407 +12,300 @@ import {
   Layers,
   ChevronLeft,
   ChevronRight,
-  ShieldCheck,
-  Zap,
-  Bot,
-  Cpu,
   Play,
   Pause,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 interface ShowcaseCard {
   id: string;
   badge: string;
   badgeColor: string;
   title: string;
-  tagline: string;
-  description: string;
-  benefits: string[];
-  colorGlow: string;
+  valueStatement: string;
+  bullets: [string, string];
   borderColor: string;
   renderVisual: () => React.ReactNode;
 }
+
+const CARDS: ShowcaseCard[] = [
+  // 1. AI CAREER DISCOVERY
+  {
+    id: "discovery",
+    badge: "Matching Engine",
+    badgeColor: "border-cyan-500/40 bg-cyan-500/10 text-cyan-600 dark:text-cyan-300",
+    title: "AI Career Discovery",
+    valueStatement: "Find high-trajectory career paths tailored to your coursework and technical strengths.",
+    bullets: [
+      "Multi-dimensional capability matching",
+      "Dynamic transferable skill modeling",
+    ],
+    borderColor: "hover:border-cyan-400/60 shadow-[0_0_20px_rgba(6,215,247,0.12)]",
+    renderVisual: () => (
+      <div className="relative h-40 w-full rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-slate-900 to-slate-950 p-3.5 overflow-hidden flex flex-col justify-between">
+        <div className="absolute -top-10 -right-10 size-28 bg-cyan-500/15 rounded-full blur-xl pointer-events-none" />
+        <div className="flex items-center justify-between z-10">
+          <div className="flex items-center gap-2">
+            <span className="grid size-6 place-items-center rounded-lg bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+              <Compass className="size-3.5" />
+            </span>
+            <span className="text-[11px] font-bold text-white">Career Fit Matcher</span>
+          </div>
+          <span className="rounded-full bg-cyan-500/20 border border-cyan-400/40 px-2 py-0.5 text-[10px] font-extrabold text-cyan-300">
+            94% Fit
+          </span>
+        </div>
+        <div className="rounded-xl border border-cyan-500/30 bg-cyan-950/40 p-2 z-10">
+          <p className="text-[9px] uppercase tracking-wider text-cyan-400 font-bold">Top Recommended Path</p>
+          <p className="text-xs font-extrabold text-white">Cloud Data Engineer</p>
+        </div>
+        <div className="flex items-center gap-1.5 text-[10px] text-cyan-200/90 z-10">
+          <Sparkles className="size-3 text-cyan-400 shrink-0" />
+          <span className="truncate">High alignment with Distributed Systems & SQL</span>
+        </div>
+      </div>
+    ),
+  },
+
+  // 2. PERSONALIZED ROADMAP
+  {
+    id: "roadmap",
+    badge: "Adaptive Path",
+    badgeColor: "border-blue-500/40 bg-blue-500/10 text-blue-600 dark:text-blue-300",
+    title: "Personalized Roadmap",
+    valueStatement: "Follow an adaptive step-by-step milestone curriculum that updates as you learn.",
+    bullets: [
+      "Mastery gating with structured unlocks",
+      "Bite-sized missions for college schedules",
+    ],
+    borderColor: "hover:border-blue-400/60 shadow-[0_0_20px_rgba(0,140,255,0.12)]",
+    renderVisual: () => (
+      <div className="relative h-40 w-full rounded-2xl border border-blue-500/30 bg-gradient-to-br from-slate-900 to-slate-950 p-3.5 overflow-hidden flex flex-col justify-between">
+        <div className="absolute -top-10 -right-10 size-28 bg-blue-500/15 rounded-full blur-xl pointer-events-none" />
+        <div className="flex items-center justify-between z-10">
+          <div className="flex items-center gap-2">
+            <span className="grid size-6 place-items-center rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30">
+              <Map className="size-3.5" />
+            </span>
+            <span className="text-[11px] font-bold text-white">Milestone Navigator</span>
+          </div>
+          <span className="text-[10px] font-mono text-blue-300 font-semibold">Step 3 of 5</span>
+        </div>
+        <div className="space-y-1.5 z-10">
+          <div className="flex items-center justify-between text-[10px]">
+            <span className="text-white font-medium">Distributed Pipeline Engine</span>
+            <span className="text-blue-400 font-bold">60% Complete</span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
+            <div className="h-full w-3/5 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400" />
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 text-[10px] text-blue-200/90 z-10">
+          <CheckCircle2 className="size-3 text-blue-400 shrink-0" />
+          <span className="truncate">Next: Build Kafka streaming consumer</span>
+        </div>
+      </div>
+    ),
+  },
+
+  // 3. READINESS SCORING
+  {
+    id: "readiness",
+    badge: "Benchmarking",
+    badgeColor: "border-purple-500/40 bg-purple-500/10 text-purple-600 dark:text-purple-300",
+    title: "Readiness Scoring",
+    valueStatement: "Track your placement readiness score across coding, system design, and communication.",
+    bullets: [
+      "Objective 6-dimensional evaluation",
+      "Continuous gap analysis with remediation",
+    ],
+    borderColor: "hover:border-purple-400/60 shadow-[0_0_20px_rgba(168,85,247,0.12)]",
+    renderVisual: () => (
+      <div className="relative h-40 w-full rounded-2xl border border-purple-500/30 bg-gradient-to-br from-slate-900 to-slate-950 p-3.5 overflow-hidden flex flex-col justify-between">
+        <div className="absolute -top-10 -right-10 size-28 bg-purple-500/15 rounded-full blur-xl pointer-events-none" />
+        <div className="flex items-center justify-between z-10">
+          <div className="flex items-center gap-2">
+            <span className="grid size-6 place-items-center rounded-lg bg-purple-500/20 text-purple-400 border border-purple-500/30">
+              <Award className="size-3.5" />
+            </span>
+            <span className="text-[11px] font-bold text-white">Readiness Index</span>
+          </div>
+          <span className="rounded-full bg-purple-500/20 border border-purple-400/40 px-2 py-0.5 text-[10px] font-extrabold text-purple-300">
+            78 / 100
+          </span>
+        </div>
+        <div className="grid grid-cols-2 gap-1.5 z-10">
+          <div className="rounded-lg bg-slate-950/70 border border-purple-500/20 p-1.5">
+            <span className="text-[9px] text-muted-foreground block">Technical Base</span>
+            <span className="text-xs font-bold text-purple-300">84% Ready</span>
+          </div>
+          <div className="rounded-lg bg-slate-950/70 border border-cyan-500/20 p-1.5">
+            <span className="text-[9px] text-muted-foreground block">System Design</span>
+            <span className="text-xs font-bold text-cyan-300">76% Ready</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 text-[10px] text-purple-200/90 z-10">
+          <Sparkles className="size-3 text-purple-400 shrink-0" />
+          <span className="truncate">Tier: Nearly Placement-Ready</span>
+        </div>
+      </div>
+    ),
+  },
+
+  // 4. PRACTICAL PROJECTS
+  {
+    id: "projects",
+    badge: "Portfolio Proof",
+    badgeColor: "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-300",
+    title: "Practical Projects",
+    valueStatement: "Build production-grade applications that provide concrete evidence for hiring teams.",
+    bullets: [
+      "Industry-grade project architectures",
+      "Automated verification & code evaluation",
+    ],
+    borderColor: "hover:border-amber-400/60 shadow-[0_0_20px_rgba(245,158,11,0.12)]",
+    renderVisual: () => (
+      <div className="relative h-40 w-full rounded-2xl border border-amber-500/30 bg-gradient-to-br from-slate-900 to-slate-950 p-3.5 overflow-hidden flex flex-col justify-between font-mono">
+        <div className="absolute -top-10 -right-10 size-28 bg-amber-500/15 rounded-full blur-xl pointer-events-none" />
+        <div className="flex items-center justify-between z-10">
+          <div className="flex items-center gap-2">
+            <span className="grid size-6 place-items-center rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
+              <Terminal className="size-3.5" />
+            </span>
+            <span className="text-[11px] font-bold text-white font-sans">Lab Workspace</span>
+          </div>
+          <span className="text-[9px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-1.5 py-0.5 rounded">
+            PASS 12/12
+          </span>
+        </div>
+        <div className="rounded-lg bg-black/70 p-2 text-[10px] text-slate-300 space-y-1 z-10">
+          <p className="text-amber-400">$ spar test --suite=distributed-sync</p>
+          <p className="text-emerald-400 font-bold">✓ Latency &lt; 4ms | Raft consensus OK</p>
+        </div>
+        <div className="flex items-center gap-1.5 text-[10px] text-amber-200/90 font-sans z-10">
+          <CheckCircle2 className="size-3 text-amber-400 shrink-0" />
+          <span className="truncate">Evidence badge attached to profile</span>
+        </div>
+      </div>
+    ),
+  },
+
+  // 5. INTERVIEW PREPARATION
+  {
+    id: "interviews",
+    badge: "AI Mock Simulator",
+    badgeColor: "border-indigo-500/40 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300",
+    title: "Interview Preparation",
+    valueStatement: "Practice role-specific mock interviews with real-time AI feedback on communication & logic.",
+    bullets: [
+      "Dynamic follow-ups based on your answers",
+      "Detailed scoring on technical & behavioral depth",
+    ],
+    borderColor: "hover:border-indigo-400/60 shadow-[0_0_20px_rgba(99,102,241,0.12)]",
+    renderVisual: () => (
+      <div className="relative h-40 w-full rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-slate-900 to-slate-950 p-3.5 overflow-hidden flex flex-col justify-between">
+        <div className="absolute -top-10 -right-10 size-28 bg-indigo-500/15 rounded-full blur-xl pointer-events-none" />
+        <div className="flex items-center justify-between z-10">
+          <div className="flex items-center gap-2">
+            <span className="grid size-6 place-items-center rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+              <MessageSquare className="size-3.5" />
+            </span>
+            <span className="text-[11px] font-bold text-white">AI Interviewer</span>
+          </div>
+          <span className="text-[10px] text-indigo-300 font-mono">Question 4/8</span>
+        </div>
+        <div className="rounded-xl border border-indigo-500/30 bg-indigo-950/40 p-2 text-[10px] text-white z-10">
+          <p className="text-indigo-300 font-bold mb-0.5">SPAR AI Interviewer</p>
+          <p className="text-slate-200">"How would you handle cache invalidation during write spikes?"</p>
+        </div>
+        <div className="flex items-center gap-1.5 text-[10px] text-indigo-200/90 z-10">
+          <Sparkles className="size-3 text-indigo-400 shrink-0" />
+          <span className="truncate">Instant articulation & trade-off scoring</span>
+        </div>
+      </div>
+    ),
+  },
+
+  // 6. JOB GAP OPTIMIZER
+  {
+    id: "optimizer",
+    badge: "Gap Remediation",
+    badgeColor: "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300",
+    title: "Job Gap Optimizer",
+    valueStatement: "Compare your skills against target job postings and fix identified gaps before applying.",
+    bullets: [
+      "Live JD skill & requirement extraction",
+      "Targeted micro-learning to bridge gaps",
+    ],
+    borderColor: "hover:border-emerald-400/60 shadow-[0_0_20px_rgba(16,185,129,0.12)]",
+    renderVisual: () => (
+      <div className="relative h-40 w-full rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-slate-900 to-slate-950 p-3.5 overflow-hidden flex flex-col justify-between">
+        <div className="absolute -top-10 -right-10 size-28 bg-emerald-500/15 rounded-full blur-xl pointer-events-none" />
+        <div className="flex items-center justify-between z-10">
+          <div className="flex items-center gap-2">
+            <span className="grid size-6 place-items-center rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <Target className="size-3.5" />
+            </span>
+            <span className="text-[11px] font-bold text-white">Target JD Matcher</span>
+          </div>
+          <span className="rounded-full bg-emerald-500/20 border border-emerald-400/40 px-2 py-0.5 text-[10px] font-extrabold text-emerald-300">
+            +18% Match Boost
+          </span>
+        </div>
+        <div className="space-y-1.5 z-10">
+          <div className="flex items-center justify-between text-[10px]">
+            <span className="text-white">Profile vs Target JD</span>
+            <span className="text-emerald-400 font-bold">88% Coverage</span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
+            <div className="h-full w-[88%] rounded-full bg-gradient-to-r from-emerald-500 to-cyan-400" />
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 text-[10px] text-emerald-200/90 z-10">
+          <CheckCircle2 className="size-3 text-emerald-400 shrink-0" />
+          <span className="truncate">All core role requirements verified</span>
+        </div>
+      </div>
+    ),
+  },
+];
 
 export function PlatformCapabilities() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const CARDS: ShowcaseCard[] = [
-    // 1. AI CAREER DISCOVERY
-    {
-      id: "discovery",
-      badge: "MATCHING ENGINE",
-      badgeColor: "border-cyan-500/40 bg-cyan-500/10 text-cyan-600 dark:text-cyan-300 shadow-sm",
-      title: "AI Career Discovery",
-      tagline: "Precision AI Path Matching",
-      description: "Discovers high-trajectory careers aligned to your coursework, coding style, and market demand.",
-      benefits: [
-        "Multi-dimensional capability modeling",
-        "Live tech industry salary & hiring alignment",
-        "Dynamic transferable skill simulation",
-      ],
-      colorGlow: "from-cyan-500/20 to-blue-600/10",
-      borderColor: "hover:border-cyan-400/60 shadow-[0_0_25px_rgba(6,215,247,0.12)]",
-      renderVisual: () => (
-        <div className="relative h-48 w-full rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-slate-900 to-slate-950 p-4 overflow-hidden flex flex-col justify-between">
-          <div className="absolute -top-10 -right-10 size-32 bg-cyan-500/15 rounded-full blur-2xl pointer-events-none" />
-          
-          <div className="flex items-center justify-between z-10">
-            <div className="flex items-center gap-2">
-              <span className="grid size-7 place-items-center rounded-lg bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
-                <Compass className="size-4" />
-              </span>
-              <span className="text-[11px] font-bold text-white">Career Fit Matcher</span>
-            </div>
-            <span className="rounded-full bg-cyan-500/20 border border-cyan-400/40 px-2 py-0.5 text-[10px] font-extrabold text-cyan-300 shadow-[0_0_10px_rgba(6,215,247,0.3)]">
-              94% Match
-            </span>
-          </div>
-
-          <div className="rounded-xl border border-cyan-500/30 bg-cyan-950/40 p-2.5 z-10">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[9px] uppercase tracking-wider text-cyan-400 font-bold">Top Recommended Role</p>
-                <p className="text-xs font-extrabold text-white">Cloud Data Architect</p>
-              </div>
-              <span className="text-[10px] font-bold text-emerald-400">₹14L–₹22L Avg</span>
-            </div>
-            <div className="flex gap-1 mt-2">
-              <span className="rounded bg-slate-950/80 border border-cyan-400/30 px-1.5 py-0.5 text-[9px] text-cyan-200">
-                ⚡ Spark · 92%
-              </span>
-              <span className="rounded bg-slate-950/80 border border-blue-400/30 px-1.5 py-0.5 text-[9px] text-blue-200">
-                ⚙️ Dist. Systems · 89%
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1.5 text-[10px] text-cyan-200/90 z-10">
-            <Sparkles className="size-3 text-cyan-400 shrink-0" />
-            <span className="truncate">+28% systems advantage over college cohorts</span>
-          </div>
-        </div>
-      ),
-    },
-
-    // 2. PERSONALIZED ROADMAP
-    {
-      id: "roadmap",
-      badge: "ADAPTIVE PATH",
-      badgeColor: "border-blue-500/40 bg-blue-500/10 text-blue-600 dark:text-blue-300 shadow-sm",
-      title: "Personalized Roadmap",
-      tagline: "Dynamic Milestone Journey",
-      description: "Constructs an adaptive step-by-step curriculum that shifts based on your quiz & code submissions.",
-      benefits: [
-        "Deterministic mastery gating & unlocks",
-        "Micro-missions tailored to college schedules",
-        "Context-aware SPAR AI Tutor in workspace",
-      ],
-      colorGlow: "from-blue-500/20 to-indigo-600/10",
-      borderColor: "hover:border-blue-400/60 shadow-[0_0_25px_rgba(0,140,255,0.12)]",
-      renderVisual: () => (
-        <div className="relative h-48 w-full rounded-2xl border border-blue-500/30 bg-gradient-to-br from-slate-900 to-slate-950 p-4 overflow-hidden flex flex-col justify-between">
-          <div className="absolute -top-10 -right-10 size-32 bg-blue-500/15 rounded-full blur-2xl pointer-events-none" />
-
-          <div className="flex items-center justify-between z-10">
-            <div className="flex items-center gap-2">
-              <span className="grid size-7 place-items-center rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30">
-                <Map className="size-4" />
-              </span>
-              <span className="text-[11px] font-bold text-white">Adaptive Milestone Path</span>
-            </div>
-            <span className="rounded-full bg-blue-500/20 border border-blue-400/40 px-2 py-0.5 text-[10px] font-bold text-blue-300">
-              Stage 3 / 5 Unlocked
-            </span>
-          </div>
-
-          {/* Connected Milestone Step Chips */}
-          <div className="grid grid-cols-3 gap-1.5 z-10">
-            <div className="rounded-xl border border-emerald-500/40 bg-emerald-950/40 p-2 text-center">
-              <span className="text-[8px] text-emerald-400 font-bold block">01 Data Found.</span>
-              <span className="text-[10px] font-extrabold text-white">Mastered ✓</span>
-            </div>
-            <div className="rounded-xl border border-cyan-400/60 bg-cyan-950/40 p-2 text-center shadow-[0_0_12px_rgba(6,215,247,0.3)]">
-              <span className="text-[8px] text-cyan-300 font-bold block">02 Lakehouse</span>
-              <span className="text-[10px] font-extrabold text-cyan-200">Active (78%)</span>
-            </div>
-            <div className="rounded-xl border border-border/40 bg-slate-950/40 p-2 text-center opacity-60">
-              <span className="text-[8px] text-muted-foreground font-bold block">03 Dist Engine</span>
-              <span className="text-[10px] font-medium text-slate-400">Locked 🔒</span>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between text-[10px] text-blue-200/90 z-10">
-            <span>Next: PySpark Optimization Lab</span>
-            <span className="text-cyan-400 font-bold">Estimated: 35m</span>
-          </div>
-        </div>
-      ),
-    },
-
-    // 3. READINESS SCORE
-    {
-      id: "readiness",
-      badge: "BENCHMARK METRICS",
-      badgeColor: "border-teal-500/40 bg-teal-500/10 text-teal-600 dark:text-teal-300 shadow-sm",
-      title: "Readiness Scoring",
-      tagline: "Deterministic Capability Index",
-      description: "Continuous 0-100 benchmark metric evaluating your practical ability against hiring standards.",
-      benefits: [
-        "Transparent multi-pillar rubric scoring",
-        "Target employer benchmark comparisons",
-        "Prescriptive action plan to close weak areas",
-      ],
-      colorGlow: "from-teal-500/20 to-emerald-600/10",
-      borderColor: "hover:border-teal-400/60 shadow-[0_0_25px_rgba(20,184,166,0.12)]",
-      renderVisual: () => (
-        <div className="relative h-48 w-full rounded-2xl border border-teal-500/30 bg-gradient-to-br from-slate-900 to-slate-950 p-4 overflow-hidden flex flex-col justify-between">
-          <div className="absolute -top-10 -right-10 size-32 bg-teal-500/15 rounded-full blur-2xl pointer-events-none" />
-
-          <div className="flex items-center justify-between z-10">
-            <div className="flex items-center gap-2">
-              <span className="grid size-7 place-items-center rounded-lg bg-teal-500/20 text-teal-400 border border-teal-500/30">
-                <Award className="size-4" />
-              </span>
-              <span className="text-[11px] font-bold text-white">Placement Readiness Index</span>
-            </div>
-            <span className="rounded-full bg-emerald-500/20 border border-emerald-400/40 px-2 py-0.5 text-[10px] font-extrabold text-emerald-300">
-              Exceeds Benchmark
-            </span>
-          </div>
-
-          <div className="flex items-center gap-4 bg-slate-950/60 border border-teal-500/30 rounded-xl p-3 z-10">
-            <div className="relative grid size-14 shrink-0 place-items-center rounded-full border-2 border-teal-400 shadow-[0_0_15px_rgba(20,184,166,0.4)]">
-              <span className="font-display text-lg font-black text-white">82</span>
-              <span className="text-[7px] font-bold text-teal-300 -mt-1">/ 100</span>
-            </div>
-            <div className="flex-1 space-y-1">
-              <div className="flex justify-between text-[9px]">
-                <span className="text-slate-300">Market Ready Threshold (75)</span>
-                <span className="text-emerald-400 font-bold">+7 Pts</span>
-              </div>
-              <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-teal-400 via-emerald-400 to-cyan-400 w-[82%]" />
-              </div>
-              <p className="text-[8px] text-slate-400">Higher than 88% of campus peers</p>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between text-[10px] text-teal-200/90 z-10">
-            <span>Verified Across 14 Artifacts</span>
-            <span className="text-emerald-400 font-bold">Placement Ready ✓</span>
-          </div>
-        </div>
-      ),
-    },
-
-    // 4. PRACTICAL PROJECTS
-    {
-      id: "projects",
-      badge: "PROOF OF WORK",
-      badgeColor: "border-indigo-500/40 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 shadow-sm",
-      title: "Practical Projects",
-      tagline: "Production-Grade Repositories",
-      description: "Build full-stack & distributed systems verified by automated rubrics, test suites & security benchmarks.",
-      benefits: [
-        "Automated rubric & code test verification",
-        "Recruiter-shareable proof badges & GitHub links",
-        "Contextual debugging assistance inside IDE",
-      ],
-      colorGlow: "from-indigo-500/20 to-purple-600/10",
-      borderColor: "hover:border-indigo-400/60 shadow-[0_0_25px_rgba(70,87,255,0.12)]",
-      renderVisual: () => (
-        <div className="relative h-48 w-full rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-slate-900 to-slate-950 p-4 overflow-hidden flex flex-col justify-between">
-          <div className="absolute -top-10 -right-10 size-32 bg-indigo-500/15 rounded-full blur-2xl pointer-events-none" />
-
-          <div className="flex items-center justify-between z-10">
-            <div className="flex items-center gap-2">
-              <span className="grid size-7 place-items-center rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-                <Terminal className="size-4" />
-              </span>
-              <span className="text-[11px] font-bold text-white">Project Evaluation</span>
-            </div>
-            <span className="rounded-full bg-emerald-500/20 border border-emerald-400/40 px-2 py-0.5 text-[10px] font-bold text-emerald-300">
-              Verified 96/100
-            </span>
-          </div>
-
-          {/* Test Matrix Preview */}
-          <div className="rounded-xl bg-slate-950/80 border border-indigo-500/30 p-2.5 space-y-1.5 z-10 font-mono text-[9px]">
-            <div className="flex items-center justify-between text-indigo-200">
-              <span>distributed-event-stream</span>
-              <span className="text-muted-foreground text-[8px]">Go / Kafka</span>
-            </div>
-            <div className="grid grid-cols-3 gap-1 text-center">
-              <div className="rounded bg-slate-900 p-1 border border-border/40">
-                <span className="text-[7px] text-muted-foreground block">Coverage</span>
-                <span className="text-[9px] font-bold text-emerald-400">98.4%</span>
-              </div>
-              <div className="rounded bg-slate-900 p-1 border border-border/40">
-                <span className="text-[7px] text-muted-foreground block">Latency</span>
-                <span className="text-[9px] font-bold text-cyan-400">&lt;12ms</span>
-              </div>
-              <div className="rounded bg-slate-900 p-1 border border-border/40">
-                <span className="text-[7px] text-muted-foreground block">Authenticity</span>
-                <span className="text-[9px] font-bold text-indigo-300">100% ✓</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1.5 text-[10px] text-indigo-200/90 z-10">
-            <ShieldCheck className="size-3 text-cyan-400 shrink-0" />
-            <span className="truncate">SPAR Verified Artifact #SP-9042</span>
-          </div>
-        </div>
-      ),
-    },
-
-    // 5. INTERVIEW PREP
-    {
-      id: "interviews",
-      badge: "AI SIMULATION",
-      badgeColor: "border-purple-500/40 bg-purple-500/10 text-purple-600 dark:text-purple-300 shadow-sm",
-      title: "Interview Preparation",
-      tagline: "Voice & Code Technical Defense",
-      description: "Simulate live company interview loops with adaptive AI probing your code complexity & trade-offs.",
-      benefits: [
-        "Live code reasoning & speech audio analysis",
-        "Company-specific question banks & drills",
-        "Granular STAR-framework scoring feedback",
-      ],
-      colorGlow: "from-purple-500/20 to-pink-600/10",
-      borderColor: "hover:border-purple-400/60 shadow-[0_0_25px_rgba(130,71,255,0.12)]",
-      renderVisual: () => (
-        <div className="relative h-48 w-full rounded-2xl border border-purple-500/30 bg-gradient-to-br from-slate-900 to-slate-950 p-4 overflow-hidden flex flex-col justify-between">
-          <div className="absolute -top-10 -right-10 size-32 bg-purple-500/15 rounded-full blur-2xl pointer-events-none" />
-
-          <div className="flex items-center justify-between z-10">
-            <div className="flex items-center gap-2">
-              <span className="grid size-7 place-items-center rounded-lg bg-purple-500/20 text-purple-400 border border-purple-500/30">
-                <MessageSquare className="size-4" />
-              </span>
-              <span className="text-[11px] font-bold text-white">Live AI Technical Drill</span>
-            </div>
-            <span className="rounded-full bg-purple-500/20 border border-purple-400/40 px-2 py-0.5 text-[10px] font-bold text-purple-300">
-              Live Waveform
-            </span>
-          </div>
-
-          <div className="rounded-xl bg-slate-950/80 border border-purple-500/30 p-2.5 space-y-1 z-10">
-            <span className="text-[8px] text-muted-foreground block">Interviewer Question:</span>
-            <p className="text-[10px] text-purple-200 italic line-clamp-2">
-              "How would you handle partition skew when scaling this consumer group to 50 partitions?"
-            </p>
-          </div>
-
-          {/* Audio Waveform Simulator */}
-          <div className="flex items-center justify-between z-10">
-            <div className="flex items-center gap-1">
-              {[40, 75, 55, 90, 60, 100, 45, 80, 65, 95, 30].map((h, i) => (
-                <div
-                  key={i}
-                  className="w-1 bg-gradient-to-t from-purple-500 to-cyan-400 rounded-full animate-pulse"
-                  style={{ height: `${h * 0.16}px`, animationDelay: `${i * 0.08}s` }}
-                />
-              ))}
-            </div>
-            <span className="text-[10px] font-bold text-cyan-300">92% Correctness · STAR ✓</span>
-          </div>
-        </div>
-      ),
-    },
-
-    // 6. JOB GAP OPTIMIZER
-    {
-      id: "opportunities",
-      badge: "PLACEMENT MATCH",
-      badgeColor: "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-300 shadow-sm",
-      title: "Job Gap Optimizer",
-      tagline: "Role Calibration Engine",
-      description: "Compares your capabilities against target campus placement drives to close missing skill gaps.",
-      benefits: [
-        "Instant JD match percentage & gap detection",
-        "1-click targeted remediation projects & drills",
-        "Automated handling of required prerequisite skills",
-      ],
-      colorGlow: "from-amber-500/20 to-orange-600/10",
-      borderColor: "hover:border-amber-400/60 shadow-[0_0_25px_rgba(245,158,11,0.12)]",
-      renderVisual: () => (
-        <div className="relative h-48 w-full rounded-2xl border border-amber-500/30 bg-gradient-to-br from-slate-900 to-slate-950 p-4 overflow-hidden flex flex-col justify-between">
-          <div className="absolute -top-10 -right-10 size-32 bg-amber-500/15 rounded-full blur-2xl pointer-events-none" />
-
-          <div className="flex items-center justify-between z-10">
-            <div className="flex items-center gap-2">
-              <span className="grid size-7 place-items-center rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                <Target className="size-4" />
-              </span>
-              <span className="text-[11px] font-bold text-white">Target Job Matcher</span>
-            </div>
-            <span className="rounded-full bg-emerald-500/20 border border-emerald-400/40 px-2 py-0.5 text-[10px] font-bold text-emerald-300">
-              87% Match
-            </span>
-          </div>
-
-          <div className="space-y-1.5 z-10">
-            <div className="flex items-center justify-between text-[10px] bg-slate-950/80 p-1.5 rounded-lg border border-border/40">
-              <span className="text-white">Distributed Go Systems</span>
-              <span className="text-emerald-400 font-bold">100% ✓</span>
-            </div>
-            <div className="flex items-center justify-between text-[10px] bg-slate-950/80 p-1.5 rounded-lg border border-amber-500/30">
-              <span className="text-amber-200">Kubernetes Ingress Orchestration</span>
-              <span className="text-amber-400 font-bold">+8% Needed</span>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between text-[10px] text-amber-200/90 z-10">
-            <span>Remediation Available</span>
-            <span className="rounded bg-amber-500/20 text-amber-300 font-bold px-2 py-0.5 text-[9px]">
-              Start Drill ⚡
-            </span>
-          </div>
-        </div>
-      ),
-    },
-  ];
-
-  // Auto-advance carousel every 4.2 seconds
-  useEffect(() => {
-    if (isPaused) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % CARDS.length);
-    }, 4200);
-    return () => clearInterval(interval);
-  }, [isPaused, CARDS.length]);
-
-  // Scroll to active card when index changes
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      const container = scrollContainerRef.current;
-      const cardWidth = container.firstElementChild ? (container.firstElementChild as HTMLElement).offsetWidth + 24 : 360;
-      container.scrollTo({
-        left: currentIndex * cardWidth,
-        behavior: "smooth",
-      });
-    }
-  }, [currentIndex]);
+  const scrollToIndex = (index: number) => {
+    if (!scrollContainerRef.current) return;
+    const cardWidth = scrollContainerRef.current.children[0]?.clientWidth || 360;
+    scrollContainerRef.current.scrollTo({
+      left: index * (cardWidth + 24),
+      behavior: "smooth",
+    });
+    setCurrentIndex(index);
+  };
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => (prev === 0 ? CARDS.length - 1 : prev - 1));
+    const nextIdx = (currentIndex - 1 + CARDS.length) % CARDS.length;
+    scrollToIndex(nextIdx);
   };
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % CARDS.length);
+    const nextIdx = (currentIndex + 1) % CARDS.length;
+    scrollToIndex(nextIdx);
   };
 
-  const scrollToSlide = (idx: number) => {
-    setCurrentIndex(idx);
-  };
+  // Subtle 7-second auto-scroll when not paused
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(() => {
+      handleNext();
+    }, 7000);
+    return () => clearInterval(timer);
+  }, [currentIndex, isPaused]);
 
   return (
     <section id="capabilities" className="my-20 scroll-mt-24 space-y-10 select-none">
-      {/* Section Header (Centered like bottom sections) */}
+      {/* Centered Section Header */}
       <div className="text-center max-w-3xl mx-auto space-y-3 px-4">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-500/40 bg-card/90 dark:bg-[#090e24]/90 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-300 shadow-sm backdrop-blur">
           <Layers className="size-3.5 text-cyan-500" />
@@ -428,9 +321,8 @@ export function PlatformCapabilities() {
           SPAR connects your career path, skills, projects, readiness, and interview preparation into one intelligent student journey.
         </p>
 
-        {/* Carousel Controls (Prev/Next, Auto-scroll Pause, Centered Indicators) */}
+        {/* Carousel Navigation Controls & Indicators */}
         <div className="flex items-center justify-center gap-3 pt-3">
-          {/* Pause / Play Toggle */}
           <button
             type="button"
             onClick={() => setIsPaused((v) => !v)}
@@ -440,24 +332,22 @@ export function PlatformCapabilities() {
             {isPaused ? <Play className="size-3.5 text-cyan-500" /> : <Pause className="size-3.5" />}
           </button>
 
-          {/* Left Arrow */}
           <button
             type="button"
             onClick={handlePrev}
-            aria-label="Previous showcase card"
+            aria-label="Previous capability"
             className="grid size-9 place-items-center rounded-2xl border border-border/80 bg-card/90 dark:bg-[#090e24]/90 text-muted-foreground hover:text-foreground hover:border-cyan-500/40 transition-all backdrop-blur shadow-sm"
           >
             <ChevronLeft className="size-4" />
           </button>
 
-          {/* Slide Indicator Dots (Centered) */}
           <div className="flex items-center gap-1.5 px-2">
             {CARDS.map((_, idx) => (
               <button
                 key={idx}
                 type="button"
-                onClick={() => scrollToSlide(idx)}
-                aria-label={`Jump to slide ${idx + 1}`}
+                onClick={() => scrollToIndex(idx)}
+                aria-label={`Jump to capability ${idx + 1}`}
                 className={`h-2 rounded-full transition-all duration-300 ${
                   currentIndex === idx
                     ? "w-6 bg-gradient-to-r from-cyan-500 to-indigo-600 shadow-md"
@@ -467,11 +357,10 @@ export function PlatformCapabilities() {
             ))}
           </div>
 
-          {/* Right Arrow */}
           <button
             type="button"
             onClick={handleNext}
-            aria-label="Next showcase card"
+            aria-label="Next capability"
             className="grid size-9 place-items-center rounded-2xl border border-border/80 bg-card/90 dark:bg-[#090e24]/90 text-muted-foreground hover:text-foreground hover:border-cyan-500/40 transition-all backdrop-blur shadow-sm"
           >
             <ChevronRight className="size-4" />
@@ -479,7 +368,7 @@ export function PlatformCapabilities() {
         </div>
       </div>
 
-      {/* SINGLE ROW AUTO-SCROLLING HORIZONTAL SHOWCASE */}
+      {/* HORIZONTAL CAROUSEL SHOWCASE (Desktop: 3 Visible | Mobile: 1 Visible with Touch-Snap) */}
       <div
         className="relative px-4 overflow-hidden"
         onMouseEnter={() => setIsPaused(true)}
@@ -493,16 +382,16 @@ export function PlatformCapabilities() {
           {CARDS.map((card, idx) => (
             <div
               key={card.id}
-              className={`snap-center shrink-0 w-[340px] sm:w-[380px] lg:w-[420px] rounded-3xl border border-border/80 bg-card/95 dark:bg-[#090e24]/85 p-6 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between shadow-lg ${card.borderColor}`}
+              className={`snap-center shrink-0 w-[300px] sm:w-[360px] lg:w-[calc((100%-48px)/3)] rounded-3xl border border-border/80 bg-card/95 dark:bg-[#090e24]/85 p-5 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between shadow-lg ${card.borderColor}`}
             >
-              {/* Card Top: Rich Visual Preview Scene */}
-              <div className="space-y-4">
+              {/* Card Top: Visual preview scene */}
+              <div className="space-y-3.5">
                 {card.renderVisual()}
 
                 {/* Eyebrow Badge & Title */}
-                <div className="pt-2 space-y-2">
+                <div className="space-y-1.5 pt-1">
                   <div className="flex items-center justify-between">
-                    <span className={`rounded-full border px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-wider ${card.badgeColor}`}>
+                    <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider ${card.badgeColor}`}>
                       {card.badge}
                     </span>
                     <span className="text-[10px] font-mono text-muted-foreground">
@@ -510,28 +399,28 @@ export function PlatformCapabilities() {
                     </span>
                   </div>
 
-                  <h3 className="font-display text-xl font-bold text-foreground tracking-tight">
+                  <h3 className="font-display text-lg font-bold text-foreground">
                     {card.title}
                   </h3>
 
-                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                    {card.description}
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {card.valueStatement}
                   </p>
                 </div>
 
-                {/* 3 Benefit Bullets */}
-                <div className="space-y-2 pt-1 border-t border-border/50">
-                  {card.benefits.map((b) => (
-                    <div key={b} className="flex items-center gap-2">
+                {/* 2 Crisp Supporting Bullets */}
+                <div className="space-y-1.5 pt-1 border-t border-border/50">
+                  {card.bullets.map((bullet, bIdx) => (
+                    <div key={bIdx} className="flex items-center gap-2 text-xs text-foreground/90 font-medium">
                       <CheckCircle2 className="size-3.5 text-cyan-500 shrink-0" />
-                      <span className="text-[11px] text-foreground/90 truncate">{b}</span>
+                      <span className="truncate">{bullet}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Card Bottom CTA */}
-              <div className="pt-5 border-t border-border/50 mt-4">
+              <div className="pt-4 border-t border-border/50 mt-4">
                 <a
                   href={`#${card.id}`}
                   className="flex items-center justify-between text-xs font-bold text-cyan-600 dark:text-cyan-400 hover:underline transition-colors group"
@@ -543,23 +432,6 @@ export function PlatformCapabilities() {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Bottom Step Indicator Dots */}
-      <div className="flex items-center justify-center gap-2 pt-2">
-        {CARDS.map((_, idx) => (
-          <button
-            key={idx}
-            type="button"
-            onClick={() => scrollToSlide(idx)}
-            aria-label={`Jump to slide ${idx + 1}`}
-            className={`h-2 rounded-full transition-all duration-300 ${
-              currentIndex === idx
-                ? "w-8 bg-gradient-to-r from-cyan-500 to-indigo-600 shadow-md"
-                : "w-2 bg-secondary/80 hover:bg-muted-foreground"
-            }`}
-          />
-        ))}
       </div>
     </section>
   );
