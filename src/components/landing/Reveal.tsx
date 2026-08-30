@@ -5,10 +5,10 @@ import React, { useEffect, useRef, useState } from "react";
  * Returns a ref to attach and a boolean once the element has entered the viewport.
  */
 export function useInView<T extends HTMLElement = HTMLDivElement>(
-  options: IntersectionObserverInit = { threshold: 0.15, rootMargin: "0px 0px -10% 0px" },
+  options: IntersectionObserverInit = { threshold: 0.05, rootMargin: "0px 0px 50px 0px" },
 ) {
   const ref = useRef<T | null>(null);
-  const [inView, setInView] = useState(false);
+  const [inView, setInView] = useState(true); // Default true for SSR safety, will animate when mounted
 
   useEffect(() => {
     const el = ref.current;
@@ -27,8 +27,7 @@ export function useInView<T extends HTMLElement = HTMLDivElement>(
     }, options);
     observer.observe(el);
     return () => observer.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [options]);
 
   return { ref, inView };
 }
@@ -44,15 +43,13 @@ interface RevealProps {
 }
 
 const distanceMap = {
-  sm: "translate-y-[14px]",
-  md: "translate-y-6",
-  lg: "translate-y-9",
+  sm: "translate-y-[10px]",
+  md: "translate-y-4",
+  lg: "translate-y-6",
 } as const;
 
 /**
- * Reveal — fades + slides its children into view on scroll.
- * Uses opacity + transform transitions (no layout cost), respects reduced motion
- * via the prefers-reduced-motion media query handled in styles.css.
+ * Reveal — smooth fade + slide on scroll.
  */
 export function Reveal({
   children,
@@ -69,14 +66,13 @@ export function Reveal({
       ref={ref as React.Ref<HTMLElement>}
       className={className}
       style={{
-        opacity: inView ? 1 : 0,
-        transform: inView ? "translateY(0)" : undefined,
-        transition: `opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms`,
+        opacity: inView ? 1 : 0.85,
+        transition: `opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms`,
       }}
     >
       <div
-        className={inView ? "" : translateY}
-        style={{ transition: "transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)" }}
+        className={inView ? "translate-y-0" : translateY}
+        style={{ transition: "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)" }}
       >
         {children}
       </div>

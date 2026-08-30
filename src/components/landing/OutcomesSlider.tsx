@@ -159,7 +159,7 @@ export function OutcomesSlider() {
         <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight leading-tight">
           Where SPAR{" "}
           <span className="bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 dark:from-cyan-400 dark:via-blue-500 dark:to-purple-500 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(6,215,247,0.35)] animate-gradient-text">
-            takes you.
+            Placement Milestones.
           </span>
         </h2>
         <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-2xl mx-auto">
