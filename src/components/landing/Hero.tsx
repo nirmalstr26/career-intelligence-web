@@ -1,55 +1,9 @@
 import React from "react";
-import {
-  Compass,
-  Map,
-  Briefcase,
-  Award,
-  Sparkles,
-} from "lucide-react";
+import { Sparkles } from "lucide-react";
 import heroBgImage from "@/assets/hero_background_home.png";
 import { CareerRoadArt } from "@/components/landing/CareerRoadArt";
-import { StatsFloatingCard } from "@/components/landing/StatsFloatingCard";
 import { AuthCard } from "@/components/landing/AuthCard";
-
-interface FeatureTile {
-  title: string;
-  tagline: string;
-  icon: React.ElementType;
-  iconColor: string;
-  glowColor: string;
-}
-
-// 4 Focused Hero Capabilities
-const FEATURE_TILES: FeatureTile[] = [
-  {
-    title: "Career Discovery",
-    tagline: "Target high-fit tech roles",
-    icon: Compass,
-    iconColor: "text-purple-500 dark:text-purple-400",
-    glowColor: "border-purple-500/30 bg-purple-500/10 dark:bg-purple-950/40 shadow-sm",
-  },
-  {
-    title: "Personalized Roadmap",
-    tagline: "Adaptive milestone steps",
-    icon: Map,
-    iconColor: "text-blue-500 dark:text-blue-400",
-    glowColor: "border-blue-500/30 bg-blue-500/10 dark:bg-blue-950/40 shadow-sm",
-  },
-  {
-    title: "Verified Projects",
-    tagline: "Evidence-backed repositories",
-    icon: Briefcase,
-    iconColor: "text-cyan-600 dark:text-cyan-400",
-    glowColor: "border-cyan-500/30 bg-cyan-500/10 dark:bg-cyan-950/40 shadow-sm",
-  },
-  {
-    title: "Placement Readiness",
-    tagline: "Real-time hiring scoring",
-    icon: Award,
-    iconColor: "text-emerald-500 dark:text-emerald-400",
-    glowColor: "border-emerald-500/30 bg-emerald-500/10 dark:bg-emerald-950/40 shadow-sm",
-  },
-];
+import { ConstellationCapabilityRoadmap } from "@/components/landing/ConstellationCapabilityRoadmap";
 
 export function Hero() {
   return (
@@ -83,9 +37,9 @@ export function Hero() {
       </div>
 
       {/* 3-Column Clean Three-Zone Composition */}
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1.1fr_1fr_420px] xl:grid-cols-[1.15fr_1.05fr_430px] items-center gap-8 lg:gap-6 xl:gap-8">
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1.15fr_0.95fr_420px] xl:grid-cols-[1.2fr_1fr_430px] items-center gap-8 lg:gap-6 xl:gap-8">
         
-        {/* LEFT COLUMN: Value Proposition + 4 Clean Capability Chips */}
+        {/* LEFT COLUMN: Value Proposition + Animated Constellation Capability Roadmap */}
         <div className="space-y-6 pt-2">
           {/* Eyebrow Pill */}
           <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/40 bg-card/90 dark:bg-[#090e24]/90 px-3.5 py-1.5 text-xs text-cyan-600 dark:text-cyan-300 shadow-[0_0_15px_rgba(6,215,247,0.15)] backdrop-blur-md">
@@ -109,41 +63,15 @@ export function Hero() {
             SPAR AI helps you discover the right careers, build in-demand skills, track your readiness, and get placement ready with continuous AI guidance.
           </p>
 
-          {/* 4 Focused Capability Chips (2 Columns x 2 Rows) */}
-          <div className="grid grid-cols-2 gap-2.5 pt-1 max-w-lg">
-            {FEATURE_TILES.map((tile) => {
-              const Icon = tile.icon;
-              return (
-                <div
-                  key={tile.title}
-                  className="flex items-center gap-2.5 rounded-xl border border-border/80 bg-card/85 dark:bg-[#090e24]/80 p-3 backdrop-blur-md transition-all hover:border-cyan-500/40 hover:-translate-y-0.5 shadow-sm"
-                >
-                  <div className={`grid size-8 shrink-0 place-items-center rounded-lg border ${tile.glowColor}`}>
-                    <Icon className={`size-4 ${tile.iconColor}`} />
-                  </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-display text-xs font-bold text-foreground truncate">
-                      {tile.title}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground truncate">
-                      {tile.tagline}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+          {/* ANIMATED CONSTELLATION CAPABILITY ROADMAP (Career Discovery -> Personalized Roadmap -> Verified Projects -> Placement Readiness) */}
+          <div className="pt-2">
+            <ConstellationCapabilityRoadmap />
           </div>
         </div>
 
-        {/* CENTER COLUMN: Visual Career Path + Floating Pilot Pillar Card */}
-        <div className="flex flex-col items-center justify-between h-full pt-1">
-          {/* Floating Pathway Milestone Chips */}
+        {/* CENTER COLUMN: Visual Career Path (Clean, floating stats card removed) */}
+        <div className="flex flex-col items-center justify-center h-full pt-1">
           <CareerRoadArt />
-
-          {/* Bottom Pilot Pillar Card */}
-          <div className="w-full flex justify-center -mt-6 sm:-mt-10 z-20">
-            <StatsFloatingCard />
-          </div>
         </div>
 
         {/* RIGHT COLUMN: Radiant Light Glowing Glassmorphic Auth Panel */}
