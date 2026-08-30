@@ -8,16 +8,16 @@ import { ConstellationCapabilityRoadmap } from "@/components/landing/Constellati
 export function Hero() {
   return (
     <section className="relative pt-6 pb-12 overflow-hidden">
-      {/* EXPANSIVE SEAMLESS BACKGROUND ARTWORK LAYER */}
-      <div className="pointer-events-none absolute inset-0 -top-10 -bottom-16 flex items-center justify-center select-none overflow-hidden">
-        <div className="relative w-full max-w-[1800px] h-[760px] lg:h-[880px] flex items-center justify-center">
+      {/* EXPANSIVE HIGH-VISIBILITY BACKGROUND ARTWORK LAYER */}
+      <div className="pointer-events-none absolute inset-0 -top-10 -bottom-14 flex items-center justify-center select-none overflow-hidden">
+        <div className="relative w-full max-w-[1920px] h-full min-h-[760px] lg:min-h-[880px] flex items-center justify-center">
           
-          {/* Luminous Ambient Glow Underlayer */}
+          {/* Enhanced Rich Atmospheric Aura */}
           <div 
-            className="absolute inset-0 -z-10 opacity-80 dark:opacity-60"
+            className="absolute inset-0 -z-10 opacity-90"
             style={{
               background:
-                "radial-gradient(ellipse 80% 70% at 50% 45%, rgba(6, 215, 247, 0.22), rgba(99, 102, 241, 0.18) 40%, rgba(168, 85, 247, 0.12) 65%, transparent 90%)",
+                "radial-gradient(ellipse 85% 75% at 50% 45%, rgba(6, 215, 247, 0.28), rgba(99, 102, 241, 0.22) 42%, rgba(168, 85, 247, 0.15) 68%, transparent 95%)",
             }}
           />
 
@@ -25,19 +25,14 @@ export function Hero() {
             src={heroBgImage || "/brand/hero_background_home.png"}
             alt=""
             aria-hidden="true"
-            className="w-full h-full object-cover object-center scale-105 select-none transition-all duration-300 opacity-100 dark:opacity-95 contrast-[1.12] saturate-[1.25] brightness-[1.04] dark:contrast-100 dark:saturate-100 dark:brightness-100"
+            className="w-full h-full object-cover object-center select-none transition-all duration-300 opacity-100"
+            style={{
+              filter: "contrast(1.18) saturate(1.3) brightness(1.04)",
+            }}
           />
 
-          {/* Dark theme gradient overlays */}
-          <div className="hidden dark:block absolute inset-0 bg-gradient-to-t from-[#030712] via-[#030712]/30 to-transparent opacity-90" />
-          <div className="hidden dark:block absolute inset-0 bg-gradient-to-b from-[#030712]/70 via-transparent to-transparent opacity-85" />
-          <div className="hidden dark:block absolute inset-0 bg-gradient-to-r from-[#030712] via-transparent to-[#030712] opacity-80" />
-
-          {/* Light theme soft edge blending - only fades the outermost boundaries so the full scene is 100% visible & vibrant */}
-          <div className="dark:hidden absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-background via-background/50 to-transparent" />
-          <div className="dark:hidden absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-background/60 via-transparent to-transparent" />
-          <div className="dark:hidden absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background/40 to-transparent" />
-          <div className="dark:hidden absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background/40 to-transparent" />
+          {/* Minimal seamless bottom fade into trusted colleges strip */}
+          <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-background to-transparent opacity-80" />
         </div>
       </div>
 
@@ -64,7 +59,7 @@ export function Hero() {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-xs sm:text-sm text-foreground/80 dark:text-muted-foreground leading-relaxed max-w-lg font-medium">
+          <p className="text-xs sm:text-sm text-foreground/85 dark:text-muted-foreground leading-relaxed max-w-lg font-medium">
             SPAR AI helps you discover the right careers, build in-demand skills, track your readiness, and get placement ready with continuous AI guidance.
           </p>
 
