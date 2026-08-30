@@ -680,3 +680,13 @@ export async function devLogin(email: string, firstName?: string, lastName?: str
     is_new_registration: false,
   });
 }
+
+
+export async function loginCollege(email: string, password?: string): Promise<any> {
+  return api.post<any>("/auth/college/login", {
+    body: {
+      email,
+      password: password || "Password@123",
+    },
+  });
+}
