@@ -6,12 +6,10 @@ import {
   CheckCircle2,
   AlertTriangle,
   ArrowRight,
-  TrendingUp,
-  MessageSquare,
-  ShieldCheck,
   Zap,
+  TrendingUp,
+  Target,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export function IntelligenceInAction() {
   const [activeTab, setActiveTab] = useState<"coach" | "readiness">("coach");
@@ -68,7 +66,7 @@ export function IntelligenceInAction() {
         {activeTab === "coach" ? (
           /* TAB 1: AI COACH */
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
-            {/* Left: Explanation + 3 Concise Benefits */}
+            {/* Left: Explanation + Simple, Jargon-Free Benefits */}
             <div className="space-y-5">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 px-2.5 py-0.5 rounded-full border border-cyan-500/20">
@@ -78,22 +76,22 @@ export function IntelligenceInAction() {
                   Contextual mentor in your daily workflow.
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed mt-1">
-                  SPAR Coach understands your exact milestone code, past quiz results, and target job roles to provide relevant, ungeneric answers.
+                  SPAR Coach understands your milestone code, answers questions in context, and recommends your next best step.
                 </p>
               </div>
 
               <div className="space-y-2.5">
                 <div className="flex items-start gap-2.5 text-xs text-foreground/90">
                   <CheckCircle2 className="size-4 text-cyan-500 shrink-0 mt-0.5" />
-                  <span><strong>Context-Aware:</strong> Analyzes your actual project files and test outputs.</span>
+                  <span><strong>Understands what you're working on:</strong> Answers questions directly related to your current project.</span>
                 </div>
                 <div className="flex items-start gap-2.5 text-xs text-foreground/90">
                   <CheckCircle2 className="size-4 text-cyan-500 shrink-0 mt-0.5" />
-                  <span><strong>Interview Readiness:</strong> Drills behavioral trade-offs & articulation depth.</span>
+                  <span><strong>Practices real interview questions:</strong> Drills behavioral trade-offs & technical articulation.</span>
                 </div>
                 <div className="flex items-start gap-2.5 text-xs text-foreground/90">
                   <CheckCircle2 className="size-4 text-cyan-500 shrink-0 mt-0.5" />
-                  <span><strong>Actionable Next Steps:</strong> Recommends immediate 15-minute corrective drills.</span>
+                  <span><strong>Recommends your next best step:</strong> Gives immediate, bite-sized corrective actions.</span>
                 </div>
               </div>
 
@@ -140,34 +138,34 @@ export function IntelligenceInAction() {
             </div>
           </div>
         ) : (
-          /* TAB 2: READINESS INTELLIGENCE */
+          /* TAB 2: READINESS INTELLIGENCE (Interactive Ring + 3 Competency Bars + Strongest/Weakest + Next Best Action) */
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
-            {/* Left: Explanation + 3 Concise Benefits */}
+            {/* Left: Explanation + Simple, Jargon-Free Benefits */}
             <div className="space-y-5">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20">
                   Objective Placement Scoring
                 </span>
                 <h3 className="font-display text-2xl font-bold text-foreground mt-2">
-                  Know exactly where you stand.
+                  Know where you stand. No guessing.
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed mt-1">
-                  Replace guesswork with continuous multi-dimensional evaluation across technical foundation, code verification, system design, and communication.
+                  Multi-dimensional placement readiness tracking based on verified hands-on evidence and objective criteria.
                 </p>
               </div>
 
               <div className="space-y-2.5">
                 <div className="flex items-start gap-2.5 text-xs text-foreground/90">
                   <CheckCircle2 className="size-4 text-purple-500 shrink-0 mt-0.5" />
-                  <span><strong>6-Dimensional Index:</strong> Granular evaluation across real employer criteria.</span>
+                  <span><strong>Objective readiness score:</strong> Evaluates technical foundation, project evidence, and problem solving.</span>
                 </div>
                 <div className="flex items-start gap-2.5 text-xs text-foreground/90">
                   <CheckCircle2 className="size-4 text-purple-500 shrink-0 mt-0.5" />
-                  <span><strong>Evidence-Backed:</strong> Tied to verified repositories and AI mock transcripts.</span>
+                  <span><strong>Backed by verified proof:</strong> Tied directly to projects you've built and mock interview transcripts.</span>
                 </div>
                 <div className="flex items-start gap-2.5 text-xs text-foreground/90">
                   <CheckCircle2 className="size-4 text-purple-500 shrink-0 mt-0.5" />
-                  <span><strong>Clear Remediation:</strong> Specific recommendations to reach the next tier.</span>
+                  <span><strong>Clear roadmap to the next tier:</strong> See your strongest skills, weakest areas, and exactly how to improve.</span>
                 </div>
               </div>
 
@@ -182,17 +180,33 @@ export function IntelligenceInAction() {
               </div>
             </div>
 
-            {/* Right: Readiness Score Dashboard Simulation */}
+            {/* Right: Readiness Ring + 3 Competency Bars + Strong/Weak + Next Best Action */}
             <div className="rounded-2xl border border-purple-500/30 bg-slate-950 p-5 space-y-4 shadow-2xl">
-              {/* Overall Score Header */}
+              {/* 78/100 Readiness Ring Header */}
               <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                <div className="flex items-center gap-3">
-                  <div className="grid size-12 place-items-center rounded-2xl bg-gradient-to-br from-purple-500/20 to-cyan-500/20 border border-purple-500/40 text-purple-300 font-display font-black text-xl">
-                    78
+                <div className="flex items-center gap-3.5">
+                  <div className="relative size-14 flex items-center justify-center">
+                    <svg className="size-full -rotate-90" viewBox="0 0 36 36">
+                      <path
+                        className="text-slate-800 stroke-current"
+                        strokeWidth="3.5"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <path
+                        className="text-purple-500 stroke-current"
+                        strokeDasharray="78, 100"
+                        strokeWidth="3.5"
+                        strokeLinecap="round"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                    </svg>
+                    <span className="absolute font-display font-black text-sm text-white">78</span>
                   </div>
                   <div>
-                    <span className="text-xs font-bold text-white block">Overall Readiness Score</span>
-                    <span className="text-[10px] text-purple-400 font-medium">Nearly Placement-Ready Tier</span>
+                    <span className="text-xs font-bold text-white block">Readiness Score</span>
+                    <span className="text-[10px] text-purple-300 font-medium">Nearly Placement-Ready Tier</span>
                   </div>
                 </div>
                 <span className="rounded-full bg-emerald-500/20 border border-emerald-500/40 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300">
@@ -200,7 +214,7 @@ export function IntelligenceInAction() {
                 </span>
               </div>
 
-              {/* 4 Competency Bars */}
+              {/* 3 Core Competency Bars */}
               <div className="space-y-2.5 text-[11px]">
                 <div className="space-y-1">
                   <div className="flex justify-between text-slate-300">
@@ -214,7 +228,7 @@ export function IntelligenceInAction() {
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-slate-300">
-                    <span>Project & Code Proof</span>
+                    <span>Project & Code Evidence</span>
                     <span className="font-bold text-purple-400">88%</span>
                   </div>
                   <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
@@ -224,35 +238,40 @@ export function IntelligenceInAction() {
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-slate-300">
-                    <span>System Architecture</span>
-                    <span className="font-bold text-blue-400">76%</span>
+                    <span>Problem Solving & Communication</span>
+                    <span className="font-bold text-blue-400">68%</span>
                   </div>
                   <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
-                    <div className="h-full w-[76%] bg-blue-400 rounded-full" />
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <div className="flex justify-between text-slate-300">
-                    <span>Communication & Articulation</span>
-                    <span className="font-bold text-amber-400">64%</span>
-                  </div>
-                  <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
-                    <div className="h-full w-[64%] bg-amber-400 rounded-full" />
+                    <div className="h-full w-[68%] bg-blue-400 rounded-full" />
                   </div>
                 </div>
               </div>
 
-              {/* Identified Weak Area & Prescribed Action */}
-              <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-2.5 flex items-center justify-between text-[11px]">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="size-4 text-amber-400 shrink-0" />
-                  <div>
-                    <span className="font-bold text-amber-300 block">Priority Remediation Area</span>
-                    <span className="text-[10px] text-slate-300">Practice behavioral trade-off rationale</span>
-                  </div>
+              {/* Strongest & Weakest Skill Split */}
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <div className="rounded-xl bg-slate-900/90 border border-emerald-500/30 p-2 text-[10px]">
+                  <span className="text-emerald-400 font-bold block flex items-center gap-1">
+                    <CheckCircle2 className="size-3" /> Strongest Area
+                  </span>
+                  <span className="text-slate-200 truncate block mt-0.5 font-medium">Distributed Querying (92%)</span>
                 </div>
-                <span className="text-[10px] font-bold text-amber-400 underline">Start Drill →</span>
+                <div className="rounded-xl bg-slate-900/90 border border-amber-500/30 p-2 text-[10px]">
+                  <span className="text-amber-400 font-bold block flex items-center gap-1">
+                    <AlertTriangle className="size-3" /> Weakest Area
+                  </span>
+                  <span className="text-slate-200 truncate block mt-0.5 font-medium">Behavioral Rationale (60%)</span>
+                </div>
+              </div>
+
+              {/* Next Best Action CTA Drill */}
+              <div className="rounded-xl border border-cyan-500/30 bg-cyan-950/40 p-2.5 flex items-center justify-between text-[11px]">
+                <div className="flex items-center gap-2">
+                  <Target className="size-4 text-cyan-400 shrink-0" />
+                  <span className="text-slate-200">Next Best Action: <strong>15-Min Mock Interview</strong></span>
+                </div>
+                <a href="#signup" className="text-[10px] font-bold text-cyan-300 underline">
+                  Start Drill →
+                </a>
               </div>
             </div>
           </div>

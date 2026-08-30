@@ -8,10 +8,7 @@ import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
-  Layers,
-  Terminal,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 interface CareerPath {
   id: string;
@@ -148,11 +145,39 @@ const CAREERS: CareerPath[] = [
 
 export function CareerPathsSection() {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
+  const startXRef = useRef(0);
+  const scrollLeftRef = useRef(0);
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollRef.current) return;
-    const scrollAmount = direction === "left" ? -380 : 380;
+    const cardWidth = scrollRef.current.children[0]?.clientWidth || 340;
+    const scrollAmount = direction === "left" ? -cardWidth : cardWidth;
     scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+  };
+
+  // Mouse Drag Support
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollRef.current) return;
+    isDraggingRef.current = true;
+    startXRef.current = e.pageX - scrollRef.current.offsetLeft;
+    scrollLeftRef.current = scrollRef.current.scrollLeft;
+  };
+
+  const handleMouseLeave = () => {
+    isDraggingRef.current = false;
+  };
+
+  const handleMouseUp = () => {
+    isDraggingRef.current = false;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingRef.current || !scrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startXRef.current) * 1.5;
+    scrollRef.current.scrollLeft = scrollLeftRef.current - walk;
   };
 
   return (
@@ -195,16 +220,20 @@ export function CareerPathsSection() {
         </div>
       </div>
 
-      {/* HORIZONTAL CAROUSEL (3 VISIBLE ON DESKTOP) */}
+      {/* DISCOVERY CAROUSEL: 3 Full Cards + 20-25% of 4th Card Peeking on Desktop */}
       <div
         ref={scrollRef}
-        className="flex gap-6 overflow-x-auto scrollbar-none py-4 px-4 max-w-[1440px] mx-auto snap-x snap-mandatory"
+        onMouseDown={handleMouseDown}
+        onMouseLeave={handleMouseLeave}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        className="flex gap-6 overflow-x-auto scrollbar-none py-4 px-4 max-w-[1440px] mx-auto snap-x snap-mandatory cursor-grab active:cursor-grabbing"
         style={{ scrollBehavior: "smooth" }}
       >
         {CAREERS.map((career) => (
           <div
             key={career.id}
-            className={`snap-center shrink-0 w-[300px] sm:w-[360px] lg:w-[calc((100%-48px)/3)] rounded-3xl border border-border/80 bg-card/95 dark:bg-[#090e24]/85 p-5 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between shadow-lg ${career.glowBorder}`}
+            className={`snap-center shrink-0 w-[290px] sm:w-[340px] lg:w-[calc((100%-64px)/3.25)] min-w-[300px] sm:min-w-[330px] rounded-3xl border border-border/80 bg-card/95 dark:bg-[#090e24]/85 p-5 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between shadow-lg ${career.glowBorder}`}
           >
             <div className="space-y-3.5">
               {career.renderVisual()}

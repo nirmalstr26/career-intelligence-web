@@ -1,11 +1,9 @@
 import React from "react";
 import {
   Compass,
-  LineChart,
-  FileText,
-  UserCheck,
+  Map,
   Briefcase,
-  Target,
+  Award,
   Sparkles,
 } from "lucide-react";
 import heroBgImage from "@/assets/hero_background_home.png";
@@ -21,6 +19,7 @@ interface FeatureTile {
   glowColor: string;
 }
 
+// 4 Focused Hero Capabilities (AI Coach & Colleges are deeply explored in dedicated sections)
 const FEATURE_TILES: FeatureTile[] = [
   {
     title: "Career Discovery",
@@ -30,37 +29,23 @@ const FEATURE_TILES: FeatureTile[] = [
     glowColor: "border-purple-500/30 bg-purple-500/10 dark:bg-purple-950/40 shadow-sm",
   },
   {
-    title: "Readiness Tracking",
-    tagline: "Real-time placement score",
-    icon: LineChart,
-    iconColor: "text-cyan-600 dark:text-cyan-400",
-    glowColor: "border-cyan-500/30 bg-cyan-500/10 dark:bg-cyan-950/40 shadow-sm",
-  },
-  {
-    title: "Verified Projects",
-    tagline: "Evidence-backed portfolios",
-    icon: Briefcase,
-    iconColor: "text-purple-500 dark:text-purple-400",
-    glowColor: "border-purple-500/30 bg-purple-500/10 dark:bg-purple-950/40 shadow-sm",
-  },
-  {
-    title: "AI SPAR Coach",
-    tagline: "24/7 contextual guidance",
-    icon: Sparkles,
-    iconColor: "text-cyan-600 dark:text-cyan-400",
-    glowColor: "border-cyan-500/30 bg-cyan-500/10 dark:bg-cyan-950/40 shadow-sm",
-  },
-  {
-    title: "Interview Prep",
-    tagline: "Adaptive technical mocks",
-    icon: Target,
+    title: "Personalized Roadmap",
+    tagline: "Adaptive milestone steps",
+    icon: Map,
     iconColor: "text-blue-500 dark:text-blue-400",
     glowColor: "border-blue-500/30 bg-blue-500/10 dark:bg-blue-950/40 shadow-sm",
   },
   {
-    title: "Cohort Intelligence",
-    tagline: "Institutional analytics",
-    icon: UserCheck,
+    title: "Verified Projects",
+    tagline: "Evidence-backed repositories",
+    icon: Briefcase,
+    iconColor: "text-cyan-600 dark:text-cyan-400",
+    glowColor: "border-cyan-500/30 bg-cyan-500/10 dark:bg-cyan-950/40 shadow-sm",
+  },
+  {
+    title: "Placement Readiness",
+    tagline: "Real-time hiring scoring",
+    icon: Award,
     iconColor: "text-emerald-500 dark:text-emerald-400",
     glowColor: "border-emerald-500/30 bg-emerald-500/10 dark:bg-emerald-950/40 shadow-sm",
   },
@@ -100,8 +85,8 @@ export function Hero() {
       {/* 3-Column Clean Three-Zone Composition */}
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1.1fr_1fr_400px] xl:grid-cols-[1.15fr_1.05fr_410px] items-start gap-8 lg:gap-6 xl:gap-8">
         
-        {/* LEFT COLUMN: Value Proposition + 6 Compact Mini Feature Tiles */}
-        <div className="space-y-5 pt-2">
+        {/* LEFT COLUMN: Value Proposition + 4 Clean Capability Chips */}
+        <div className="space-y-6 pt-2">
           {/* Eyebrow Pill */}
           <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/40 bg-card/90 dark:bg-[#090e24]/90 px-3.5 py-1.5 text-xs text-cyan-600 dark:text-cyan-300 shadow-[0_0_15px_rgba(6,215,247,0.15)] backdrop-blur-md">
             <Sparkles className="size-3.5 text-cyan-500" />
@@ -124,17 +109,17 @@ export function Hero() {
             SPAR AI helps you discover the right careers, build in-demand skills, track your readiness, and get placement ready with continuous AI guidance.
           </p>
 
-          {/* 6 Ultra-Compact Feature Tiles (2 Columns x 3 Rows) */}
+          {/* 4 Focused Capability Chips (2 Columns x 2 Rows) */}
           <div className="grid grid-cols-2 gap-2.5 pt-1 max-w-lg">
             {FEATURE_TILES.map((tile) => {
               const Icon = tile.icon;
               return (
                 <div
                   key={tile.title}
-                  className="flex items-center gap-2.5 rounded-xl border border-border/80 bg-card/85 dark:bg-[#090e24]/80 p-2.5 backdrop-blur-md transition-all hover:border-cyan-500/40 hover:-translate-y-0.5 shadow-sm"
+                  className="flex items-center gap-2.5 rounded-xl border border-border/80 bg-card/85 dark:bg-[#090e24]/80 p-3 backdrop-blur-md transition-all hover:border-cyan-500/40 hover:-translate-y-0.5 shadow-sm"
                 >
-                  <div className={`grid size-7 shrink-0 place-items-center rounded-lg border ${tile.glowColor}`}>
-                    <Icon className={`size-3.5 ${tile.iconColor}`} />
+                  <div className={`grid size-8 shrink-0 place-items-center rounded-lg border ${tile.glowColor}`}>
+                    <Icon className={`size-4 ${tile.iconColor}`} />
                   </div>
                   <div className="flex flex-col min-w-0">
                     <span className="font-display text-xs font-bold text-foreground truncate">

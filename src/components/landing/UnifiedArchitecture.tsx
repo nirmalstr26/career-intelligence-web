@@ -8,11 +8,8 @@ import {
   MessageSquare,
   Target,
   Sparkles,
-  Activity,
   Zap,
   CheckCircle2,
-  Database,
-  ArrowRight,
 } from "lucide-react";
 
 interface GraphNode {
@@ -37,7 +34,7 @@ const NODES: GraphNode[] = [
     iconColor: "text-cyan-400",
     nodeColor: "border-cyan-500/40 bg-card/90 dark:bg-[#090e24]/90",
     bgGlow: "shadow-[0_0_20px_rgba(6,215,247,0.2)]",
-    description: "Maps strengths to high-trajectory tech career archetypes.",
+    description: "Maps student strengths to high-trajectory tech career archetypes.",
   },
   {
     id: "roadmap",
@@ -101,7 +98,7 @@ export function UnifiedArchitecture() {
   const selected = NODES.find((n) => n.id === activeNode) || NODES[3];
 
   return (
-    <section id="architecture" className="my-24 scroll-mt-24 space-y-10">
+    <section id="architecture" className="my-24 scroll-mt-24 space-y-10 select-none">
       {/* Centered Section Header */}
       <div className="text-center max-w-3xl mx-auto space-y-3 px-4">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/40 bg-card/90 dark:bg-[#090e24]/90 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-300 shadow-sm backdrop-blur">
@@ -139,7 +136,7 @@ export function UnifiedArchitecture() {
 
         {/* Desktop Interactive Graph & Central Hub Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px_1fr] items-center gap-6 relative z-10">
-          {/* Left 3 Nodes */}
+          {/* Left 3 Nodes: Career -> Skill -> Project */}
           <div className="space-y-3.5">
             {NODES.slice(0, 3).map((node) => {
               const Icon = node.icon;
@@ -177,14 +174,14 @@ export function UnifiedArchitecture() {
             })}
           </div>
 
-          {/* Center: Glowing SPAR AI Core */}
+          {/* Center: Glowing SPAR AI Core with Particle Flow */}
           <div className="flex flex-col items-center justify-center p-4">
             <div className="relative group">
-              {/* Outer pulsing ring */}
-              <div className="absolute -inset-3 rounded-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 opacity-40 blur-md animate-pulse" />
+              {/* Outer pulsing breathing ring */}
+              <div className="absolute -inset-4 rounded-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 opacity-40 blur-lg animate-pulse" />
 
               {/* Core Body */}
-              <div className="relative size-36 sm:size-40 rounded-full border-2 border-cyan-400 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 flex flex-col items-center justify-center text-center p-4 shadow-[0_0_40px_rgba(6,215,247,0.3)]">
+              <div className="relative size-36 sm:size-40 rounded-full border-2 border-cyan-400 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 flex flex-col items-center justify-center text-center p-4 shadow-[0_0_40px_rgba(6,215,247,0.35)]">
                 <span className="grid size-10 place-items-center rounded-full bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 mb-1 shadow-[0_0_15px_rgba(6,215,247,0.5)]">
                   <Cpu className="size-5" />
                 </span>
@@ -204,7 +201,7 @@ export function UnifiedArchitecture() {
             </div>
           </div>
 
-          {/* Right 3 Nodes */}
+          {/* Right 3 Nodes: Assessment -> Evidence -> Opportunity */}
           <div className="space-y-3.5">
             {NODES.slice(3, 6).map((node) => {
               const Icon = node.icon;

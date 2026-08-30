@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Compass,
   Map,
@@ -272,9 +272,15 @@ const CARDS: ShowcaseCard[] = [
 export function PlatformCapabilities() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [userHasInteracted, setUserHasInteracted] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const scrollToIndex = (index: number) => {
+  // Drag state
+  const isDraggingRef = useRef(false);
+  const startXRef = useRef(0);
+  const scrollLeftRef = useRef(0);
+
+  const scrollToIndex = useCallback((index: number) => {
     if (!scrollContainerRef.current) return;
     const cardWidth = scrollContainerRef.current.children[0]?.clientWidth || 360;
     scrollContainerRef.current.scrollTo({
@@ -282,29 +288,72 @@ export function PlatformCapabilities() {
       behavior: "smooth",
     });
     setCurrentIndex(index);
-  };
+  }, []);
 
   const handlePrev = () => {
+    setUserHasInteracted(true);
     const nextIdx = (currentIndex - 1 + CARDS.length) % CARDS.length;
     scrollToIndex(nextIdx);
   };
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     const nextIdx = (currentIndex + 1) % CARDS.length;
     scrollToIndex(nextIdx);
-  };
+  }, [currentIndex, scrollToIndex]);
 
-  // Subtle 7-second auto-scroll when not paused
+  // Subtle auto-scroll only if user has not interacted & not paused
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || userHasInteracted) return;
     const timer = setInterval(() => {
       handleNext();
     }, 7000);
     return () => clearInterval(timer);
-  }, [currentIndex, isPaused]);
+  }, [currentIndex, isPaused, userHasInteracted, handleNext]);
+
+  // Keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      handlePrev();
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      setUserHasInteracted(true);
+      handleNext();
+    }
+  };
+
+  // Mouse Drag handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollContainerRef.current) return;
+    isDraggingRef.current = true;
+    startXRef.current = e.pageX - scrollContainerRef.current.offsetLeft;
+    scrollLeftRef.current = scrollContainerRef.current.scrollLeft;
+    setUserHasInteracted(true);
+  };
+
+  const handleMouseLeave = () => {
+    isDraggingRef.current = false;
+  };
+
+  const handleMouseUp = () => {
+    isDraggingRef.current = false;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingRef.current || !scrollContainerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollContainerRef.current.offsetLeft;
+    const walk = (x - startXRef.current) * 1.5;
+    scrollContainerRef.current.scrollLeft = scrollLeftRef.current - walk;
+  };
 
   return (
-    <section id="capabilities" className="my-20 scroll-mt-24 space-y-10 select-none">
+    <section
+      id="capabilities"
+      className="my-20 scroll-mt-24 space-y-10 select-none outline-none"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+    >
       {/* Centered Section Header */}
       <div className="text-center max-w-3xl mx-auto space-y-3 px-4">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-500/40 bg-card/90 dark:bg-[#090e24]/90 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-300 shadow-sm backdrop-blur">
@@ -325,7 +374,10 @@ export function PlatformCapabilities() {
         <div className="flex items-center justify-center gap-3 pt-3">
           <button
             type="button"
-            onClick={() => setIsPaused((v) => !v)}
+            onClick={() => {
+              setIsPaused((v) => !v);
+              setUserHasInteracted(true);
+            }}
             aria-label={isPaused ? "Resume auto-scroll" : "Pause auto-scroll"}
             className="grid size-9 place-items-center rounded-2xl border border-border/80 bg-card/90 dark:bg-[#090e24]/90 text-muted-foreground hover:text-foreground hover:border-cyan-500/40 transition-all backdrop-blur shadow-sm"
           >
@@ -346,7 +398,10 @@ export function PlatformCapabilities() {
               <button
                 key={idx}
                 type="button"
-                onClick={() => scrollToIndex(idx)}
+                onClick={() => {
+                  setUserHasInteracted(true);
+                  scrollToIndex(idx);
+                }}
                 aria-label={`Jump to capability ${idx + 1}`}
                 className={`h-2 rounded-full transition-all duration-300 ${
                   currentIndex === idx
@@ -359,7 +414,10 @@ export function PlatformCapabilities() {
 
           <button
             type="button"
-            onClick={handleNext}
+            onClick={() => {
+              setUserHasInteracted(true);
+              handleNext();
+            }}
             aria-label="Next capability"
             className="grid size-9 place-items-center rounded-2xl border border-border/80 bg-card/90 dark:bg-[#090e24]/90 text-muted-foreground hover:text-foreground hover:border-cyan-500/40 transition-all backdrop-blur shadow-sm"
           >
@@ -368,11 +426,17 @@ export function PlatformCapabilities() {
         </div>
       </div>
 
-      {/* HORIZONTAL CAROUSEL SHOWCASE (Desktop: 3 Visible | Mobile: 1 Visible with Touch-Snap) */}
+      {/* HORIZONTAL CAROUSEL SHOWCASE (Desktop: 3 Visible | Mobile: 1 Visible with Touch-Snap & Mouse Drag) */}
       <div
-        className="relative px-4 overflow-hidden"
+        className="relative px-4 overflow-hidden cursor-grab active:cursor-grabbing"
         onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
+        onMouseLeave={() => {
+          setIsPaused(false);
+          handleMouseLeave();
+        }}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
       >
         <div
           ref={scrollContainerRef}
@@ -382,7 +446,7 @@ export function PlatformCapabilities() {
           {CARDS.map((card, idx) => (
             <div
               key={card.id}
-              className={`snap-center shrink-0 w-[300px] sm:w-[360px] lg:w-[calc((100%-48px)/3)] rounded-3xl border border-border/80 bg-card/95 dark:bg-[#090e24]/85 p-5 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between shadow-lg ${card.borderColor}`}
+              className={`snap-center shrink-0 w-[300px] sm:w-[360px] lg:w-[calc((100%-48px)/3)] h-full min-h-[460px] rounded-3xl border border-border/80 bg-card/95 dark:bg-[#090e24]/85 p-5 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between shadow-lg ${card.borderColor}`}
             >
               {/* Card Top: Visual preview scene */}
               <div className="space-y-3.5">

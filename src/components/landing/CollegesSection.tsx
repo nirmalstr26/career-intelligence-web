@@ -3,16 +3,38 @@ import {
   Building2,
   CheckCircle2,
   ArrowRight,
-  TrendingUp,
-  Award,
-  Users,
   ShieldCheck,
+  Users,
+  Sparkles,
+  Layers,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export function CollegesSection() {
   return (
-    <section id="colleges" className="my-24 scroll-mt-24 select-none">
+    <section id="colleges" className="my-24 scroll-mt-24 select-none relative">
+      {/* 
+        SUBTLE BACKGROUND TRANSITION & DATA CONVERGENCE EFFECT:
+        individual student intelligence ➔ aggregated institutional cohort analytics
+      */}
+      <div className="relative mx-auto max-w-4xl mb-6 flex flex-col items-center justify-center">
+        <div className="flex items-center gap-3 text-[11px] font-mono text-muted-foreground uppercase tracking-widest">
+          <div className="flex items-center gap-1 text-cyan-400 font-bold">
+            <span className="size-2 rounded-full bg-cyan-400 animate-ping" />
+            <span>Individual Signals</span>
+          </div>
+          <span className="text-muted-foreground/60">────────➔</span>
+          <div className="flex items-center gap-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-0.5 text-cyan-300 font-bold">
+            <Layers className="size-3" />
+            <span>Aggregated Cohort Intelligence</span>
+          </div>
+        </div>
+
+        {/* Faint animated stream connector lines */}
+        <div className="w-full h-8 flex items-center justify-center relative overflow-hidden opacity-40">
+          <div className="w-48 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent animate-pulse" />
+        </div>
+      </div>
+
       <div className="mx-auto max-w-5xl rounded-3xl border border-border/80 bg-gradient-to-br from-card via-card/95 to-secondary/30 dark:from-[#090e24]/90 dark:via-[#070c20]/95 dark:to-[#040612] p-6 sm:p-10 backdrop-blur-2xl shadow-xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* LEFT: Heading, 1 Sentence, 3 Benefits, CTA */}
@@ -61,7 +83,7 @@ export function CollegesSection() {
             </div>
           </div>
 
-          {/* RIGHT: Animated Cohort Readiness Dashboard Preview */}
+          {/* RIGHT: Animated Cohort Readiness Dashboard Preview with Sample Tag */}
           <div className="rounded-2xl border border-cyan-500/30 bg-slate-950 p-5 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2.5">
@@ -69,12 +91,13 @@ export function CollegesSection() {
                   <Building2 className="size-4" />
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-white block">SPAR Institute of Technology</span>
+                  <span className="text-xs font-bold text-white block">SPAR Engineering Institute</span>
                   <span className="text-[10px] text-muted-foreground">B.Tech CSE · 2026 Batch</span>
                 </div>
               </div>
-              <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/80 border border-cyan-500/30 px-2 py-0.5 rounded-full">
-                Active Cohort
+              {/* Clearly labeled Sample / Demo tag */}
+              <span className="text-[10px] font-mono text-cyan-300 bg-cyan-950/80 border border-cyan-500/30 px-2 py-0.5 rounded-full font-semibold">
+                Sample Cohort View (Illustrative)
               </span>
             </div>
 
