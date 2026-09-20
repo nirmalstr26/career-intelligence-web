@@ -133,6 +133,19 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    try {
+      const redirectPath = sessionStorage.getItem("spar_redirect");
+      if (redirectPath && redirectPath !== "/" && redirectPath !== "") {
+        sessionStorage.removeItem("spar_redirect");
+        void router.navigate({ to: redirectPath as any });
+      }
+    } catch {
+      // Ignore sessionStorage access errors
+    }
+  }, [router]);
 
   return (
     <QueryClientProvider client={queryClient}>
