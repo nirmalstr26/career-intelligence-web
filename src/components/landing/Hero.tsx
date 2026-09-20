@@ -1,39 +1,89 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Sparkles } from "lucide-react";
-import heroBgImage from "@/assets/hero_background_home.png";
+import heroBgDark from "@/assets/landing/hero-bg-dark.png";
+import heroBgLight from "@/assets/landing/hero-bg-light.png";
 import { CareerRoadArt } from "@/components/landing/CareerRoadArt";
 import { AuthCard } from "@/components/landing/AuthCard";
 import { ConstellationCapabilityRoadmap } from "@/components/landing/ConstellationCapabilityRoadmap";
 
+/**
+ * Subtle, performance-safe hero parallax: translates the background layer
+ * with scroll using requestAnimationFrame. SSR renders an identity transform
+ * (the listener is attached in useEffect), so there is no hydration mismatch.
+ */
+function useHeroParallax(strength = 0.18) {
+  const [offset, setOffset] = useState(0);
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
+    let frame = 0;
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        setOffset(window.scrollY * strength);
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [strength]);
+  return offset;
+}
+
 export function Hero() {
+  const parallax = useHeroParallax(0.18);
+
   return (
     <section className="relative pt-6 pb-12 overflow-hidden">
       {/* EXPANSIVE HIGH-VISIBILITY BACKGROUND ARTWORK LAYER */}
       <div className="pointer-events-none absolute inset-0 -top-10 -bottom-14 flex items-center justify-center select-none overflow-hidden">
         <div className="relative w-full max-w-[1920px] h-full min-h-[760px] lg:min-h-[880px] flex items-center justify-center">
-          
-          {/* Luminous Ambient Glow Underlayer */}
-          <div 
-            className="absolute inset-0 z-0 opacity-90"
-            style={{
-              background:
-                "radial-gradient(ellipse 85% 75% at 50% 45%, rgba(6, 215, 247, 0.28), rgba(99, 102, 241, 0.22) 42%, rgba(168, 85, 247, 0.15) 68%, transparent 95%)",
-            }}
-          />
+          {/* Theme-aware rich background imagery */}
+          <div
+            className="absolute inset-0 -z-10 will-change-transform"
+            style={{ transform: `translate3d(0, ${parallax}px, 0)` }}
+          >
+            {/* Light-theme background */}
+            <img
+              src={heroBgLight}
+              alt=""
+              aria-hidden="true"
+              width={1536}
+              height={1024}
+              className="absolute inset-0 h-full w-full object-cover object-center select-none dark:hidden"
+              style={{ filter: "saturate(1.05) brightness(1.02)" }}
+            />
+            {/* Dark-theme background */}
+            <img
+              src={heroBgDark}
+              alt=""
+              aria-hidden="true"
+              width={1536}
+              height={1024}
+              className="absolute inset-0 hidden h-full w-full object-cover object-center select-none dark:block"
+              style={{ filter: "contrast(1.16) saturate(1.32) brightness(1.02)" }}
+            />
 
-          {/* High-definition SPAR AI Career Pathway Artwork */}
-          <img
-            src={heroBgImage || "/brand/hero_background_home.png"}
-            alt=""
-            aria-hidden="true"
-            className="w-full h-full object-cover object-center select-none transition-all duration-300 opacity-100 z-0"
-            style={{
-              filter: "contrast(1.18) saturate(1.3) brightness(1.04)",
-            }}
-          />
+            {/* Slowly drifting luminous aura — keeps the background alive in both themes */}
+            <div
+              className="absolute inset-0 animate-aura-drift"
+              style={{
+                background:
+                  "radial-gradient(ellipse 80% 70% at 50% 42%, rgba(6, 215, 247, 0.26), rgba(99, 102, 241, 0.20) 42%, rgba(168, 85, 247, 0.13) 68%, transparent 95%)",
+                mixBlendMode: "screen",
+              }}
+            />
+          </div>
 
           {/* Minimal seamless bottom fade into trusted colleges strip */}
-          <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-background to-transparent opacity-80 z-0" />
+          <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-background to-transparent opacity-80" />
         </div>
       </div>
 
