@@ -41,13 +41,13 @@ export function Hero() {
   const parallax = useHeroParallax(0.18);
 
   return (
-    <section className="relative pt-6 pb-12 overflow-hidden">
+    <section className="relative isolate pt-6 pb-12 overflow-hidden">
       {/* EXPANSIVE HIGH-VISIBILITY BACKGROUND ARTWORK LAYER */}
       <div className="pointer-events-none absolute inset-0 -top-10 -bottom-14 flex items-center justify-center select-none overflow-hidden">
         <div className="relative w-full max-w-[1920px] h-full min-h-[760px] lg:min-h-[880px] flex items-center justify-center">
-          {/* Theme-aware rich background imagery */}
+          {/* Theme-aware rich background imagery — z-0 so it's above the page bg but below z-10 content */}
           <div
-            className="absolute inset-0 -z-10 will-change-transform"
+            className="absolute inset-0 z-0 will-change-transform"
             style={{ transform: `translate3d(0, ${parallax}px, 0)` }}
           >
             {/* Light-theme background */}
@@ -83,7 +83,7 @@ export function Hero() {
           </div>
 
           {/* Minimal seamless bottom fade into trusted colleges strip */}
-          <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-background to-transparent opacity-80" />
+          <div className="absolute bottom-0 inset-x-0 z-10 h-24 bg-gradient-to-t from-background to-transparent opacity-80" />
         </div>
       </div>
 
