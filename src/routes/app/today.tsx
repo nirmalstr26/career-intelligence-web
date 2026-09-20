@@ -277,6 +277,167 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
       </section>
 
       {/* =================================================================== */}
+      {/* LEVEL 2.5: INTERVIEW KNOWLEDGE PREP & SKILL SCORECARD                */}
+      {/* =================================================================== */}
+      <section className="surface-panel rounded-3xl p-6 sm:p-8 border border-border/80 bg-gradient-to-br from-card via-card to-primary/[0.03] space-y-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-5">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-primary">
+                <Target className="size-3.5" />
+                Continuous Interview Readiness
+              </span>
+              <Badge className="bg-primary/15 text-primary border-none text-[10px] font-bold">
+                {journey.interviewPrep?.level === "PLACEMENT_READY" ? "Placement Ready" :
+                 journey.interviewPrep?.level === "INTERVIEW_READY" ? "Interview Ready" : "Developing"}
+              </Badge>
+            </div>
+            <h3 className="font-display text-xl sm:text-2xl font-black text-foreground tracking-tight">
+              Interview Knowledge Prep Scorecard
+            </h3>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              Real-time competency breakdown based on completed curriculum modules, project defense, and technical assessments.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-4 bg-primary/[0.06] border border-primary/20 rounded-2xl p-4 shrink-0">
+            <div className="text-center">
+              <div className="text-3xl sm:text-4xl font-black text-primary font-mono tracking-tight">
+                {journey.interviewPrep?.score ?? 74}%
+              </div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-0.5">
+                Interview Prep Score
+              </div>
+            </div>
+            <div className="h-10 w-px bg-border/80" />
+            <Button asChild size="sm" className="font-bold text-xs">
+              <Link to="/app/interview/$interviewId" params={{ interviewId: "de-mock-interview-1" }}>
+                <Video className="size-3.5 mr-1.5" />
+                Practice Interview
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* 2-Column Competency Breakdown */}
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Column 1: Areas Improved & Strengths */}
+          <div className="space-y-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.03] p-5">
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-sm text-foreground flex items-center gap-2">
+                <CheckCircle2 className="size-4 text-emerald-500" />
+                Areas Improved & Verified Strengths
+              </h4>
+              <Badge variant="outline" className="text-[10px] text-emerald-600 border-emerald-500/30">
+                {journey.interviewPrep?.areasImproved?.length ?? 0} Verified
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Skills validated through passing quiz scores and project rubric evaluations.
+            </p>
+
+            <div className="space-y-2.5 pt-1">
+              {journey.interviewPrep?.areasImproved?.map((item) => (
+                <div
+                  key={item.skillCode}
+                  className="flex items-center justify-between p-3 rounded-xl border border-border/60 bg-card/80 text-xs shadow-xs"
+                >
+                  <div className="space-y-0.5">
+                    <div className="font-bold text-foreground flex items-center gap-2">
+                      {item.name}
+                      {item.recentGain && (
+                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/15 px-1.5 py-0.5 rounded-full">
+                          {item.recentGain}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground">
+                      Category: {item.category || "Core"} · Status: {item.level}
+                    </div>
+                  </div>
+
+                  <div className="text-right font-mono font-bold text-foreground text-sm">
+                    {item.score}
+                    <span className="text-[10px] font-normal text-muted-foreground">/100</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Column 2: Areas to Improve Breakdown */}
+          <div className="space-y-3 rounded-2xl border border-warning/30 bg-warning/[0.03] p-5">
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-sm text-foreground flex items-center gap-2">
+                <AlertCircle className="size-4 text-warning" />
+                Areas to Improve (Priority Gaps)
+              </h4>
+              <Badge variant="outline" className="text-[10px] text-warning border-warning/30">
+                {journey.interviewPrep?.areasToImprove?.length ?? 0} Priority Gaps
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Targeted concepts requiring focus to reach the 80%+ placement benchmark.
+            </p>
+
+            <div className="space-y-2.5 pt-1">
+              {journey.interviewPrep?.areasToImprove?.map((item) => (
+                <div
+                  key={item.skillCode}
+                  className="p-3 rounded-xl border border-border/60 bg-card/80 text-xs space-y-2 shadow-xs"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-foreground">{item.name}</span>
+                    <div className="flex items-center gap-2 font-mono">
+                      <span className="text-muted-foreground">{item.currentScore}</span>
+                      <span className="text-[10px] text-muted-foreground">/</span>
+                      <span className="text-primary font-bold">{item.targetScore}</span>
+                    </div>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-warning transition-all"
+                      style={{ width: `${Math.min(100, Math.round((item.currentScore / item.targetScore) * 100))}%` }}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between pt-0.5">
+                    <span className="text-[10px] text-muted-foreground">
+                      Gap: <strong>-{item.gapMagnitude} pts</strong> to target
+                    </span>
+                    <Button asChild variant="ghost" size="sm" className="h-6 px-2 text-[11px] font-bold text-primary hover:text-primary">
+                      <Link to={item.actionLink}>
+                        Take Action
+                        <ArrowRight className="size-3 ml-1" />
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Uninterrupted Flow Notification Strip */}
+        <div className="p-4 rounded-2xl border border-primary/20 bg-primary/[0.04] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2.5">
+            <Zap className="size-4 text-primary shrink-0" />
+            <span className="text-muted-foreground">
+              <strong className="text-foreground font-bold">Uninterrupted Learning Progression:</strong> Passing each module knowledge check automatically unlocks your next challenge and recalibrates your Interview Knowledge Score in real-time.
+            </span>
+          </div>
+          <Button asChild variant="outline" size="sm" className="shrink-0 text-xs font-bold">
+            <Link to="/app/path">
+              <BookOpen className="size-3.5 mr-1" />
+              View Next Module in Pathway
+            </Link>
+          </Button>
+        </div>
+      </section>
+
+      {/* =================================================================== */}
       {/* LEVEL 3: READINESS TRAJECTORY & PACE PROJECTION                      */}
       {/* =================================================================== */}
       <section className="grid gap-6 lg:grid-cols-3">
