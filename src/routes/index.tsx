@@ -84,10 +84,10 @@ function Landing() {
       <div>
         <Navbar />
 
-        <main className="relative mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-10">
-          {/* 01 — Hero (What SPAR is + Signup) */}
-          <Hero />
+        {/* 01 — Hero (Edge-to-edge full-bleed animated background canvas) */}
+        <Hero />
 
+        <main className="relative mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-10">
           {/* Pilot Credibility Pillar Strip */}
           <TrustedCollegesStrip />
 
