@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   CheckCircle2,
@@ -410,13 +410,13 @@ export function AuthCard() {
 
             <p className="mt-3.5 text-center text-[11px] text-slate-600 leading-relaxed">
               By signing up, you agree to our{" "}
-              <a href="#terms" className="text-blue-600 font-semibold hover:underline">
+              <Link to="/terms" className="text-blue-600 font-semibold hover:underline">
                 Terms of Service
-              </a>{" "}
+              </Link>{" "}
               and{" "}
-              <a href="#privacy" className="text-blue-600 font-semibold hover:underline">
+              <Link to="/privacy" className="text-blue-600 font-semibold hover:underline">
                 Privacy Policy
-              </a>
+              </Link>
               .
             </p>
           </>

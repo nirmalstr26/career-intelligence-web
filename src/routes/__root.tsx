@@ -92,6 +92,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image", content: "/brand/lockup/spar-ai-logo-dark-bg-640.png" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "google-site-verification", content: "NnlhYcBfXEm5nx2EMdURamXbQkR0bxyQqd4S7JRFZEA" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -121,6 +122,7 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <meta name="google-site-verification" content="NnlhYcBfXEm5nx2EMdURamXbQkR0bxyQqd4S7JRFZEA" />
         <HeadContent />
       </head>
       <body>
@@ -133,6 +135,19 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    try {
+      const redirectPath = sessionStorage.getItem("spar_redirect");
+      if (redirectPath && redirectPath !== "/" && redirectPath !== "") {
+        sessionStorage.removeItem("spar_redirect");
+        void router.navigate({ to: redirectPath as any });
+      }
+    } catch {
+      // Ignore sessionStorage access errors
+    }
+  }, [router]);
 
   return (
     <QueryClientProvider client={queryClient}>

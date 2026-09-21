@@ -98,8 +98,8 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
   const journey = resolveStudentJourney(ci, curr);
   const primary = journey.primaryAction;
 
-  const readinessScore = Math.round(ci.placement_readiness?.score ?? ci.primary_career_readiness?.readiness_score ?? (ci as any)?.readiness?.overall_score ?? 78);
-  const firstName = student?.first_name || "Nirmal";
+  const readinessScore = Math.round(ci.placement_readiness?.score ?? ci.primary_career_readiness?.score ?? (ci as any)?.readiness?.overall_score ?? 78);
+  const firstName = student?.first_name || user?.name?.split(" ")[0] || "Student";
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -119,10 +119,10 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
                 <Flame className="size-3.5 text-amber-500 fill-amber-500" />
-                4-Day Momentum Streak
+                Momentum Streak
               </span>
               <Badge variant="outline" className="text-[10px]">
-                {student.department || "Computer Science"} · Class of {student.expected_graduation_year || 2027}
+                {student.department || "Engineering"} · Class of {(student as any).expected_graduation_year || 2027}
               </Badge>
             </div>
 
@@ -130,7 +130,7 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
               {getGreeting()}, {firstName}
             </h1>
             <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-              Active Focus: <strong className="text-foreground">Data Engineer Career Pathway</strong> · Phase 2 of 5 (Programming & SQL)
+              Active Focus: <strong className="text-foreground">{journey.activeCareerName || "Target"} Career Pathway</strong>
             </p>
           </div>
 

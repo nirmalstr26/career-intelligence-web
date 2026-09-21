@@ -10,6 +10,7 @@ import {
   Terminal,
   MessageSquare,
   ArrowRight,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth/AuthProvider";
@@ -17,7 +18,7 @@ import { UnifiedAuthModal } from "@/components/auth/UnifiedAuthModal";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 
 export function Navbar() {
-  const { status, onboardingRequired } = useAuth();
+  const { status, user, logout, onboardingRequired } = useAuth();
   const isAuthenticated = status === "authenticated";
 
   const [productMenuOpen, setProductMenuOpen] = useState(false);

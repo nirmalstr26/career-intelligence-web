@@ -13,6 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as CollegesRouteImport } from './routes/colleges'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as TermsOfServiceRouteImport } from './routes/terms-of-service'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppAgentRouteImport } from './routes/app/agent'
@@ -58,6 +62,26 @@ const CollegesRoute = CollegesRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsOfServiceRoute = TermsOfServiceRouteImport.update({
+  id: '/terms-of-service',
+  path: '/terms-of-service',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -196,6 +220,10 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/colleges': typeof CollegesRoute
   '/onboarding': typeof OnboardingRoute
+  '/privacy': typeof PrivacyRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/terms': typeof TermsRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
   '/app/agent': typeof AppAgentRoute
   '/app/career': typeof AppCareerRoute
   '/app/coach': typeof AppCoachRoute
@@ -227,6 +255,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/colleges': typeof CollegesRoute
   '/onboarding': typeof OnboardingRoute
+  '/privacy': typeof PrivacyRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/terms': typeof TermsRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
   '/app/agent': typeof AppAgentRoute
   '/app/career': typeof AppCareerRoute
   '/app/coach': typeof AppCoachRoute
@@ -260,6 +292,10 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/colleges': typeof CollegesRoute
   '/onboarding': typeof OnboardingRoute
+  '/privacy': typeof PrivacyRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/terms': typeof TermsRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
   '/app/agent': typeof AppAgentRoute
   '/app/career': typeof AppCareerRoute
   '/app/coach': typeof AppCoachRoute
@@ -294,6 +330,10 @@ export interface FileRouteTypes {
     | '/app'
     | '/colleges'
     | '/onboarding'
+    | '/privacy'
+    | '/privacy-policy'
+    | '/terms'
+    | '/terms-of-service'
     | '/app/agent'
     | '/app/career'
     | '/app/coach'
@@ -325,6 +365,10 @@ export interface FileRouteTypes {
     | '/'
     | '/colleges'
     | '/onboarding'
+    | '/privacy'
+    | '/privacy-policy'
+    | '/terms'
+    | '/terms-of-service'
     | '/app/agent'
     | '/app/career'
     | '/app/coach'
@@ -357,6 +401,10 @@ export interface FileRouteTypes {
     | '/app'
     | '/colleges'
     | '/onboarding'
+    | '/privacy'
+    | '/privacy-policy'
+    | '/terms'
+    | '/terms-of-service'
     | '/app/agent'
     | '/app/career'
     | '/app/coach'
@@ -390,6 +438,10 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   CollegesRoute: typeof CollegesRoute
   OnboardingRoute: typeof OnboardingRoute
+  PrivacyRoute: typeof PrivacyRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
+  TermsRoute: typeof TermsRoute
+  TermsOfServiceRoute: typeof TermsOfServiceRoute
   CollegeDashboardRoute: typeof CollegeDashboardRoute
   RecruiterDashboardRoute: typeof RecruiterDashboardRoute
   RecruiterRegisterRoute: typeof RecruiterRegisterRoute
@@ -424,6 +476,34 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms-of-service': {
+      id: '/terms-of-service'
+      path: '/terms-of-service'
+      fullPath: '/terms-of-service'
+      preLoaderRoute: typeof TermsOfServiceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -668,6 +748,10 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   CollegesRoute: CollegesRoute,
   OnboardingRoute: OnboardingRoute,
+  PrivacyRoute: PrivacyRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
+  TermsRoute: TermsRoute,
+  TermsOfServiceRoute: TermsOfServiceRoute,
   CollegeDashboardRoute: CollegeDashboardRoute,
   RecruiterDashboardRoute: RecruiterDashboardRoute,
   RecruiterRegisterRoute: RecruiterRegisterRoute,
