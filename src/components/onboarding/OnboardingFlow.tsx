@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -125,6 +125,8 @@ export function OnboardingFlow() {
   // --- Step 2 State ---
   const [academicStatus, setAcademicStatus] = useState("COLLEGE");
   const [instSearchQuery, setInstSearchQuery] = useState("");
+  const [instDebouncedQuery, setInstDebouncedQuery] = useState("");
+  const [instDropdownOpen, setInstDropdownOpen] = useState(false);
   const [selectedInstId, setSelectedInstId] = useState<string | null>(null);
   const [selectedInstName, setSelectedInstName] = useState("");
   const [isCustomInst, setIsCustomInst] = useState(false);
@@ -132,6 +134,8 @@ export function OnboardingFlow() {
   const [department, setDepartment] = useState("CSE");
   const [currentYear, setCurrentYear] = useState<number>(3);
   const [graduationYear, setGraduationYear] = useState<number>(new Date().getFullYear() + 1);
+  const instDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const instWrapperRef = useRef<HTMLDivElement>(null);
 
   // --- Step 3 State ---
   const [selectedGoals, setSelectedGoals] = useState<string[]>(["JOB", "SKILLS"]);
@@ -139,8 +143,11 @@ export function OnboardingFlow() {
   const [selectedInterests, setSelectedInterests] = useState<string[]>(["DATA", "AI"]);
   const [consentGranted, setConsentGranted] = useState(true);
 
-  // Master institution search
-  const { data: instData } = useInstitutionSearch(instSearchQuery, countryCode);
+  // Master institution search — debounced
+  const { data: instData, isFetching: isInstFetching } = useInstitutionSearch(
+    instDebouncedQuery,
+    countryCode,
+  );
 
   // Populate state from authoritative backend status or session on mount
   useEffect(() => {
@@ -172,6 +179,28 @@ export function OnboardingFlow() {
       }
     }
   }, [statusData, user]);
+
+  // Debounce institution search
+  useEffect(() => {
+    if (instDebounceRef.current) clearTimeout(instDebounceRef.current);
+    instDebounceRef.current = setTimeout(() => {
+      setInstDebouncedQuery(instSearchQuery);
+    }, 300);
+    return () => {
+      if (instDebounceRef.current) clearTimeout(instDebounceRef.current);
+    };
+  }, [instSearchQuery]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (instWrapperRef.current && !instWrapperRef.current.contains(e.target as Node)) {
+        setInstDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const currentYearOptions = useMemo(() => {
     const current = new Date().getFullYear();
@@ -516,40 +545,115 @@ export function OnboardingFlow() {
                   College / Institution *
                 </label>
                 {!isCustomInst ? (
-                  <div className="space-y-2">
+                  <div className="space-y-2" ref={instWrapperRef}>
+                    {/* Search input */}
                     <div className="relative">
-                      <Search className="absolute left-3.5 top-3 size-4 text-muted-foreground" />
+                      <Search className="absolute left-3.5 top-3 size-4 text-muted-foreground pointer-events-none" />
                       <input
+                        id="inst-search-input"
                         type="text"
                         value={instSearchQuery}
-                        onChange={(e) => setInstSearchQuery(e.target.value)}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setInstSearchQuery(v);
+                          // Clear selection if user modifies the query
+                          if (selectedInstId && v !== selectedInstName) {
+                            setSelectedInstId(null);
+                          }
+                          setInstDropdownOpen(v.trim().length >= 1);
+                        }}
+                        onFocus={() => {
+                          if (instSearchQuery.trim().length >= 1) setInstDropdownOpen(true);
+                        }}
                         placeholder="Search your college name…"
-                        className="w-full rounded-xl border border-border bg-background pl-10 pr-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
+                        autoComplete="off"
+                        className={cn(
+                          "w-full rounded-xl border bg-background pl-10 pr-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none transition-colors",
+                          selectedInstId ? "border-primary" : "border-border"
+                        )}
                       />
+                      {/* Loading spinner */}
+                      {isInstFetching && (
+                        <div className="absolute right-3.5 top-3">
+                          <InlineSpinner />
+                        </div>
+                      )}
                     </div>
 
-                    {instData?.items && instData.items.length > 0 && (
-                      <div className="max-h-36 overflow-y-auto rounded-xl border border-border bg-card p-1 space-y-1">
-                        {instData.items.map((it) => (
-                          <button
-                            key={it.id}
-                            type="button"
-                            onClick={() => {
-                              setSelectedInstId(it.id);
-                              setSelectedInstName(it.name);
-                              setInstSearchQuery(it.name);
-                            }}
-                            className={cn(
-                              "w-full text-left px-3 py-2 rounded-lg text-xs transition-colors flex items-center justify-between",
-                              selectedInstId === it.id
-                                ? "bg-primary/10 text-primary font-semibold"
-                                : "hover:bg-secondary text-foreground"
+                    {/* Selected display badge */}
+                    {selectedInstId && selectedInstName && (
+                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20">
+                        <Check className="size-3.5 text-primary shrink-0" />
+                        <span className="text-xs text-primary font-medium flex-1 truncate">{selectedInstName}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedInstId(null);
+                            setSelectedInstName("");
+                            setInstSearchQuery("");
+                          }}
+                          className="text-muted-foreground hover:text-destructive text-xs ml-auto shrink-0"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Dropdown suggestions */}
+                    {instDropdownOpen && instSearchQuery.trim().length >= 1 && (
+                      <div className="max-h-52 overflow-y-auto rounded-xl border border-border bg-card shadow-lg p-1 space-y-0.5">
+                        {/* DB results */}
+                        {instData?.items && instData.items.length > 0 ? (
+                          instData.items.map((it) => (
+                            <button
+                              key={it.id}
+                              type="button"
+                              onMouseDown={(e) => e.preventDefault()} // prevent blur before click
+                              onClick={() => {
+                                setSelectedInstId(it.id);
+                                setSelectedInstName(it.name);
+                                setInstSearchQuery(it.name);
+                                setInstDropdownOpen(false);
+                              }}
+                              className={cn(
+                                "w-full text-left px-3 py-2 rounded-lg text-xs transition-colors flex items-center justify-between gap-2",
+                                selectedInstId === it.id
+                                  ? "bg-primary/10 text-primary font-semibold"
+                                  : "hover:bg-secondary text-foreground"
+                              )}
+                            >
+                              <span className="truncate">{it.name}</span>
+                              <span className="text-muted-foreground shrink-0">{it.city || it.state_region || it.country_code}</span>
+                              {selectedInstId === it.id && <Check className="size-3.5 shrink-0" />}
+                            </button>
+                          ))
+                        ) : (
+                          !isInstFetching && (
+                            <p className="px-3 py-2 text-xs text-muted-foreground">No colleges found for &quot;{instSearchQuery}&quot;</p>
+                          )
+                        )}
+
+                        {/* Always show "Use as-is / Others" separator */}
+                        {instSearchQuery.trim().length >= 2 && (
+                          <>
+                            {instData?.items && instData.items.length > 0 && (
+                              <div className="border-t border-border my-0.5" />
                             )}
-                          >
-                            <span>{it.name} ({it.city || it.country_code})</span>
-                            {selectedInstId === it.id && <Check className="size-3.5" />}
-                          </button>
-                        ))}
+                            <button
+                              type="button"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => {
+                                setSelectedInstId(null);
+                                setSelectedInstName(instSearchQuery.trim());
+                                setInstDropdownOpen(false);
+                              }}
+                              className="w-full text-left px-3 py-2 rounded-lg text-xs transition-colors hover:bg-secondary text-muted-foreground italic flex items-center gap-2"
+                            >
+                              <span className="text-primary font-semibold not-italic">+</span>
+                              Use &quot;{instSearchQuery.trim()}&quot; (Others)
+                            </button>
+                          </>
+                        )}
                       </div>
                     )}
 
@@ -558,10 +662,11 @@ export function OnboardingFlow() {
                       onClick={() => {
                         setIsCustomInst(true);
                         setSelectedInstId(null);
+                        setInstDropdownOpen(false);
                       }}
                       className="text-xs text-primary hover:underline font-medium block pt-1"
                     >
-                      + Can't find my college (Type manually)
+                      + Can&apos;t find my college? Type it manually
                     </button>
                   </div>
                 ) : (
@@ -577,7 +682,11 @@ export function OnboardingFlow() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => setIsCustomInst(false)}
+                      onClick={() => {
+                        setIsCustomInst(false);
+                        setInstSearchQuery("");
+                        setSelectedInstId(null);
+                      }}
                     >
                       Search List
                     </Button>
