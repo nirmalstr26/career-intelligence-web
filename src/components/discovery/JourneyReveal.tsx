@@ -46,8 +46,8 @@ export function JourneyReveal({
     },
     {
       title: "1. Baseline Assessment",
-      subtitle: "Find your starting point",
-      desc: "Short diagnostic to see what you already know vs. what to build.",
+      subtitle: "3-Min Skill Pulse (Optional)",
+      desc: "Quick 5-question pulse check to benchmark your starting readiness score.",
       icon: Target,
       status: "upcoming",
     },
@@ -170,7 +170,7 @@ export function JourneyReveal({
           </h3>
         </div>
         <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl">
-          I know your direction, but I don't yet know exactly where your strengths and gaps are. We'll start with a short baseline assessment so I don't make you repeat things you already know.
+          I know your direction, but I don't yet know exactly where your strengths and gaps are. You can take a fast 3-minute Skill Pulse (5 questions) anytime so I don't make you repeat concepts you already know, or dive straight into your Cockpit now!
         </p>
 
         <div className="grid gap-3 sm:grid-cols-2 pt-2">
@@ -193,31 +193,32 @@ export function JourneyReveal({
       <div className="flex flex-col items-center justify-center gap-3 pt-4 sm:flex-row">
         <Button
           size="lg"
-          onClick={() => void navigate({ to: "/app/diagnostic" })}
-          className="w-full sm:w-auto gap-2 rounded-xl bg-primary px-8 text-sm font-semibold text-primary-foreground hover:bg-primary/90 shadow-md"
+          onClick={() => void navigate({ to: "/app/today" })}
+          className="w-full sm:w-auto gap-2 rounded-xl bg-primary px-8 text-sm font-bold text-primary-foreground hover:bg-primary/90 shadow-lg"
         >
-          <Zap className="size-4 fill-current" />
-          Find my starting point (Diagnostic)
+          <Sparkles className="size-4 fill-current" />
+          Launch My Career Cockpit
           <ArrowRight className="size-4" />
         </Button>
 
         <Button
           variant="outline"
           size="lg"
-          onClick={() => void navigate({ to: "/app/coach" })}
-          className="w-full sm:w-auto gap-2 rounded-xl text-sm"
+          onClick={() => void navigate({ to: "/app/diagnostic" })}
+          className="w-full sm:w-auto gap-2 rounded-xl text-sm font-semibold border-border hover:bg-secondary/60"
         >
-          <MessageSquare className="size-4" />
-          Ask SPAR about my path
+          <Zap className="size-4 text-amber-500 fill-amber-500/20" />
+          Take 3-Min Skill Pulse (5 Qs)
         </Button>
 
         <Button
           variant="ghost"
           size="lg"
-          onClick={() => void navigate({ to: "/app/today" })}
-          className="w-full sm:w-auto text-xs text-muted-foreground hover:text-foreground"
+          onClick={() => void navigate({ to: "/app/coach" })}
+          className="w-full sm:w-auto gap-2 rounded-xl text-xs text-muted-foreground hover:text-foreground"
         >
-          Go to Dashboard
+          <MessageSquare className="size-4" />
+          Ask SPAR about my path
         </Button>
       </div>
     </div>

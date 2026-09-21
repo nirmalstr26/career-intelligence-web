@@ -310,6 +310,21 @@ export function resolveStudentJourney(
         ctaText: `Continue ${inProgressModule.title || "Module"}`,
         ctaLink: `/app/learn/${inProgressModule.code}`,
       };
+    } else if (modulesCompleted === 0 && (!ci?.placement_readiness?.evidence_count || ci.placement_readiness.evidence_count === 0)) {
+      primaryAction = {
+        type: "diagnostic",
+        priority: "RECOMMENDED",
+        badgeText: "Day 1 Mission",
+        title: "Benchmark Your Baseline (3-Min Skill Pulse)",
+        subtitle: `Answer 5 quick questions so SPAR personalizes your ${primaryCareerName} roadmap and calculates your starting readiness score.`,
+        estimatedMinutes: 3,
+        phaseName: "Foundations",
+        difficulty: "EASY",
+        whyItMatters: "Establishes your initial baseline score and helps you test out of introductory material you already know.",
+        whatHappensNext: "Calculates your initial Career Readiness score and unlocks tailored learning milestones.",
+        ctaText: "Start 3-Min Skill Pulse",
+        ctaLink: "/app/diagnostic",
+      };
     } else if (recommendedModule) {
       primaryAction = {
         type: "start_module",
