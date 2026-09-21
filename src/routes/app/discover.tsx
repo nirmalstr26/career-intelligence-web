@@ -27,8 +27,7 @@ export const Route = createFileRoute("/app/discover")({
 
 function DiscoverPage() {
   const navigate = useNavigate();
-  const { session: authSession } = useAuth();
-  const student = authSession?.student ?? null;
+  const { student, user } = useAuth();
 
   const { data: sessionData, isLoading, refetch } = useCurrentCareerDiscovery();
   const startDiscovery = useStartCareerDiscovery();
@@ -78,9 +77,9 @@ function DiscoverPage() {
     (r) => r.career_code === session?.selected_career_code
   );
 
-  const studentName = student?.first_name || "Student";
-  const deptName = student?.academic_profile?.program?.department || "Engineering";
-  const yearNum = student?.academic_profile?.current_year || 1;
+  const studentName = student?.first_name || user?.name?.split(" ")[0] || "Student";
+  const deptName = (student as any)?.academic_profile?.program?.department || "Engineering";
+  const yearNum = (student as any)?.academic_profile?.current_year || 1;
 
   // 1. Stage: Career Selected -> Journey Reveal
   if (hasSelectedCareer && session?.selected_career_code) {
