@@ -293,14 +293,14 @@ export function Hero() {
 
       {/* ── CENTERED HERO CONTENT CONTAINER ────────────────────── */}
       <div className="relative z-10 w-full px-4 sm:px-8 lg:px-12 xl:px-16 mx-auto max-w-[1440px]">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] xl:grid-cols-[1fr_440px] gap-10 lg:gap-14 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_420px] xl:grid-cols-[minmax(0,1.1fr)_440px] gap-8 lg:gap-12 xl:gap-14 items-center">
 
           {/* ── LEFT COLUMN: VALUE PROPOSITION & CAPABILITIES ────── */}
-          <div className="space-y-5 lg:space-y-6">
+          <div className="space-y-5 lg:space-y-6 min-w-0 max-w-full">
 
             {/* Headline */}
-            <div style={{ animation: "hero-fade-up 0.55s ease forwards 0ms", opacity: 0 }}>
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-[3.8rem] xl:text-[4.2rem] font-extrabold tracking-tight leading-[1.06] text-white">
+            <div>
+              <h1 className="font-display text-4xl sm:text-5xl lg:text-[3.6rem] xl:text-[4rem] font-extrabold tracking-tight leading-[1.06] text-white">
                 Your career,{" "}
                 <br className="hidden sm:block" />
                 <span
@@ -318,25 +318,19 @@ export function Hero() {
             </div>
 
             {/* Subtitle */}
-            <p
-              className="text-base sm:text-lg text-white/60 leading-relaxed max-w-xl font-light"
-              style={{ animation: "hero-fade-up 0.55s ease forwards 150ms", opacity: 0 }}
-            >
+            <p className="text-base sm:text-lg text-white/60 leading-relaxed max-w-xl font-light">
               SPAR maps your strengths to high-demand careers, builds your adaptive
               skill roadmap, coaches you through real mock interviews, and tracks
               your hiring readiness — all in one AI platform built for college students.
             </p>
 
             {/* ── SCROLLING TICKER STRIP (PERSONALISED ROADMAPS ETC) ─ */}
-            <div style={{ animation: "hero-fade-up 0.5s ease forwards 250ms", opacity: 0 }}>
+            <div className="w-full max-w-xl min-w-0 overflow-hidden">
               <TickerStrip />
             </div>
 
             {/* ── 4 STATS — clean inline row matching image ───────── */}
-            <div
-              className="flex flex-wrap gap-x-8 gap-y-4 sm:gap-x-12 pt-1"
-              style={{ animation: "hero-fade-up 0.5s ease forwards 350ms", opacity: 0 }}
-            >
+            <div className="flex flex-wrap gap-x-6 gap-y-4 sm:gap-x-10 pt-1">
               {STAT_ITEMS.map((s) => (
                 <div key={s.label} className="flex flex-col">
                   <div
@@ -361,10 +355,7 @@ export function Hero() {
             </div>
 
             {/* ── CREDIBILITY & TRUST STRIP ─────────────────────── */}
-            <div
-              className="flex flex-wrap items-center gap-3 pt-2"
-              style={{ animation: "hero-fade-up 0.5s ease forwards 450ms", opacity: 0 }}
-            >
+            <div className="flex flex-wrap items-center gap-3 pt-2">
               {/* College Avatars */}
               <div className="flex -space-x-2">
                 {[
@@ -401,10 +392,10 @@ export function Hero() {
 
           {/* ── RIGHT COLUMN: GLOWING HIGH-CONVERTING AUTH CARD ──── */}
           <div
-            className="flex justify-center lg:justify-end"
-            style={{ animation: "hero-fade-up 0.65s ease forwards 300ms", opacity: 0 }}
+            id="auth-card"
+            className="flex justify-center lg:justify-end w-full min-w-0 mt-6 lg:mt-0"
           >
-            <div className="relative w-full max-w-[440px]">
+            <div className="relative w-full max-w-[420px] sm:max-w-[440px]">
               {/* Multi-Layered Neon Backlight Glow */}
               <div
                 className="absolute -inset-6 rounded-3xl opacity-70 pointer-events-none"
