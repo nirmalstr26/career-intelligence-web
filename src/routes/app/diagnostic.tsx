@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardList, Home } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardList, Home, Sparkles, Zap, X, Clock } from "lucide-react";
 
 import { Chip, EmptyState, SectionCard, humanizeCode } from "@/components/app/ui";
 import { InlineSpinner } from "@/components/common/Loader";
@@ -26,6 +26,7 @@ type Phase = "intro" | "in_progress" | "results";
 function DiagnosticPage() {
   const studentId = useStudentId();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const assessmentsQuery = useQuery({
     queryKey: ["assessments"],
@@ -33,6 +34,7 @@ function DiagnosticPage() {
   });
 
   const [phase, setPhase] = useState<Phase>("intro");
+  const [pulseMode, setPulseMode] = useState<"pulse" | "full">("pulse");
   const [attempt, setAttempt] = useState<StartedAttempt | null>(null);
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
   const [index, setIndex] = useState(0);
@@ -40,13 +42,46 @@ function DiagnosticPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function begin(assessment: AssessmentSummary) {
+  async function begin(assessment: AssessmentSummary, mode: "pulse" | "full" = pulseMode) {
     setError(null);
     setBusy(true);
     try {
       const started = await careerai.startAttempt(studentId, assessment.id);
-      const ordered = [...started.questions].sort((a, b) => a.display_order - b.display_order);
-      setAttempt({ ...started, questions: ordered });
+      let ordered = [...started.questions].sort((a, b) => a.display_order - b.display_order);
+
+      if (mode === "pulse" && ordered.length > 5) {
+        // Select 5 core representative questions across different domains:
+        const targetSkills = ["PROGRAMMING", "SQL", "DATA_STRUCTURES", "SYSTEM_DESIGN", "ANALYTICAL_REASONING"];
+        const selectedQuestions: AttemptQuestion[] = [];
+
+        for (const skill of targetSkills) {
+          const found = ordered.find((q) => q.skill_code === skill && !selectedQuestions.some(sq => sq.id === q.id));
+          if (found) {
+            selectedQuestions.push(found);
+          }
+        }
+
+        // If fewer than 5 found, backfill from remaining
+        if (selectedQuestions.length < 5) {
+          for (const q of ordered) {
+            if (selectedQuestions.length >= 5) break;
+            if (!selectedQuestions.some(sq => sq.id === q.id)) {
+              selectedQuestions.push(q);
+            }
+          }
+        }
+
+        ordered = selectedQuestions;
+      }
+
+      setAttempt({
+        ...started,
+        assessment: {
+          ...started.assessment,
+          name: mode === "pulse" ? "Career Foundation Skill Pulse" : started.assessment.name,
+        },
+        questions: ordered,
+      });
       setAnswers({});
       setIndex(0);
       setResult(null);
@@ -141,6 +176,7 @@ function DiagnosticPage() {
         onBack={() => setIndex((i) => Math.max(0, i - 1))}
         onNext={() => void next(question)}
         onFinish={() => void finish(question)}
+        onExit={() => void navigate({ to: "/app/today" })}
         busy={busy}
         error={error}
       />
@@ -149,11 +185,27 @@ function DiagnosticPage() {
 
   // intro
   return (
-    <div className="space-y-6">
-      <header>
-        <h1 className="font-display text-2xl font-bold sm:text-3xl">Diagnostic</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Answer a few questions so CareerAI can measure your skills and refine your career fit.
+    <div className="mx-auto max-w-[760px] space-y-6 animate-in fade-in duration-300">
+      <div className="flex items-center justify-between">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => void navigate({ to: "/app/today" })}
+          className="gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="size-3.5" />
+          Back to Career Cockpit
+        </Button>
+      </div>
+
+      <header className="space-y-2">
+        <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary">
+          <Sparkles className="size-3.5" />
+          <span>Baseline Technical Calibration</span>
+        </div>
+        <h1 className="font-display text-2xl font-bold sm:text-3xl">Skill Diagnostic</h1>
+        <p className="text-sm text-muted-foreground leading-relaxed max-w-xl">
+          Quickly calibrate your starting placement readiness score so SPAR can personalize your curriculum and avoid repeating topics you already know.
         </p>
       </header>
 
@@ -163,9 +215,60 @@ function DiagnosticPage() {
         </p>
       ) : null}
 
+      {/* Mode Selector Card */}
+      <div className="grid gap-3.5 sm:grid-cols-2">
+        <div
+          onClick={() => setPulseMode("pulse")}
+          className={cn(
+            "relative cursor-pointer rounded-2xl border p-5 transition-all",
+            pulseMode === "pulse"
+              ? "border-primary bg-primary/10 shadow-md ring-1 ring-primary/40"
+              : "border-border bg-card hover:border-border/80 hover:bg-surface"
+          )}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 text-[10px] font-bold text-amber-500 uppercase tracking-wider">
+              <Zap className="size-3 fill-current" />
+              Recommended · ~3 Mins
+            </span>
+            <div className={cn("size-4 rounded-full border flex items-center justify-center", pulseMode === "pulse" ? "border-primary bg-primary" : "border-muted-foreground/30")}>
+              {pulseMode === "pulse" && <div className="size-1.5 rounded-full bg-white" />}
+            </div>
+          </div>
+          <h3 className="font-display text-base font-bold text-foreground">5-Question Skill Pulse</h3>
+          <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+            Fast, high-impact check across Programming, SQL, Data Structures, Systems, and Logic. Perfect for day-1 setup.
+          </p>
+        </div>
+
+        <div
+          onClick={() => setPulseMode("full")}
+          className={cn(
+            "relative cursor-pointer rounded-2xl border p-5 transition-all",
+            pulseMode === "full"
+              ? "border-primary bg-primary/10 shadow-md ring-1 ring-primary/40"
+              : "border-border bg-card hover:border-border/80 hover:bg-surface"
+          )}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+              <Clock className="size-3" />
+              Comprehensive · ~15 Mins
+            </span>
+            <div className={cn("size-4 rounded-full border flex items-center justify-center", pulseMode === "full" ? "border-primary bg-primary" : "border-muted-foreground/30")}>
+              {pulseMode === "full" && <div className="size-1.5 rounded-full bg-white" />}
+            </div>
+          </div>
+          <h3 className="font-display text-base font-bold text-foreground">Full Foundation Diagnostic</h3>
+          <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+            In-depth 22-question assessment across all foundational engineering competencies for an exhaustive benchmark.
+          </p>
+        </div>
+      </div>
+
       {assessmentsQuery.isLoading ? (
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <InlineSpinner /> Loading assessments&hellip;
+        <div className="flex items-center gap-2 text-muted-foreground py-8 justify-center">
+          <InlineSpinner /> Loading assessment details&hellip;
         </div>
       ) : assessmentsQuery.data === undefined || assessmentsQuery.data.length === 0 ? (
         <SectionCard>
@@ -175,40 +278,46 @@ function DiagnosticPage() {
             description="There are no active assessments right now. Check back soon."
             action={
               <Button asChild variant="outline">
-                <Link to="/app/home">
-                  <Home />
-                  Back to dashboard
+                <Link to="/app/today">
+                  <Home className="size-4 mr-2" />
+                  Back to Cockpit
                 </Link>
               </Button>
             }
           />
         </SectionCard>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {assessmentsQuery.data.map((assessment) => (
-            <SectionCard key={assessment.id}>
-              <div className="flex items-start justify-between gap-3">
+        <div>
+          {assessmentsQuery.data.slice(0, 1).map((assessment) => (
+            <div key={assessment.id} className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h2 className="font-display text-lg font-semibold">{assessment.name}</h2>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <Chip>{humanizeCode(assessment.assessment_type)}</Chip>
-                    {assessment.estimated_minutes !== null ? (
-                      <Chip>~{assessment.estimated_minutes} min</Chip>
-                    ) : null}
-                  </div>
+                  <h2 className="font-display text-lg font-bold">
+                    {pulseMode === "pulse" ? "Career Foundation Skill Pulse" : assessment.name}
+                  </h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {pulseMode === "pulse" ? "5 high-signal questions · ~3 minutes" : "22 questions · ~15 minutes"}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Chip>{pulseMode === "pulse" ? "5 Questions" : "22 Questions"}</Chip>
+                  <Chip>{pulseMode === "pulse" ? "~3 min" : "~15 min"}</Chip>
                 </div>
               </div>
-              <Button
-                variant="hero"
-                className="mt-5 w-full"
-                disabled={busy}
-                onClick={() => void begin(assessment)}
-              >
-                {busy ? <InlineSpinner /> : null}
-                Begin
-                <ArrowRight />
-              </Button>
-            </SectionCard>
+
+              <div className="pt-2">
+                <Button
+                  size="lg"
+                  className="w-full gap-2 rounded-xl bg-primary text-sm font-bold text-primary-foreground hover:bg-primary/90 shadow-md"
+                  disabled={busy}
+                  onClick={() => void begin(assessment, pulseMode)}
+                >
+                  {busy ? <InlineSpinner /> : <Zap className="size-4 fill-current" />}
+                  {pulseMode === "pulse" ? "Begin 3-Min Skill Pulse" : "Begin Full Diagnostic"}
+                  <ArrowRight className="size-4" />
+                </Button>
+              </div>
+            </div>
           ))}
         </div>
       )}
@@ -226,6 +335,7 @@ interface QuestionViewProps {
   onBack: () => void;
   onNext: () => void;
   onFinish: () => void;
+  onExit?: () => void;
   busy: boolean;
   error: string | null;
 }
@@ -240,6 +350,7 @@ function QuestionView({
   onBack,
   onNext,
   onFinish,
+  onExit,
   busy,
   error,
 }: QuestionViewProps) {
@@ -260,9 +371,22 @@ function QuestionView({
   return (
     <div className="mx-auto max-w-[720px] space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
-          {assessmentName}
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
+            {assessmentName}
+          </p>
+          {onExit && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onExit}
+              className="gap-1.5 text-xs text-muted-foreground hover:text-foreground h-7 px-2"
+            >
+              <X className="size-3.5" />
+              Save & Exit to Cockpit
+            </Button>
+          )}
+        </div>
         <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground">
           <span>
             Question {index + 1} of {total}
@@ -389,9 +513,9 @@ function ResultsView({ result, onRestart }: { result: AttemptResult; onRestart: 
 
       <div className="flex flex-wrap gap-3">
         <Button asChild variant="hero">
-          <Link to="/app/home">
+          <Link to="/app/today">
             <Home />
-            Back to dashboard
+            Back to Cockpit
           </Link>
         </Button>
         <Button variant="outline" onClick={onRestart}>
