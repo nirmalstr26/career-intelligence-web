@@ -143,6 +143,26 @@ function AuroraBackground({ parallax }: { parallax: number }) {
         }}
       />
 
+      {/* Orbital Dotted Trajectory Arc matching reference image */}
+      <svg
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 1440 900"
+        preserveAspectRatio="none"
+      >
+        <path
+          d="M-40 460 Q 480 610, 980 390 T 1480 260"
+          fill="none"
+          stroke="rgba(6,215,247,0.18)"
+          strokeWidth="1.5"
+          strokeDasharray="4 8"
+        />
+        <circle cx="260" cy="505" r="2.5" fill="#06d7f7" opacity="0.6" />
+        <circle cx="560" cy="535" r="3" fill="#818cf8" opacity="0.7" />
+        <circle cx="860" cy="450" r="2.5" fill="#a855f7" opacity="0.6" />
+        <circle cx="1180" cy="340" r="3" fill="#06d7f7" opacity="0.7" />
+      </svg>
+
       {/* Vignette Depth */}
       <div
         className="absolute inset-0"
@@ -162,11 +182,11 @@ function AuroraBackground({ parallax }: { parallax: number }) {
  * TICKER ITEMS — horizontal scrolling strip
  * ------------------------------------------------------------------ */
 const TICKER_ITEMS = [
-  { label: "READINESS SCORE", dot: "cyan" },
-  { label: "PROJECT GUIDANCE", dot: "indigo" },
-  { label: "PLACEMENT READY", dot: "violet" },
-  { label: "AI INTERVIEW COACH", dot: "emerald" },
-  { label: "SKILL ROADMAP", dot: "cyan" },
+  { label: "PERSONALISED ROADMAPS", dot: "cyan" },
+  { label: "READINESS SCORE", dot: "indigo" },
+  { label: "PROJECT GUIDANCE", dot: "violet" },
+  { label: "PLACEMENT READY", dot: "emerald" },
+  { label: "AI INTERVIEW COACH", dot: "cyan" },
   { label: "CAREER MATCHING", dot: "indigo" },
   { label: "LIVE MOCK ROUNDS", dot: "violet" },
   { label: "HIRING INTELLIGENCE", dot: "emerald" },
@@ -184,20 +204,20 @@ function TickerStrip() {
   const items = [...TICKER_ITEMS, ...TICKER_ITEMS];
   return (
     <div
-      className="relative w-full overflow-hidden py-2"
-      style={{ mask: "linear-gradient(90deg, transparent, black 10%, black 90%, transparent)" }}
+      className="relative w-full overflow-hidden py-1.5"
+      style={{ mask: "linear-gradient(90deg, transparent, black 8%, black 92%, transparent)" }}
     >
       <div
         className="flex gap-0 whitespace-nowrap"
         style={{
-          animation: "ticker-scroll 22s linear infinite",
+          animation: "ticker-scroll 24s linear infinite",
           width: "max-content",
         }}
       >
         {items.map((item, i) => (
           <span
             key={i}
-            className="inline-flex items-center gap-2.5 px-5 text-[11px] font-bold tracking-widest uppercase text-white/45 select-none"
+            className="inline-flex items-center gap-2 px-4 sm:px-5 text-[10.5px] font-bold tracking-widest uppercase text-white/40 select-none"
           >
             <span
               className="size-1.5 rounded-full shrink-0"
@@ -267,7 +287,7 @@ export function Hero() {
   const parallax = useHeroParallax(0.14);
 
   return (
-    <section className="relative isolate w-full min-h-[92vh] flex items-center overflow-hidden pt-6 pb-16">
+    <section className="relative isolate w-full min-h-[92vh] flex items-center overflow-hidden pt-4 pb-14">
       {/* ── 100% EDGE-TO-EDGE FULL-BLEED ANIMATED AURORA CANVAS ── */}
       <AuroraBackground parallax={parallax} />
 
@@ -276,27 +296,13 @@ export function Hero() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] xl:grid-cols-[1fr_440px] gap-10 lg:gap-14 items-center">
 
           {/* ── LEFT COLUMN: VALUE PROPOSITION & CAPABILITIES ────── */}
-          <div className="space-y-6 lg:space-y-7">
-
-            {/* Futuristic Eyebrow Pill */}
-            <div
-              className="inline-flex items-center gap-2.5 rounded-full border border-cyan-400/35 bg-cyan-950/40 px-4 py-1.5 backdrop-blur-md shadow-[0_0_20px_rgba(6,215,247,0.2)]"
-              style={{ animation: "hero-fade-up 0.5s ease forwards 0ms", opacity: 0 }}
-            >
-              <div className="relative flex size-2 items-center justify-center">
-                <span className="absolute size-2 rounded-full bg-cyan-400 animate-ping opacity-75" />
-                <span className="size-1.5 rounded-full bg-cyan-400" />
-              </div>
-              <Sparkles className="size-3.5 text-cyan-400" />
-              <span className="text-[11px] font-bold tracking-wider uppercase text-cyan-200">
-                AI Career Intelligence · India's #1 Platform
-              </span>
-            </div>
+          <div className="space-y-5 lg:space-y-6">
 
             {/* Headline */}
-            <div style={{ animation: "hero-fade-up 0.55s ease forwards 120ms", opacity: 0 }}>
+            <div style={{ animation: "hero-fade-up 0.55s ease forwards 0ms", opacity: 0 }}>
               <h1 className="font-display text-4xl sm:text-5xl lg:text-[3.8rem] xl:text-[4.2rem] font-extrabold tracking-tight leading-[1.06] text-white">
                 Your career,{" "}
+                <br className="hidden sm:block" />
                 <span
                   className="bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-400 bg-clip-text text-transparent"
                   style={{
@@ -314,50 +320,58 @@ export function Hero() {
             {/* Subtitle */}
             <p
               className="text-base sm:text-lg text-white/60 leading-relaxed max-w-xl font-light"
-              style={{ animation: "hero-fade-up 0.55s ease forwards 240ms", opacity: 0 }}
+              style={{ animation: "hero-fade-up 0.55s ease forwards 150ms", opacity: 0 }}
             >
               SPAR maps your strengths to high-demand careers, builds your adaptive
               skill roadmap, coaches you through real mock interviews, and tracks
               your hiring readiness — all in one AI platform built for college students.
             </p>
 
-            {/* ── SCROLLING TICKER STRIP ─────────────────────────── */}
-            <div style={{ animation: "hero-fade-up 0.5s ease forwards 340ms", opacity: 0 }}>
+            {/* ── SCROLLING TICKER STRIP (PERSONALISED ROADMAPS ETC) ─ */}
+            <div style={{ animation: "hero-fade-up 0.5s ease forwards 250ms", opacity: 0 }}>
               <TickerStrip />
             </div>
 
-            {/* ── 4 STATS — simple inline row ───────────────────── */}
+            {/* ── 4 STATS — clean inline row matching image ───────── */}
             <div
-              className="flex flex-wrap gap-x-6 gap-y-3 sm:gap-x-10 pt-1"
-              style={{ animation: "hero-fade-up 0.5s ease forwards 480ms", opacity: 0 }}
+              className="flex flex-wrap gap-x-8 gap-y-4 sm:gap-x-12 pt-1"
+              style={{ animation: "hero-fade-up 0.5s ease forwards 350ms", opacity: 0 }}
             >
               {STAT_ITEMS.map((s) => (
                 <div key={s.label} className="flex flex-col">
                   <div
-                    className="text-2xl sm:text-3xl font-black leading-none tracking-tight"
+                    className="text-2xl sm:text-3xl lg:text-[2.2rem] font-black leading-none tracking-tight"
                     style={{ color: s.color, textShadow: `0 0 20px ${s.color}55` }}
                   >
                     {s.value}
-                    <span className="text-lg font-bold ml-0.5">{s.suffix}</span>
+                    <span className="text-base sm:text-lg font-bold ml-0.5">{s.suffix}</span>
                   </div>
-                  <div className="text-[12px] font-semibold text-white/80 mt-0.5 leading-tight">{s.label}</div>
-                  <div className="text-[10px] text-white/35 leading-tight">{s.subLabel}</div>
+                  <div className="text-[13px] font-bold text-white mt-1.5 leading-tight">{s.label}</div>
+                  <div className="text-[11px] text-white/40 leading-tight mt-0.5">{s.subLabel}</div>
+                  {/* Subtle colored glow bar underneath matching reference image */}
+                  <div
+                    className="h-[3px] w-8 rounded-full mt-2"
+                    style={{
+                      backgroundColor: s.color,
+                      boxShadow: `0 0 8px ${s.color}88`,
+                    }}
+                  />
                 </div>
               ))}
             </div>
 
             {/* ── CREDIBILITY & TRUST STRIP ─────────────────────── */}
             <div
-              className="flex flex-wrap items-center gap-3 pt-1"
-              style={{ animation: "hero-fade-up 0.5s ease forwards 640ms", opacity: 0 }}
+              className="flex flex-wrap items-center gap-3 pt-2"
+              style={{ animation: "hero-fade-up 0.5s ease forwards 450ms", opacity: 0 }}
             >
               {/* College Avatars */}
               <div className="flex -space-x-2">
                 {[
-                  { bg: "bg-gradient-to-br from-cyan-400 to-cyan-600", text: "VIT" },
-                  { bg: "bg-gradient-to-br from-indigo-400 to-indigo-600", text: "SRM" },
-                  { bg: "bg-gradient-to-br from-violet-400 to-violet-600", text: "BITS" },
-                  { bg: "bg-gradient-to-br from-emerald-400 to-emerald-600", text: "MIT" },
+                  { bg: "bg-cyan-500", text: "VIT" },
+                  { bg: "bg-indigo-600", text: "SRM" },
+                  { bg: "bg-violet-600", text: "BITS" },
+                  { bg: "bg-emerald-500", text: "MIT" },
                 ].map((a, i) => (
                   <div
                     key={i}
@@ -376,9 +390,10 @@ export function Hero() {
                 and 60+ colleges
               </p>
 
-              <div className="flex items-center gap-1.5 ml-auto sm:ml-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-[11px] text-emerald-300 font-semibold">
+              <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold ml-1">
                 <CheckCircle2 className="size-3.5 text-emerald-400" />
                 <span>100% Free for Students</span>
+                <span className="text-emerald-400/70 font-bold">&gt;</span>
               </div>
             </div>
 
