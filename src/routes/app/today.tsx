@@ -98,7 +98,7 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
   const journey = resolveStudentJourney(ci, curr);
   const primary = journey.primaryAction;
 
-  const readinessScore = Math.round(ci.placement_readiness?.score ?? ci.primary_career_readiness?.score ?? (ci as any)?.readiness?.overall_score ?? 78);
+  const readinessScore = Math.round(ci.placement_readiness?.score ?? ci.primary_career_readiness?.score ?? (ci as any)?.readiness?.overall_score ?? 0);
   const firstName = student?.first_name || user?.name?.split(" ")[0] || "Student";
 
   const getGreeting = () => {
@@ -288,7 +288,8 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
                 Continuous Interview Readiness
               </span>
               <Badge className="bg-primary/15 text-primary border-none text-[10px] font-bold">
-                {journey.interviewPrep?.level === "PLACEMENT_READY" ? "Placement Ready" :
+                {(journey.interviewPrep?.score ?? 0) === 0 ? "Not Started" :
+                 journey.interviewPrep?.level === "PLACEMENT_READY" ? "Placement Ready" :
                  journey.interviewPrep?.level === "INTERVIEW_READY" ? "Interview Ready" : "Developing"}
               </Badge>
             </div>
@@ -303,7 +304,7 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
           <div className="flex items-center gap-4 bg-primary/[0.06] border border-primary/20 rounded-2xl p-4 shrink-0">
             <div className="text-center">
               <div className="text-3xl sm:text-4xl font-black text-primary font-mono tracking-tight">
-                {journey.interviewPrep?.score ?? 74}%
+                {journey.interviewPrep?.score ?? 0}%
               </div>
               <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-0.5">
                 Interview Prep Score
@@ -337,31 +338,42 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
             </p>
 
             <div className="space-y-2.5 pt-1">
-              {journey.interviewPrep?.areasImproved?.map((item) => (
-                <div
-                  key={item.skillCode}
-                  className="flex items-center justify-between p-3 rounded-xl border border-border/60 bg-card/80 text-xs shadow-xs"
-                >
-                  <div className="space-y-0.5">
-                    <div className="font-bold text-foreground flex items-center gap-2">
-                      {item.name}
-                      {item.recentGain && (
-                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/15 px-1.5 py-0.5 rounded-full">
-                          {item.recentGain}
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-[10px] text-muted-foreground">
-                      Category: {item.category || "Core"} · Status: {item.level}
-                    </div>
-                  </div>
-
-                  <div className="text-right font-mono font-bold text-foreground text-sm">
-                    {item.score}
-                    <span className="text-[10px] font-normal text-muted-foreground">/100</span>
-                  </div>
+              {(journey.interviewPrep?.areasImproved?.length ?? 0) === 0 ? (
+                <div className="rounded-xl border border-dashed border-border/80 p-4 text-center">
+                  <p className="text-xs text-muted-foreground">
+                    No verified skills yet. Complete your Day 1 3-Min Skill Pulse to benchmark your technical foundation.
+                  </p>
+                  <Button asChild size="sm" variant="outline" className="mt-2.5 text-xs font-semibold">
+                    <Link to="/app/diagnostic">Start 3-Min Skill Pulse</Link>
+                  </Button>
                 </div>
-              ))}
+              ) : (
+                journey.interviewPrep?.areasImproved?.map((item) => (
+                  <div
+                    key={item.skillCode}
+                    className="flex items-center justify-between p-3 rounded-xl border border-border/60 bg-card/80 text-xs shadow-xs"
+                  >
+                    <div className="space-y-0.5">
+                      <div className="font-bold text-foreground flex items-center gap-2">
+                        {item.name}
+                        {item.recentGain && (
+                          <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/15 px-1.5 py-0.5 rounded-full">
+                            {item.recentGain}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">
+                        Category: {item.category || "Core"} · Status: {item.level}
+                      </div>
+                    </div>
+
+                    <div className="text-right font-mono font-bold text-foreground text-sm">
+                      {item.score}
+                      <span className="text-[10px] font-normal text-muted-foreground">/100</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -381,41 +393,48 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
             </p>
 
             <div className="space-y-2.5 pt-1">
-              {journey.interviewPrep?.areasToImprove?.map((item) => (
-                <div
-                  key={item.skillCode}
-                  className="p-3 rounded-xl border border-border/60 bg-card/80 text-xs space-y-2 shadow-xs"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-foreground">{item.name}</span>
-                    <div className="flex items-center gap-2 font-mono">
-                      <span className="text-muted-foreground">{item.currentScore}</span>
-                      <span className="text-[10px] text-muted-foreground">/</span>
-                      <span className="text-primary font-bold">{item.targetScore}</span>
+              {(journey.interviewPrep?.areasToImprove?.length ?? 0) === 0 ? (
+                <div className="rounded-xl border border-dashed border-border/80 p-4 text-center">
+                  <p className="text-xs text-muted-foreground">
+                    No priority gaps identified yet. Take the baseline diagnostic to calibrate priority learning targets.
+                  </p>
+                </div>
+              ) : (
+                journey.interviewPrep?.areasToImprove?.map((item) => (
+                  <div
+                    key={item.skillCode}
+                    className="p-3 rounded-xl border border-border/60 bg-card/80 text-xs space-y-2 shadow-xs"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-foreground">{item.name}</span>
+                      <div className="flex items-center gap-2 font-mono">
+                        <span className="text-muted-foreground">{item.currentScore}</span>
+                        <span className="text-[10px] text-muted-foreground">/</span>
+                        <span className="text-primary font-bold">{item.targetScore}</span>
+                      </div>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-warning transition-all"
+                        style={{ width: `${Math.min(100, Math.round((item.currentScore / item.targetScore) * 100))}%` }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between pt-0.5">
+                      <span className="text-[10px] text-muted-foreground">
+                        Gap: <strong>-{item.gapMagnitude} pts</strong> to target
+                      </span>
+                      <Button asChild variant="ghost" size="sm" className="h-6 px-2 text-[11px] font-bold text-primary hover:text-primary">
+                        <Link to={item.actionLink || "/app/practice"}>
+                          Resolve Gap <ArrowRight className="size-3 ml-1" />
+                        </Link>
+                      </Button>
                     </div>
                   </div>
-
-                  {/* Progress Bar */}
-                  <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-warning transition-all"
-                      style={{ width: `${Math.min(100, Math.round((item.currentScore / item.targetScore) * 100))}%` }}
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between pt-0.5">
-                    <span className="text-[10px] text-muted-foreground">
-                      Gap: <strong>-{item.gapMagnitude} pts</strong> to target
-                    </span>
-                    <Button asChild variant="ghost" size="sm" className="h-6 px-2 text-[11px] font-bold text-primary hover:text-primary">
-                      <Link to={item.actionLink}>
-                        Take Action
-                        <ArrowRight className="size-3 ml-1" />
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
