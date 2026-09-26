@@ -76,24 +76,74 @@ function ProgressContent({ ci }: { ci: CareerIntelligence }) {
   const benchmarkQuery = useStudentBenchmark();
   const bench = benchmarkQuery.data;
 
-  const readinessScore = Math.round(ci?.placement_readiness?.score ?? ci?.primary_career_readiness?.readiness_score ?? (ci as any)?.readiness?.overall_score ?? 78);
+  const curr = currQuery.data as any;
+  const modulesCompleted = curr?.completed_count ?? curr?.completed_modules ?? 0;
+  const totalModules = curr?.total_count ?? curr?.total_modules ?? 15;
+  const currProgressPct = curr?.progress_pct ?? Math.round((modulesCompleted / Math.max(1, totalModules)) * 100);
+
+  const projects = projectsQuery.data || [];
+  const completedProjects = projects.filter((p: any) => p?.state === "COMPLETED");
+  const practicalScore = completedProjects.length > 0 ? Math.round(completedProjects[0].score || 85) : 0;
+
+  const interviews = interviewsQuery.data || [];
+  const completedInterviews = interviews.filter((i: any) => i?.status === "COMPLETED");
+  const interviewScore = completedInterviews.length > 0 ? Math.round(completedInterviews[0].overall_score || 0) : 0;
+
+  const profilePct = ci?.student?.profile_completion ?? 0;
+  const readinessScore = Math.round(ci?.placement_readiness?.score ?? ci?.primary_career_readiness?.score ?? (ci as any)?.readiness?.overall_score ?? 0);
 
   // Skill Evolution Data (Baseline vs Current vs Placement Target)
   const skillsEvolution = [
-    { skill: "SQL Window Functions & Joins", baseline: 45, current: 92, target: 80, status: "STRONG", gap: 0 },
-    { skill: "Relational Database Design", baseline: 50, current: 90, target: 80, status: "STRONG", gap: 0 },
-    { skill: "Python ETL Pipelines", baseline: 40, current: 88, target: 75, status: "STRONG", gap: 0 },
-    { skill: "Technical Communication & Defense", baseline: 55, current: 66, target: 75, status: "DEVELOPING", gap: 9 },
-    { skill: "Apache Spark Distributed Compute", baseline: 20, current: 45, target: 65, status: "GAP", gap: 20 },
+    ...(ci.strengths || []).map((s) => ({
+      skill: humanizeCode(s.skill_code),
+      baseline: Math.max(20, Math.round(s.score * 0.6)),
+      current: Math.round(s.score),
+      target: 80,
+      status: s.score >= 80 ? "STRONG" : "DEVELOPING",
+      gap: Math.max(0, 80 - Math.round(s.score)),
+    })),
+    ...(ci.priority_gaps || []).map((g) => ({
+      skill: humanizeCode(g.skill_code),
+      baseline: 20,
+      current: 40,
+      target: 75,
+      status: "GAP",
+      gap: 35,
+    })),
   ];
 
   // Readiness Composition Breakdown
   const readinessComponents = [
-    { name: "Technical Foundation", score: 88, weight: "25%", evidence: "SQL 92%, Python 88%, DB 90%" },
-    { name: "Practical Projects Portfolio", score: 88, weight: "25%", evidence: "Simple Data Pipeline (Score: 88/100)" },
-    { name: "Technical Mock Interview", score: 68.5, weight: "20%", evidence: "Adaptive Project Defense (Score: 68.5/100)" },
-    { name: "Professional Profile & Resume", score: 82, weight: "15%", evidence: "Verified Resume v1.0 & LinkedIn" },
-    { name: "Communication & Articulation", score: 66, weight: "15%", evidence: "Interview Speech & Concept Clarity" },
+    {
+      name: "Technical Foundation",
+      score: practicalScore > 0 ? practicalScore : readinessScore > 0 ? readinessScore : 0,
+      weight: "25%",
+      evidence: readinessScore > 0 ? "Diagnostic & Curriculum evidence" : "Pending diagnostic calibration",
+    },
+    {
+      name: "Practical Projects Portfolio",
+      score: practicalScore,
+      weight: "25%",
+      evidence: practicalScore > 0 ? `Completed Portfolio Project (${practicalScore}/100)` : "No project submitted yet",
+    },
+    {
+      name: "Technical Mock Interview",
+      score: interviewScore,
+      weight: "20%",
+      evidence: interviewScore > 0 ? `Adaptive Project Defense (${interviewScore}/100)` : "No mock interview completed yet",
+    },
+    {
+      name: "Professional Profile & Resume",
+      score: profilePct,
+      weight: "15%",
+      evidence: profilePct >= 80 ? "Verified Resume & Academic Profile" : "Profile setup in progress",
+    },
+    {
+      name: "Communication & Articulation",
+      score: interviewScore > 0 ? interviewScore : 0,
+      weight: "15%",
+      evidence: interviewScore > 0 ? "Interview Speech & Concept Clarity" : "Calibrated during mock interviews",
+    },
   ];
 
   return (
@@ -134,30 +184,35 @@ function ProgressContent({ ci }: { ci: CareerIntelligence }) {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-border/60 text-xs">
           <div className="p-3 rounded-2xl border bg-card/60">
             <span className="text-muted-foreground block text-[10px] uppercase font-bold">Curriculum</span>
-            <strong className="text-foreground text-sm font-black">27% Complete</strong>
-            <span className="text-[11px] text-muted-foreground block">4 / 15 modules</span>
+            <strong className="text-foreground text-sm font-black">{currProgressPct}% Complete</strong>
+            <span className="text-[11px] text-muted-foreground block">{modulesCompleted} / {totalModules} modules</span>
           </div>
 
           <div className="p-3 rounded-2xl border bg-card/60">
             <span className="text-muted-foreground block text-[10px] uppercase font-bold">Practical Project</span>
-            <strong className="text-foreground text-sm font-black">88 / 100</strong>
-            <span className="text-[11px] text-emerald-600 font-semibold block">Quarantine isolation verified</span>
+            <strong className="text-foreground text-sm font-black">{practicalScore > 0 ? `${practicalScore} / 100` : "0 / 100"}</strong>
+            <span className="text-[11px] text-muted-foreground block">
+              {practicalScore > 0 ? "Quarantine isolation verified" : "No project submitted yet"}
+            </span>
           </div>
 
           <div className="p-3 rounded-2xl border bg-card/60">
             <span className="text-muted-foreground block text-[10px] uppercase font-bold">Mock Interview</span>
-            <strong className="text-foreground text-sm font-black">68.5 / 100</strong>
-            <span className="text-[11px] text-primary font-semibold block">+12 pts gain</span>
+            <strong className="text-foreground text-sm font-black">{interviewScore > 0 ? `${interviewScore} / 100` : "0 / 100"}</strong>
+            <span className="text-[11px] text-muted-foreground block">
+              {interviewScore > 0 ? "Verified interview score" : "No mock interview yet"}
+            </span>
           </div>
 
           <div className="p-3 rounded-2xl border bg-card/60">
             <span className="text-muted-foreground block text-[10px] uppercase font-bold">Profile Readiness</span>
-            <strong className="text-foreground text-sm font-black">82%</strong>
-            <span className="text-[11px] text-purple-600 font-semibold block">Evidence-driven resume</span>
+            <strong className="text-foreground text-sm font-black">{profilePct}%</strong>
+            <span className="text-[11px] text-muted-foreground block">
+              {profilePct >= 80 ? "Evidence-driven profile" : "Profile setup in progress"}
+            </span>
           </div>
         </div>
       </header>
-
 
       {/* Step 20: Career Benchmark & Competitive Readiness Intelligence */}
       <CareerBenchmarkView />
@@ -179,52 +234,71 @@ function ProgressContent({ ci }: { ci: CareerIntelligence }) {
           </div>
         </div>
 
-        <div className="space-y-4">
-          {skillsEvolution.map((sk, i) => (
-            <div key={i} className="space-y-1.5 text-xs">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-foreground flex items-center gap-2">
-                  {sk.skill}
-                  <Badge
-                    className={`text-[9px] font-bold border-none ${
-                      sk.status === "STRONG"
-                        ? "bg-emerald-500/15 text-emerald-600"
-                        : sk.status === "DEVELOPING"
-                        ? "bg-amber-500/15 text-amber-600"
-                        : "bg-rose-500/15 text-rose-600"
-                    }`}
-                  >
-                    {sk.status === "STRONG" ? "Benchmark Met" : `Gap: -${sk.gap}%`}
-                  </Badge>
-                </span>
+        {skillsEvolution.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center space-y-3">
+            <div className="size-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">
+              <Zap className="size-5" />
+            </div>
+            <div className="max-w-md mx-auto space-y-1">
+              <h4 className="font-bold text-sm text-foreground">No Competency Baselines Recorded Yet</h4>
+              <p className="text-xs text-muted-foreground">
+                Take your 3-Minute Skill Pulse or complete your first curriculum module to establish verified skill baselines and track your growth trajectory.
+              </p>
+            </div>
+            <Button asChild size="sm" className="gap-2 rounded-xl text-xs font-bold shadow-sm">
+              <Link to="/app/diagnostic">
+                <Zap className="size-3.5 fill-current" />
+                Start 3-Min Skill Pulse
+              </Link>
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {skillsEvolution.map((sk, i) => (
+              <div key={i} className="space-y-1.5 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-foreground flex items-center gap-2">
+                    {sk.skill}
+                    <Badge
+                      className={`text-[9px] font-bold border-none ${
+                        sk.status === "STRONG"
+                          ? "bg-emerald-500/15 text-emerald-600"
+                          : sk.status === "DEVELOPING"
+                          ? "bg-amber-500/15 text-amber-600"
+                          : "bg-rose-500/15 text-rose-600"
+                      }`}
+                    >
+                      {sk.status === "STRONG" ? "Benchmark Met" : `Gap: -${sk.gap}%`}
+                    </Badge>
+                  </span>
 
-                <div className="flex items-center gap-3 font-mono text-[11px]">
-                  <span className="text-muted-foreground">Baseline: {sk.baseline}%</span>
-                  <span className="text-primary font-bold">Current: {sk.current}%</span>
-                  <span className="text-emerald-600 font-semibold">Target: {sk.target}%</span>
+                  <div className="flex items-center gap-3 font-mono text-[11px]">
+                    <span className="text-muted-foreground">Baseline: {sk.baseline}%</span>
+                    <span className="text-primary font-bold">Current: {sk.current}%</span>
+                    <span className="text-emerald-600 font-semibold">Target: {sk.target}%</span>
+                  </div>
+                </div>
+
+                {/* Progress visual */}
+                <div className="relative w-full h-3 rounded-full bg-secondary/50 overflow-hidden">
+                  <div
+                    className="absolute top-0 bottom-0 left-0 bg-primary/40 rounded-full"
+                    style={{ width: `${sk.baseline}%` }}
+                  />
+                  <div
+                    className="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-primary to-emerald-500 rounded-full transition-all"
+                    style={{ width: `${sk.current}%` }}
+                  />
+                  <div
+                    className="absolute top-0 bottom-0 w-0.5 bg-emerald-500 z-10"
+                    style={{ left: `${sk.target}%` }}
+                    title={`Target: ${sk.target}%`}
+                  />
                 </div>
               </div>
-
-              {/* Progress visual */}
-              <div className="relative w-full h-3 rounded-full bg-secondary/50 overflow-hidden">
-                <div
-                  className="absolute top-0 bottom-0 left-0 bg-primary/40 rounded-full"
-                  style={{ width: `${sk.baseline}%` }}
-                />
-                <div
-                  className="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-primary to-emerald-500 rounded-full transition-all"
-                  style={{ width: `${sk.current}%` }}
-                />
-                {/* Target line */}
-                <div
-                  className="absolute top-0 bottom-0 w-0.5 bg-emerald-500 z-10"
-                  style={{ left: `${sk.target}%` }}
-                  title={`Target: ${sk.target}%`}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* What Separates You From Your Target? (High-Impact Gaps) */}
@@ -241,48 +315,44 @@ function ProgressContent({ ci }: { ci: CareerIntelligence }) {
           </div>
         </div>
 
-        <div className="grid gap-3 md:grid-cols-2 text-xs">
-          <div className="p-4 rounded-2xl border border-amber-500/20 bg-amber-500/[0.03] space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-foreground text-sm">Apache Spark Distributed Compute</span>
-              <Badge className="bg-amber-500/15 text-amber-600 border-none font-bold text-[10px]">
-                Gap: -20%
-              </Badge>
-            </div>
-            <p className="text-muted-foreground leading-relaxed">
-              Your score is currently 45% (target 65%). Completing the Spark Distributed Transformations module will close this gap.
+        {(ci.priority_gaps || []).length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-border/80 p-6 text-center space-y-2">
+            <p className="text-xs text-muted-foreground">
+              No placement bottlenecks identified yet. Start with your Day 1 Skill Pulse or your introductory module to uncover priority focus areas.
             </p>
-            <Button asChild size="sm" variant="outline" className="w-full text-xs font-semibold gap-1">
-              <Link to="/app/path">
-                Work on this module <ArrowRight className="size-3.5" />
-              </Link>
+            <Button asChild size="sm" variant="outline" className="text-xs font-semibold">
+              <Link to="/app/path">Explore Pathway Modules <ArrowRight className="size-3.5 ml-1" /></Link>
             </Button>
           </div>
-
-          <div className="p-4 rounded-2xl border border-amber-500/20 bg-amber-500/[0.03] space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-foreground text-sm">Technical Concept Defense & Clarity</span>
-              <Badge className="bg-amber-500/15 text-amber-600 border-none font-bold text-[10px]">
-                Gap: -9%
-              </Badge>
-            </div>
-            <p className="text-muted-foreground leading-relaxed">
-              Your interview defense scored 66% (target 75%). Practice explaining partition skew and trade-offs in an adaptive mock interview.
-            </p>
-            <Button asChild size="sm" variant="outline" className="w-full text-xs font-semibold gap-1">
-              <Link to="/app/practice">
-                Practice Mock Interview <ArrowRight className="size-3.5" />
-              </Link>
-            </Button>
+        ) : (
+          <div className="grid gap-3 md:grid-cols-2 text-xs">
+            {(ci.priority_gaps || []).map((gap) => (
+              <div key={gap.skill_code} className="p-4 rounded-2xl border border-amber-500/20 bg-amber-500/[0.03] space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-foreground text-sm">{humanizeCode(gap.skill_code)}</span>
+                  <Badge className="bg-amber-500/15 text-amber-600 border-none font-bold text-[10px]">
+                    Priority Gap
+                  </Badge>
+                </div>
+                <p className="text-muted-foreground leading-relaxed">
+                  Focus on mastering this core competency to elevate your Career Readiness score.
+                </p>
+                <Button asChild size="sm" variant="outline" className="w-full text-xs font-semibold gap-1">
+                  <Link to="/app/path">
+                    Work on this competency <ArrowRight className="size-3.5" />
+                  </Link>
+                </Button>
+              </div>
+            ))}
           </div>
-        </div>
+        )}
       </section>
 
       {/* Readiness Composition Breakdown */}
       <section className="surface-panel rounded-3xl p-6 sm:p-8 border border-border/80 bg-card space-y-4 shadow-sm">
         <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
           <Layers className="size-5 text-primary" />
-          How Your 78% Readiness Score is Composed
+          How Your {readinessScore}% Readiness Score is Composed
         </h3>
 
         <div className="grid gap-2 sm:grid-cols-2 text-xs">
