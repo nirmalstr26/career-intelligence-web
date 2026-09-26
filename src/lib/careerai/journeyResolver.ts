@@ -141,7 +141,7 @@ export function resolveStudentJourney(
       (ci as any)?.placement_readiness?.score ??
       (ci as any)?.readiness?.overall_readiness ??
       (ci as any)?.primary_career_readiness?.score ??
-      79
+      0
     );
 
     // Flatten all modules in curriculum for quick state scans
@@ -466,28 +466,19 @@ export function resolveStudentJourney(
       }
     }
 
-    if (areasImproved.length === 0) {
-      areasImproved.push(
-        { skillCode: "PYTHON", name: "Python Programming", score: 78, level: "VERIFIED", category: "Core", recentGain: "+12 pts" },
-        { skillCode: "SQL", name: "SQL & Query Optimization", score: 74, level: "READY", category: "Data", recentGain: "+10 pts" },
-        { skillCode: "PROBLEM_SOLVING", name: "Analytical Problem Solving", score: 72, level: "READY", category: "Foundations" },
-      );
-    }
-    if (areasToImprove.length === 0) {
-      areasToImprove.push(
-        { skillCode: "DATA_PIPELINES", name: "Data Pipeline Design & Idempotency", currentScore: 54, targetScore: 75, priority: "HIGH", gapMagnitude: 21, recommendedAction: "Complete Phase 3 Data Engineering Core module", actionLink: "/app/learn/DATA_PIPELINE_DESIGN" },
-        { skillCode: "DATA_QUALITY", name: "Data Quality & Quarantine Rules", currentScore: 58, targetScore: 75, priority: "MEDIUM", gapMagnitude: 17, recommendedAction: "Practice Automated Data Validation mission", actionLink: "/app/practice" },
-        { skillCode: "DISTRIBUTED_COMPUTING", name: "Spark & Distributed Processing", currentScore: 48, targetScore: 70, priority: "HIGH", gapMagnitude: 22, recommendedAction: "Study Apache Spark streaming architecture", actionLink: "/app/practice" },
-      );
-    }
-
-    const avgImprovedScore = areasImproved.reduce((acc, curr) => acc + curr.score, 0) / Math.max(1, areasImproved.length);
+    const hasAnyEvidence = areasImproved.length > 0 || modulesCompleted > 0 || readinessScore > 0;
+    const avgImprovedScore = areasImproved.length > 0
+      ? areasImproved.reduce((acc, curr) => acc + curr.score, 0) / areasImproved.length
+      : 0;
     const curriculumPctWeight = (modulesCompleted / Math.max(1, totalModules)) * 100;
-    const interviewPrepScore = Math.min(100, Math.round(
-      avgImprovedScore * 0.45 + curriculumPctWeight * 0.35 + (readinessScore > 70 ? 20 : 10)
-    ));
+    const interviewPrepScore = hasAnyEvidence
+      ? Math.min(100, Math.round(
+          avgImprovedScore * 0.45 + curriculumPctWeight * 0.35 + (readinessScore > 70 ? 20 : 10)
+        ))
+      : 0;
 
     const interviewLevel =
+      !hasAnyEvidence ? "FOUNDATIONAL" :
       interviewPrepScore >= 85 ? "PLACEMENT_READY" :
       interviewPrepScore >= 70 ? "INTERVIEW_READY" :
       interviewPrepScore >= 50 ? "DEVELOPING" : "FOUNDATIONAL";
@@ -556,23 +547,17 @@ export function resolveStudentJourney(
       },
       activeCareerName: "Data Engineer",
       activeCareerCode: "DATA_ENGINEER",
-      learningProgressPct: 27,
-      modulesCompleted: 4,
+      learningProgressPct: 0,
+      modulesCompleted: 0,
       totalModules: 15,
-      readinessScore: 79,
+      readinessScore: 0,
       interviewPrep: {
-        score: 72,
-        level: "INTERVIEW_READY",
-        technicalScore: 76,
-        specializationScore: 68,
-        areasImproved: [
-          { skillCode: "PYTHON", name: "Python Programming", score: 78, level: "VERIFIED", category: "Core", recentGain: "+12 pts" },
-          { skillCode: "SQL", name: "SQL & Query Optimization", score: 74, level: "READY", category: "Data", recentGain: "+10 pts" },
-        ],
-        areasToImprove: [
-          { skillCode: "DATA_PIPELINES", name: "Data Pipeline Design & Idempotency", currentScore: 54, targetScore: 75, priority: "HIGH", gapMagnitude: 21, recommendedAction: "Complete Phase 3 Data Engineering Core module", actionLink: "/app/learn/DATA_PIPELINE_DESIGN" },
-          { skillCode: "DATA_QUALITY", name: "Data Quality & Quarantine Rules", currentScore: 58, targetScore: 75, priority: "MEDIUM", gapMagnitude: 17, recommendedAction: "Practice Automated Data Validation mission", actionLink: "/app/practice" },
-        ],
+        score: 0,
+        level: "FOUNDATIONAL",
+        technicalScore: 0,
+        specializationScore: 0,
+        areasImproved: [],
+        areasToImprove: [],
       },
     };
   }
