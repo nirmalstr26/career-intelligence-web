@@ -273,7 +273,7 @@ export const LinkedInIntelligenceV2View: React.FC = () => {
                   3 Grounded Headline Strategies
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                  Grounded in verified skills (SQL 92%, Python 88%) and "Aspiring" career positioning.
+                  Grounded in demonstrated competencies and "Aspiring" career positioning.
                 </p>
               </div>
             </div>

@@ -20,16 +20,63 @@ interface MilestoneStage {
   description: string;
 }
 
-const STAGES: MilestoneStage[] = [
-  { id: "discover", name: "Discover", status: "COMPLETED", progressText: "Completed", description: "Data Engineer pathway selected" },
-  { id: "assess", name: "Assess", status: "COMPLETED", progressText: "Completed", description: "AI baseline diagnostic score 82%" },
-  { id: "learn", name: "Learn", status: "CURRENT", progressText: "67% through Phase 2", description: "SQL & Python foundation modules" },
-  { id: "practice", name: "Practice", status: "STARTING", progressText: "2 missions ready", description: "Hands-on data pipeline exercises" },
-  { id: "demonstrate", name: "Demonstrate", status: "UPCOMING", progressText: "Project Verified", description: "Data Pipeline Rubric (88/100)" },
-  { id: "placement", name: "Placement Ready", status: "TARGET", progressText: "85+ Verified Target", description: "Direct recruiter interview matching" },
-];
+export function CareerMilestoneRail({
+  readinessScore = 0,
+  modulesCompleted = 0,
+  className,
+}: {
+  readinessScore?: number;
+  modulesCompleted?: number;
+  className?: string;
+}) {
+  const hasStartedLearning = modulesCompleted > 0;
+  const hasReadiness = readinessScore > 0;
 
-export function CareerMilestoneRail({ className }: { className?: string }) {
+  const stages: MilestoneStage[] = [
+    {
+      id: "discover",
+      name: "Discover",
+      status: "COMPLETED",
+      progressText: "Completed",
+      description: "Career Pathway selected",
+    },
+    {
+      id: "assess",
+      name: "Assess",
+      status: hasReadiness ? "COMPLETED" : "CURRENT",
+      progressText: hasReadiness ? `${readinessScore}% Baseline` : "3-Min Pulse",
+      description: hasReadiness ? "Diagnostic completed" : "Calibrate technical foundation",
+    },
+    {
+      id: "learn",
+      name: "Learn",
+      status: hasStartedLearning ? "CURRENT" : "STARTING",
+      progressText: hasStartedLearning ? `${modulesCompleted} Modules` : "Not Started",
+      description: "Pathway foundation modules",
+    },
+    {
+      id: "practice",
+      name: "Practice",
+      status: "UPCOMING",
+      progressText: "Hands-on",
+      description: "Code challenges and missions",
+    },
+    {
+      id: "demonstrate",
+      name: "Demonstrate",
+      status: "UPCOMING",
+      progressText: "Portfolio",
+      description: "Verified practical project rubrics",
+    },
+    {
+      id: "placement",
+      name: "Placement Ready",
+      status: "TARGET",
+      progressText: "80+ Target",
+      description: "Recruiter interview matching",
+    },
+  ];
+
   return (
     <div className={`surface-panel rounded-3xl p-6 sm:p-7 border border-border/80 bg-card space-y-6 shadow-sm ${className || ""}`}>
       <div>
@@ -44,7 +91,7 @@ export function CareerMilestoneRail({ className }: { className?: string }) {
 
       {/* Responsive Horizontal Stage Rail */}
       <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 pt-1">
-        {STAGES.map((st, i) => {
+        {stages.map((st, i) => {
           const isCompleted = st.status === "COMPLETED";
           const isCurrent = st.status === "CURRENT";
           const isTarget = st.status === "TARGET";
@@ -103,20 +150,24 @@ export function CareerMilestoneRail({ className }: { className?: string }) {
         <div className="grid gap-2 sm:grid-cols-3 text-xs">
           <div className="p-3 rounded-2xl border border-primary/25 bg-primary/[0.03] space-y-1">
             <Badge className="bg-primary/20 text-primary border-none text-[9px] font-bold">1. Current</Badge>
-            <span className="font-bold text-foreground block">Complete SQL Fundamentals</span>
-            <span className="text-[11px] text-muted-foreground">Latest assessment: 82% · Est: ~25 mins</span>
+            <span className="font-bold text-foreground block">
+              {hasReadiness ? "Advance Guided Curriculum" : "Complete 3-Min Skill Pulse"}
+            </span>
+            <span className="text-[11px] text-muted-foreground">
+              {hasReadiness ? "Begin your pathway modules" : "5 quick questions to establish technical baseline"}
+            </span>
           </div>
 
           <div className="p-3 rounded-2xl border bg-secondary/15 space-y-1">
             <Badge variant="outline" className="text-[9px] font-bold">2. Next</Badge>
-            <span className="font-bold text-foreground block">Data Engineering Specialization</span>
-            <span className="text-[11px] text-muted-foreground">Unlocks distributed pipeline track</span>
+            <span className="font-bold text-foreground block">Curriculum Foundation Modules</span>
+            <span className="text-[11px] text-muted-foreground">Master core domain concepts and pass knowledge checks</span>
           </div>
 
           <div className="p-3 rounded-2xl border bg-secondary/15 space-y-1">
             <Badge variant="outline" className="text-[9px] font-bold">3. Upcoming</Badge>
-            <span className="font-bold text-foreground block">Start Practical Pipeline Project</span>
-            <span className="text-[11px] text-muted-foreground">Automated CSV quarantine & schema modeling</span>
+            <span className="font-bold text-foreground block">Start Practical Project</span>
+            <span className="text-[11px] text-muted-foreground">Build production code and earn verified rubric score</span>
           </div>
         </div>
       </div>

@@ -148,74 +148,132 @@ function DiscoverPage() {
     );
   }
 
+  const handleSelectDirectTrack = async (careerCode: string) => {
+    try {
+      let activeSession = sessionData;
+      if (!activeSession?.id) {
+        activeSession = await startDiscovery.mutateAsync(false);
+      }
+      if (activeSession?.id) {
+        await selectCareer.mutateAsync({
+          sessionId: activeSession.id,
+          careerCode,
+        });
+      }
+    } catch (err) {
+      console.error("Failed to select track:", err);
+    }
+  };
+
   // 4. Stage: Hero Welcome & Start Discovery
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 text-center space-y-8 animate-in fade-in duration-300">
+    <div className="mx-auto max-w-4xl px-4 py-8 text-center space-y-8 animate-in fade-in duration-300">
       <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary">
         <Sparkles className="size-4" />
-        <span>SPAR AI Career Discovery</span>
+        <span>SPAR AI Career Discovery & Setup</span>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          Let's figure out where you could thrive.
+          Choose your career direction to unlock your personalized roadmap
         </h1>
-        <p className="mx-auto max-w-xl text-sm sm:text-base text-muted-foreground leading-relaxed">
-          I'll ask you a few questions about what you enjoy, how you like to solve problems, and what kind of work excites you. Then I'll show you career paths worth exploring.
+        <p className="mx-auto max-w-xl text-xs sm:text-sm text-muted-foreground leading-relaxed">
+          Select a career track below to immediately personalize your curriculum and practice challenges, or chat with SPAR to discover the best fit for your strengths.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3 max-w-2xl mx-auto text-left">
-        <div className="rounded-xl border border-border bg-card p-4 space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
-            1. Short Chat
-          </span>
-          <h4 className="text-xs font-bold text-foreground">4–5 Quick Questions</h4>
-          <p className="text-[11px] text-muted-foreground">
-            No exams or grades — just what you enjoy solving.
-          </p>
+      {/* Quick-Pick Career Tracks */}
+      <div className="grid gap-4 sm:grid-cols-3 max-w-3xl mx-auto text-left">
+        <div
+          onClick={() => void handleSelectDirectTrack("DATA_ENGINEER")}
+          className="group relative rounded-2xl border border-primary/30 hover:border-primary bg-primary/[0.03] hover:bg-primary/[0.08] p-5 cursor-pointer transition-all shadow-xs flex flex-col justify-between"
+        >
+          <div className="space-y-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/15 px-2 py-0.5 rounded-full inline-block">
+              Data & Cloud Track
+            </span>
+            <h4 className="text-base font-bold text-foreground group-hover:text-primary transition-colors">
+              Data Engineer
+            </h4>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Build robust ETL data pipelines, SQL transformations, warehouse schemas, and distributed data systems.
+            </p>
+          </div>
+          <div className="pt-4 flex items-center justify-between text-xs font-bold text-primary">
+            <span>Select Data Pathway</span>
+            <Zap className="size-3.5 fill-current" />
+          </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-4 space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
-            2. Match Analysis
-          </span>
-          <h4 className="text-xs font-bold text-foreground">Top 3 Career Paths</h4>
-          <p className="text-[11px] text-muted-foreground">
-            Detailed why-it-fits explanations and challenges.
-          </p>
+        <div
+          onClick={() => void handleSelectDirectTrack("AI_ENGINEER")}
+          className="group relative rounded-2xl border border-border hover:border-primary/60 bg-card hover:bg-primary/[0.04] p-5 cursor-pointer transition-all shadow-xs flex flex-col justify-between"
+        >
+          <div className="space-y-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 bg-purple-500/15 px-2 py-0.5 rounded-full inline-block">
+              AI / ML Track
+            </span>
+            <h4 className="text-base font-bold text-foreground group-hover:text-primary transition-colors">
+              AI & ML Engineer
+            </h4>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Fine-tune models, implement LLM orchestration, evaluation pipelines, and intelligent AI agent workflows.
+            </p>
+          </div>
+          <div className="pt-4 flex items-center justify-between text-xs font-bold text-muted-foreground group-hover:text-primary">
+            <span>Select AI Pathway</span>
+            <Zap className="size-3.5 fill-current" />
+          </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-4 space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
-            3. Roadmap
-          </span>
-          <h4 className="text-xs font-bold text-foreground">Personalized Journey</h4>
-          <p className="text-[11px] text-muted-foreground">
-            Tailored learning missions and mock interviews.
-          </p>
+        <div
+          onClick={() => void handleSelectDirectTrack("FULL_STACK_DEVELOPER")}
+          className="group relative rounded-2xl border border-border hover:border-primary/60 bg-card hover:bg-primary/[0.04] p-5 cursor-pointer transition-all shadow-xs flex flex-col justify-between"
+        >
+          <div className="space-y-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-500/15 px-2 py-0.5 rounded-full inline-block">
+              Software Engineering
+            </span>
+            <h4 className="text-base font-bold text-foreground group-hover:text-primary transition-colors">
+              Full-Stack Software Engineer
+            </h4>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Build full-stack web applications, REST/GraphQL backend APIs, system architectures, and cloud deployments.
+            </p>
+          </div>
+          <div className="pt-4 flex items-center justify-between text-xs font-bold text-muted-foreground group-hover:text-primary">
+            <span>Select Software Pathway</span>
+            <Zap className="size-3.5 fill-current" />
+          </div>
         </div>
       </div>
 
-      <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-        <Button
-          size="lg"
-          onClick={() => handleStartDiscovery(false)}
-          className="w-full sm:w-auto gap-2 rounded-xl bg-primary px-8 text-sm font-semibold text-primary-foreground hover:bg-primary/90 shadow-md"
-        >
-          <Zap className="size-4 fill-current" />
-          Start with SPAR
-        </Button>
+      {/* Alternative: Chat with SPAR */}
+      <div className="pt-4 max-w-xl mx-auto border-t border-border/60">
+        <p className="text-xs text-muted-foreground mb-3">
+          Not sure which pathway is right for you?
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Button
+            size="default"
+            variant="outline"
+            onClick={() => handleStartDiscovery(false)}
+            className="w-full sm:w-auto gap-2 rounded-xl text-xs font-semibold"
+          >
+            <MessageSquare className="size-3.5 text-primary" />
+            Explore with SPAR AI Coach (3 Quick Qs)
+          </Button>
 
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={() => void navigate({ to: "/app/explore" })}
-          className="w-full sm:w-auto gap-2 rounded-xl text-sm"
-        >
-          <Compass className="size-4" />
-          Explore Careers Manually
-        </Button>
+          <Button
+            variant="ghost"
+            size="default"
+            onClick={() => void navigate({ to: "/app/explore" })}
+            className="w-full sm:w-auto gap-2 rounded-xl text-xs text-muted-foreground"
+          >
+            <Compass className="size-3.5" />
+            Browse All Pathways
+          </Button>
+        </div>
       </div>
     </div>
   );

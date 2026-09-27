@@ -30,7 +30,6 @@ export function Protected({
   const blocked =
     status !== "authenticated" ||
     (mode === "app" && onboardingRequired && role === "STUDENT") ||
-    (mode === "onboarding" && !onboardingRequired && role === "STUDENT") ||
     (mode === "admin" && role !== "PLATFORM_ADMIN" && user?.email !== "admin@careerai.dev" && !user?.email?.includes("dev")) ||
     (mode === "college" && role !== "COLLEGE_COORDINATOR" && role !== "COLLEGE_ADMIN" && !user?.email?.includes("dev") && !user?.email?.includes("college"));
 
@@ -46,10 +45,6 @@ export function Protected({
     // Role-specific routing
     if (mode === "app" && onboardingRequired && role === "STUDENT") {
       void navigate({ to: "/onboarding" });
-      return;
-    }
-    if (mode === "onboarding" && !onboardingRequired && role === "STUDENT") {
-      void navigate({ to: "/app/today" });
       return;
     }
   }, [status, onboardingRequired, mode, role, navigate]);
