@@ -101,7 +101,7 @@ const INTEREST_PILLS = [
 
 export function OnboardingFlow() {
   const navigate = useNavigate();
-  const { user, student, refreshSession } = useAuth();
+  const { user, student, refreshSession, onboardingRequired } = useAuth();
 
   const { data: statusData, isLoading: isStatusLoading } = useOnboardingStatus();
   const { data: refData } = useOnboardingReference();
@@ -115,6 +115,13 @@ export function OnboardingFlow() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [transitioning, setTransitioning] = useState(false);
   const [transitionStage, setTransitionStage] = useState(0);
+
+  // If already onboarded and not actively transitioning, redirect to today
+  useEffect(() => {
+    if (onboardingRequired === false && !transitioning) {
+      void navigate({ to: "/app/today" });
+    }
+  }, [onboardingRequired, transitioning, navigate]);
 
   // --- Step 1 State ---
   const [firstName, setFirstName] = useState("");

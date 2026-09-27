@@ -43,8 +43,8 @@ export const CareerBenchmarkView: React.FC<CareerBenchmarkViewProps> = ({ onAskS
 
   const data = benchmarkQuery.data;
 
-  // Insufficient cohort / coming soon state
-  if (!data || data.insufficient_sample || !data.available) {
+  // Insufficient cohort / no evidence state
+  if (!data || data.insufficient_sample || !data.available || data.readiness_score === 0) {
     return (
       <div className="rounded-3xl border border-border/80 bg-gradient-to-br from-card to-muted/30 p-8 text-center space-y-4">
         <div className="size-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto">
@@ -52,15 +52,28 @@ export const CareerBenchmarkView: React.FC<CareerBenchmarkViewProps> = ({ onAskS
         </div>
         <div className="max-w-md mx-auto space-y-2">
           <h3 className="font-display font-extrabold text-lg text-foreground">
-            Your Benchmark is Coming Soon
+            {data?.reason === "NO_EVIDENCE" || data?.readiness_score === 0
+              ? "Cohort Benchmark Calibration Pending"
+              : "Your Benchmark is Coming Soon"}
           </h3>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            SPAR needs a reliable comparison group of at least 30 comparable learners preparing for {data?.career_title || "this career"} before displaying percentile distributions. Your absolute Career Readiness score remains fully active.
+            {data?.reason === "NO_EVIDENCE" || data?.readiness_score === 0
+              ? "Complete your 3-Minute Skill Pulse or first practical project to calibrate your starting baseline and compare your standing against peer learners in your cohort."
+              : `SPAR needs a reliable comparison group of at least 30 comparable learners preparing for ${data?.career_title || "this career"} before displaying percentile distributions. Your absolute Career Readiness score remains fully active.`}
           </p>
         </div>
-        <Badge variant="outline" className="text-[11px] font-mono">
-          Current Cohort Sample: {data?.cohort_size || 14} / 30 required
-        </Badge>
+        {data?.reason === "NO_EVIDENCE" || data?.readiness_score === 0 ? (
+          <Button asChild size="sm" className="gap-2 rounded-xl text-xs font-bold shadow-sm">
+            <Link to="/app/diagnostic">
+              <Zap className="size-3.5 fill-current" />
+              Take 3-Min Skill Pulse
+            </Link>
+          </Button>
+        ) : (
+          <Badge variant="outline" className="text-[11px] font-mono">
+            Current Cohort Sample: {data?.cohort_size || 14} / 30 required
+          </Badge>
+        )}
       </div>
     );
   }

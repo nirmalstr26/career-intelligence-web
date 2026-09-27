@@ -14,9 +14,9 @@ interface ContextualCoachCardProps {
 
 const DEFAULT_PROMPTS = [
   "What should I focus on next?",
-  "How do I close my biggest skill gap?",
-  "Quiz me on SQL window functions.",
-  "Am I ready for Data Engineering internships?",
+  "How do I close my priority skill gap?",
+  "Practice core technical questions with me.",
+  "What are the top verified signals for internships?",
 ];
 
 export function ContextualCoachCard({

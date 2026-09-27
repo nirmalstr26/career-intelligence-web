@@ -23,6 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { humanizeCode } from "@/lib/utils";
 import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
+import { resolveStudentJourney } from "@/lib/careerai/journeyResolver";
 
 export const Route = createFileRoute("/app/coach")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -49,6 +50,12 @@ function CoachPage() {
   const primaryCareerCode = ci?.career_direction?.primary_career ?? "DATA_ENGINEER";
   const currQuery = useCurriculum(primaryCareerCode);
   const curr = currQuery.data;
+
+  const journey = resolveStudentJourney(ci, curr);
+  const readiness = Math.round(ci?.placement_readiness?.score ?? ci?.primary_career_readiness?.score ?? (ci as any)?.readiness?.overall_score ?? 0);
+  const topVerifiedSkill = journey.interviewPrep?.areasImproved?.[0];
+  const priorityGap = journey.interviewPrep?.areasToImprove?.[0];
+  const activeFocusTitle = journey.primaryAction?.title || (curr?.career_cluster_name ? `${curr.career_cluster_name} Foundations` : "Foundation & Setup");
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState(prompt || "");
@@ -153,9 +160,9 @@ function CoachPage() {
 
   const STARTER_ACTIONS = [
     { title: "Plan My Day", desc: "Give me an optimal 30-minute study session plan.", query: "What should I focus on for 30 minutes today?" },
-    { title: "Explain My Gap", desc: "Why is Spark my biggest remaining skill gap?", query: "Why is Apache Spark my biggest remaining skill gap and how do I close it?" },
-    { title: "Practice With Me", desc: "Quiz me on SQL joins and window aggregations.", query: "Quiz me on SQL window functions and subquery aggregations." },
-    { title: "Placement Fit", desc: "Am I ready to apply for Data Engineering internships?", query: "Am I ready to apply for Data Engineer internships? What are my strongest evidence signals?" },
+    { title: "Explain My Gap", desc: "How do I close my priority skill gaps?", query: "How do I close my priority skill gaps and what should I practice next?" },
+    { title: "Practice With Me", desc: "Quiz me on core technical concepts.", query: "Quiz me on foundational technical concepts for my pathway." },
+    { title: "Placement Fit", desc: "Am I ready to apply for internships?", query: "Am I ready to apply for technical internships? What are my strongest evidence signals?" },
   ];
 
   return (
@@ -175,10 +182,10 @@ function CoachPage() {
 
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="bg-primary/15 text-primary border-primary/30 text-xs">
-              Path: {curr?.career_cluster_name || "Data Engineer"}
+              Path: {curr?.career_cluster_name || journey.activeCareerName || "Career Pathway"}
             </Badge>
             <Badge variant="outline" className="bg-emerald-500/15 text-emerald-600 border-emerald-500/30 text-xs">
-              Readiness: {ci?.placement_readiness?.score ?? 78}/100
+              Readiness: {readiness}/100
             </Badge>
           </div>
         </div>
@@ -187,22 +194,28 @@ function CoachPage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-border/60 text-[11px]">
           <div className="p-2 rounded-xl border bg-secondary/15">
             <span className="text-muted-foreground block text-[9px] uppercase font-bold">Current Focus</span>
-            <strong className="text-foreground truncate block">SQL Fundamentals (82%)</strong>
+            <strong className="text-foreground truncate block">{activeFocusTitle}</strong>
           </div>
 
           <div className="p-2 rounded-xl border bg-secondary/15">
             <span className="text-muted-foreground block text-[9px] uppercase font-bold">Top Verified Skill</span>
-            <strong className="text-emerald-600 truncate block">SQL Windowing (92%)</strong>
+            <strong className="text-emerald-600 truncate block">
+              {topVerifiedSkill ? `${topVerifiedSkill.name} (${topVerifiedSkill.score}%)` : "None yet (0%)"}
+            </strong>
           </div>
 
           <div className="p-2 rounded-xl border bg-secondary/15">
             <span className="text-muted-foreground block text-[9px] uppercase font-bold">Priority Gap</span>
-            <strong className="text-amber-600 truncate block">Spark Compute (-20%)</strong>
+            <strong className="text-amber-600 truncate block">
+              {priorityGap ? `${priorityGap.name} (-${priorityGap.gapMagnitude} pts)` : "Pending assessment"}
+            </strong>
           </div>
 
           <div className="p-2 rounded-xl border bg-secondary/15">
             <span className="text-muted-foreground block text-[9px] uppercase font-bold">Next Milestone</span>
-            <strong className="text-primary truncate block">Data Pipeline Project</strong>
+            <strong className="text-primary truncate block">
+              {readiness > 0 ? "Pathway Modules" : "Complete 3-Min Skill Pulse"}
+            </strong>
           </div>
         </div>
       </header>

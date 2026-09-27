@@ -156,14 +156,22 @@ function PracticePage() {
         <div className="grid grid-cols-3 gap-3 pt-3 border-t border-border/60 text-xs text-center">
           <div className="p-3 rounded-2xl border bg-card/60">
             <span className="text-muted-foreground block text-[10px] uppercase font-bold">Projects</span>
-            <strong className="text-foreground text-sm font-black">1 / 2 Built</strong>
-            <span className="text-[11px] text-emerald-600 font-semibold block">Score: 88/100</span>
+            <strong className="text-foreground text-sm font-black">
+              {projects.filter((p: any) => p.status === "COMPLETED" || p.state === "COMPLETED").length} / {projects.length || 2} Built
+            </strong>
+            <span className="text-[11px] text-muted-foreground font-semibold block">
+              {projects.some((p: any) => p.status === "COMPLETED" || p.state === "COMPLETED") ? "Verified" : "Not Started"}
+            </span>
           </div>
 
           <div className="p-3 rounded-2xl border bg-card/60">
             <span className="text-muted-foreground block text-[10px] uppercase font-bold">Mock Interviews</span>
-            <strong className="text-foreground text-sm font-black">Score: 68.5/100</strong>
-            <span className="text-[11px] text-primary font-semibold block">+12 pts improvement</span>
+            <strong className="text-foreground text-sm font-black">
+              {interviews.some((i: any) => i.status === "COMPLETED") ? `${interviews[0]?.overall_score || 0} / 100` : "0 / 100"}
+            </strong>
+            <span className="text-[11px] text-muted-foreground font-semibold block">
+              {interviews.some((i: any) => i.status === "COMPLETED") ? "Completed" : "Not Started"}
+            </span>
           </div>
 
           <div className="p-3 rounded-2xl border bg-card/60">

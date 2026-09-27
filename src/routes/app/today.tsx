@@ -99,7 +99,14 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
   const primary = journey.primaryAction;
 
   const readinessScore = Math.round(ci.placement_readiness?.score ?? ci.primary_career_readiness?.score ?? (ci as any)?.readiness?.overall_score ?? 0);
-  const firstName = student?.first_name || user?.name?.split(" ")[0] || "Student";
+  const modulesCompleted = journey.modulesCompleted || 0;
+  const totalModules = journey.totalModules || 15;
+  const curriculumPct = journey.learningProgressPct || 0;
+  const projectRubricScore = (ci as any)?.practical_project?.rubric_score ?? 0;
+  const mockInterviewScore = journey.interviewPrep?.score ?? 0;
+  const profileScore = Math.round((ci as any)?.profile_readiness?.overall_score ?? (ci as any)?.profile_readiness?.score ?? 0);
+
+  const firstName = student?.first_name || (ci as any)?.user?.name?.split(" ")[0] || "Student";
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -151,33 +158,45 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
           <div className="p-3 rounded-2xl border bg-card/60 flex items-center justify-between">
             <div>
               <span className="text-muted-foreground block text-[10px] uppercase font-bold">Curriculum</span>
-              <strong className="text-foreground text-sm font-black">4 / 15 Modules</strong>
+              <strong className="text-foreground text-sm font-black">{modulesCompleted} / {totalModules} Modules</strong>
             </div>
-            <Badge variant="secondary" className="text-[10px] font-mono">27%</Badge>
+            <Badge variant="secondary" className="text-[10px] font-mono">{curriculumPct}%</Badge>
           </div>
 
           <div className="p-3 rounded-2xl border bg-card/60 flex items-center justify-between">
             <div>
               <span className="text-muted-foreground block text-[10px] uppercase font-bold">Project Rubric</span>
-              <strong className="text-foreground text-sm font-black">88 / 100</strong>
+              <strong className="text-foreground text-sm font-black">{projectRubricScore > 0 ? `${projectRubricScore} / 100` : "0 / 100"}</strong>
             </div>
-            <Badge className="bg-emerald-500/15 text-emerald-600 border-none text-[10px]">Verified</Badge>
+            {projectRubricScore > 0 ? (
+              <Badge className="bg-emerald-500/15 text-emerald-600 border-none text-[10px]">Verified</Badge>
+            ) : (
+              <Badge variant="secondary" className="text-[10px]">Not Started</Badge>
+            )}
           </div>
 
           <div className="p-3 rounded-2xl border bg-card/60 flex items-center justify-between">
             <div>
               <span className="text-muted-foreground block text-[10px] uppercase font-bold">Mock Interview</span>
-              <strong className="text-foreground text-sm font-black">68.5 / 100</strong>
+              <strong className="text-foreground text-sm font-black">{mockInterviewScore > 0 ? `${mockInterviewScore} / 100` : "0 / 100"}</strong>
             </div>
-            <Badge className="bg-primary/15 text-primary border-none text-[10px]">+12 pts</Badge>
+            {mockInterviewScore > 0 ? (
+              <Badge className="bg-primary/15 text-primary border-none text-[10px]">{mockInterviewScore >= 70 ? "Ready" : "Developing"}</Badge>
+            ) : (
+              <Badge variant="secondary" className="text-[10px]">Not Started</Badge>
+            )}
           </div>
 
           <div className="p-3 rounded-2xl border bg-card/60 flex items-center justify-between">
             <div>
               <span className="text-muted-foreground block text-[10px] uppercase font-bold">Profile Ready</span>
-              <strong className="text-foreground text-sm font-black">82%</strong>
+              <strong className="text-foreground text-sm font-black">{profileScore > 0 ? `${profileScore}%` : "0%"}</strong>
             </div>
-            <Badge className="bg-purple-500/15 text-purple-600 border-none text-[10px]">Resume v1.0</Badge>
+            {profileScore > 0 ? (
+              <Badge className="bg-purple-500/15 text-purple-600 border-none text-[10px]">Resume Active</Badge>
+            ) : (
+              <Badge variant="secondary" className="text-[10px]">Not Started</Badge>
+            )}
           </div>
         </div>
       </header>
@@ -194,16 +213,16 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
                 YOUR NEXT MOVE
               </span>
               <Badge variant="outline" className="text-xs">
-                {primary?.phaseName || "Phase 2: Programming & SQL"}
+                {primary?.phaseName || "Phase 1: Foundations"}
               </Badge>
             </div>
 
             <div>
               <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-                {primary?.title || 'Continue Learning'}
+                {primary?.title || (modulesCompleted === 0 ? "Start Your Career Journey" : "Continue Learning")}
               </h2>
               <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                {primary?.subtitle || 'Continue your guided career curriculum.'}
+                {primary?.subtitle || (modulesCompleted === 0 ? "Take the 3-minute Skill Pulse or begin your foundational learning modules." : "Continue your guided career curriculum.")}
               </p>
             </div>
 
@@ -461,17 +480,40 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
       {/* =================================================================== */}
       <section className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <ReadinessTrajectoryChart targetScore={85} />
+          {readinessScore > 0 ? (
+            <ReadinessTrajectoryChart targetScore={85} />
+          ) : (
+            <div className="surface-panel rounded-3xl p-6 sm:p-7 border border-border/80 bg-card space-y-3 shadow-sm flex flex-col justify-center min-h-[260px]">
+              <div className="flex items-center gap-2 text-primary font-bold">
+                <TrendingUp className="size-5" />
+                <h3 className="font-display text-base sm:text-lg font-bold text-foreground">
+                  Career Readiness Trajectory
+                </h3>
+                <Badge variant="outline" className="text-[10px]">Baseline Calibration</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed max-w-lg">
+                Your capability trajectory begins charting here as you complete knowledge checks, quizzes, and project rubrics. Start with your Day 1 3-minute Skill Pulse to establish your baseline.
+              </p>
+              <div className="pt-2">
+                <Button asChild size="sm" className="text-xs font-semibold">
+                  <Link to="/app/diagnostic">
+                    <Zap className="size-3.5 mr-1 text-amber-400" />
+                    Start 3-Minute Skill Pulse
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
 
         <div>
           <PaceProjectionCard
             currentScore={readinessScore}
             targetScore={85}
-            weeklyGrowth={3.2}
-            completedActivitiesCount={3}
-            hoursInvested="4h 20m"
-            readinessGain={4}
+            weeklyGrowth={readinessScore > 0 ? 3.2 : 0}
+            completedActivitiesCount={modulesCompleted}
+            hoursInvested={modulesCompleted > 0 ? "1h 30m" : "0m"}
+            readinessGain={readinessScore}
           />
         </div>
       </section>
@@ -479,7 +521,7 @@ function TodayContent({ ci, refreshing }: { ci: CareerIntelligence; refreshing: 
       {/* =================================================================== */}
       {/* LEVEL 4: CAREER MILESTONE RAIL                                       */}
       {/* =================================================================== */}
-      <CareerMilestoneRail />
+      <CareerMilestoneRail readinessScore={readinessScore} modulesCompleted={modulesCompleted} />
 
       {/* =================================================================== */}
       {/* LEVEL 5: RECRUITER INVITATIONS & COLLEGE COHORTS                     */}
