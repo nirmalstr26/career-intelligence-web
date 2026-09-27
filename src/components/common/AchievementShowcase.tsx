@@ -12,71 +12,92 @@ export interface AchievementItem {
   iconColor: string;
 }
 
-const ACHIEVEMENTS: AchievementItem[] = [
-  {
-    id: "foundations",
-    title: "Foundation Builder",
-    category: "Curriculum",
-    earnedDate: "Aug 2026",
-    isUnlocked: true,
-    whyItMatters: "Completed Core Technology & Computer Science Fundamentals with verified diagnostic mastery.",
-    iconColor: "text-emerald-500 bg-emerald-500/15",
-  },
-  {
-    id: "sql_verified",
-    title: "SQL Verified",
-    category: "Assessment",
-    earnedDate: "Aug 2026",
-    isUnlocked: true,
-    whyItMatters: "Demonstrated 92% mastery on advanced SQL aggregations and window functions.",
-    iconColor: "text-primary bg-primary/15",
-  },
-  {
-    id: "project_builder",
-    title: "Project Builder",
-    category: "Practical Project",
-    earnedDate: "Aug 2026",
-    isUnlocked: true,
-    whyItMatters: "Built 'Simple Data Pipeline' with verified automated error quarantine handling (Score: 88/100).",
-    iconColor: "text-purple-500 bg-purple-500/15",
-  },
-  {
-    id: "interview_growth",
-    title: "Interview Growth (+12 pts)",
-    category: "Mock Interview",
-    earnedDate: "Aug 2026",
-    isUnlocked: true,
-    whyItMatters: "Demonstrated strong technical project defense and error-recovery explanation (Score: 68.5/100).",
-    iconColor: "text-amber-500 bg-amber-500/15",
-  },
-  {
-    id: "profile_ready",
-    title: "Career Profile Ready",
-    category: "Professional Profile",
-    earnedDate: "Aug 2026",
-    isUnlocked: true,
-    whyItMatters: "Structured evidence-backed resume and LinkedIn profile reached 82% readiness.",
-    iconColor: "text-blue-500 bg-blue-500/15",
-  },
-  {
-    id: "placement_ready",
-    title: "Placement Ready (85+)",
-    category: "Career Milestone",
-    earnedDate: null,
-    isUnlocked: false,
-    whyItMatters: "Crosses the verified 85% placement benchmark for direct recruiter interview matching.",
-    iconColor: "text-muted-foreground bg-secondary",
-  },
-];
+interface AchievementItem {
+  id: string;
+  title: string;
+  category: string;
+  earnedDate: string | null;
+  isUnlocked: boolean;
+  whyItMatters: string;
+  iconColor: string;
+}
 
 export function AchievementShowcase({
+  modulesCompleted = 0,
+  hasVerifiedSkills = false,
+  hasProject = false,
+  hasInterview = false,
+  profileReadiness = 0,
   compact = false,
   className,
 }: {
+  modulesCompleted?: number;
+  hasVerifiedSkills?: boolean;
+  hasProject?: boolean;
+  hasInterview?: boolean;
+  profileReadiness?: number;
   compact?: boolean;
   className?: string;
 }) {
-  const items = compact ? ACHIEVEMENTS.slice(0, 4) : ACHIEVEMENTS;
+  const achievements: AchievementItem[] = [
+    {
+      id: "foundations",
+      title: "Foundation Builder",
+      category: "Curriculum",
+      earnedDate: modulesCompleted >= 3 ? "Verified" : null,
+      isUnlocked: modulesCompleted >= 3,
+      whyItMatters: "Complete Core Technology & Computer Science Fundamentals with verified mastery.",
+      iconColor: modulesCompleted >= 3 ? "text-emerald-500 bg-emerald-500/15" : "text-muted-foreground bg-secondary",
+    },
+    {
+      id: "sql_verified",
+      title: "Core Skill Mastery",
+      category: "Assessment",
+      earnedDate: hasVerifiedSkills ? "Verified" : null,
+      isUnlocked: hasVerifiedSkills,
+      whyItMatters: "Demonstrate 80%+ mastery on domain core skill assessments and knowledge checks.",
+      iconColor: hasVerifiedSkills ? "text-primary bg-primary/15" : "text-muted-foreground bg-secondary",
+    },
+    {
+      id: "project_builder",
+      title: "Project Builder",
+      category: "Practical Project",
+      earnedDate: hasProject ? "Verified" : null,
+      isUnlocked: hasProject,
+      whyItMatters: "Build an end-to-end practical project and pass automated code rubric evaluation.",
+      iconColor: hasProject ? "text-purple-500 bg-purple-500/15" : "text-muted-foreground bg-secondary",
+    },
+    {
+      id: "interview_growth",
+      title: "Interview Defense",
+      category: "Mock Interview",
+      earnedDate: hasInterview ? "Verified" : null,
+      isUnlocked: hasInterview,
+      whyItMatters: "Defend your architectural choices in an AI-simulated technical interview.",
+      iconColor: hasInterview ? "text-amber-500 bg-amber-500/15" : "text-muted-foreground bg-secondary",
+    },
+    {
+      id: "profile_ready",
+      title: "Career Profile Ready",
+      category: "Professional Profile",
+      earnedDate: profileReadiness >= 75 ? "Verified" : null,
+      isUnlocked: profileReadiness >= 75,
+      whyItMatters: "Build an evidence-backed resume and verified portfolio presence.",
+      iconColor: profileReadiness >= 75 ? "text-blue-500 bg-blue-500/15" : "text-muted-foreground bg-secondary",
+    },
+    {
+      id: "placement_ready",
+      title: "Placement Ready (80+)",
+      category: "Career Milestone",
+      earnedDate: null,
+      isUnlocked: false,
+      whyItMatters: "Cross the verified 80% placement benchmark for direct recruiter interview matching.",
+      iconColor: "text-muted-foreground bg-secondary",
+    },
+  ];
+
+  const items = compact ? achievements.slice(0, 4) : achievements;
+  const unlockedCount = items.filter((a) => a.isUnlocked).length;
 
   return (
     <div className={`surface-panel rounded-3xl p-6 sm:p-7 border border-border/80 bg-card space-y-4 shadow-sm ${className || ""}`}>
@@ -92,7 +113,7 @@ export function AchievementShowcase({
         </div>
 
         <Badge className="bg-amber-500/15 text-amber-600 border-none font-bold text-xs">
-          5 / 6 Unlocked
+          {unlockedCount} / {items.length} Unlocked
         </Badge>
       </div>
 

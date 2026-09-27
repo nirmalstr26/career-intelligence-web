@@ -490,15 +490,21 @@ function ProfilePage() {
                     <span className="text-[10px] text-muted-foreground">Demonstrated</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {verifiedSkills.map((sk) => (
-                      <Badge
-                        key={sk.skill_code}
-                        variant="outline"
-                        className="text-[11px] bg-background border-emerald-500/40 text-foreground"
-                      >
-                        {sk.skill_name.split(" ")[0]} ({sk.score.toFixed(0)}%)
-                      </Badge>
-                    ))}
+                    {verifiedSkills.length > 0 ? (
+                      verifiedSkills.map((sk) => (
+                        <Badge
+                          key={sk.skill_code}
+                          variant="outline"
+                          className="text-[11px] bg-background border-emerald-500/40 text-foreground"
+                        >
+                          {sk.skill_name.split(" ")[0]} ({sk.score.toFixed(0)}%)
+                        </Badge>
+                      ))
+                    ) : (
+                      <span className="text-[11px] text-muted-foreground italic">
+                        No verified skills yet. Complete modules or challenges to verify.
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -512,15 +518,21 @@ function ProfilePage() {
                     <span className="text-[10px] text-muted-foreground">Curriculum</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {learningSkills.map((sk) => (
-                      <Badge
-                        key={sk.skill_code}
-                        variant="outline"
-                        className="text-[11px] bg-background border-amber-500/40 text-foreground/80"
-                      >
-                        {sk.skill_name.split(" ")[0]}
-                      </Badge>
-                    ))}
+                    {learningSkills.length > 0 ? (
+                      learningSkills.map((sk) => (
+                        <Badge
+                          key={sk.skill_code}
+                          variant="outline"
+                          className="text-[11px] bg-background border-amber-500/40 text-foreground/80"
+                        >
+                          {sk.skill_name.split(" ")[0]}
+                        </Badge>
+                      ))
+                    ) : (
+                      <span className="text-[11px] text-muted-foreground italic">
+                        No active curriculum skills yet.
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -534,11 +546,17 @@ function ProfilePage() {
                     <span className="text-[10px] text-muted-foreground">Tools</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {selfDeclaredSkills.map((sk) => (
-                      <Badge key={sk} variant="secondary" className="text-[11px]">
-                        {sk}
-                      </Badge>
-                    ))}
+                    {selfDeclaredSkills.length > 0 ? (
+                      selfDeclaredSkills.map((sk) => (
+                        <Badge key={sk} variant="secondary" className="text-[11px]">
+                          {sk}
+                        </Badge>
+                      ))
+                    ) : (
+                      <span className="text-[11px] text-muted-foreground italic">
+                        No tools declared yet.
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

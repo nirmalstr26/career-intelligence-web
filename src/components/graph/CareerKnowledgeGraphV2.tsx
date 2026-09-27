@@ -427,10 +427,10 @@ const GraphInner: React.FC<CareerKnowledgeGraphV2Props> = ({
           </DialogHeader>
           <div className="p-4 rounded-2xl bg-muted/30 border text-xs text-foreground/90 space-y-3 leading-relaxed">
             <p>
-              You have solidly verified your foundational competencies in <strong>Python (88%)</strong> and <strong>SQL (92%)</strong>, backed by your Simple Data Pipeline project rubric.
+              Your Career Knowledge Graph maps the required capabilities for your chosen career pathway against your verified assessments and project completions.
             </p>
             <p className="p-3 bg-primary/10 border border-primary/30 rounded-xl text-primary font-medium">
-              <strong>Your Single Bottleneck:</strong> Apache Spark & Distributed Compute (currently at 45%). Completing this module unblocks Phase 4 Workflow Orchestration and advances your readiness past 85%.
+              <strong>Your Learning Progression:</strong> Each completed module, challenge, and rubric verification automatically updates this graph in real-time, showing your path to placement readiness.
             </p>
           </div>
           <div className="flex justify-end pt-2">
